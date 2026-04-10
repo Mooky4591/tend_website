@@ -113,4 +113,20 @@ describe('FAQ', () => {
     render(<FAQ />)
     expect(screen.getByRole('link', { name: /Ask us directly/i })).toHaveAttribute('href', '#contact')
   })
+
+  it('each answer panel is labelled by its controlling button, not by itself', async () => {
+    const user = userEvent.setup()
+    render(<FAQ />)
+
+    // Open the first accordion item
+    const firstButton = screen.getByRole('button', { name: /Do homeowners need to download/i })
+    await user.click(firstButton)
+
+    const buttonId = firstButton.getAttribute('id')!
+    const panelId = firstButton.getAttribute('aria-controls')!
+
+    const panel = document.getElementById(panelId)!
+    expect(panel.getAttribute('aria-labelledby')).toBe(buttonId)
+    expect(panel.getAttribute('aria-labelledby')).not.toBe(panelId)
+  })
 })

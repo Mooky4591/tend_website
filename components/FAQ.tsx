@@ -56,24 +56,27 @@ function ChevronIcon({ open }: { open: boolean }) {
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false)
-  const id = `faq-answer-${question.slice(0, 20).replace(/\s+/g, '-').toLowerCase()}`
+  const slug = question.slice(0, 20).replace(/\s+/g, '-').toLowerCase()
+  const buttonId = `faq-btn-${slug}`
+  const panelId = `faq-answer-${slug}`
 
   return (
     <div className="border-b border-slate-200 last:border-b-0">
       <button
+        id={buttonId}
         className="w-full flex items-center justify-between gap-4 py-5 text-left text-sm font-semibold text-slate-900 hover:text-brand-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 rounded-sm"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        aria-controls={id}
+        aria-controls={panelId}
       >
         <span>{question}</span>
         <ChevronIcon open={open} />
       </button>
 
       <div
-        id={id}
+        id={panelId}
         role="region"
-        aria-labelledby={id}
+        aria-labelledby={buttonId}
         hidden={!open}
         className="pb-5 text-sm text-slate-600 leading-relaxed"
       >

@@ -92,9 +92,9 @@ export default function ForHomeowners() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
               Example conversations
             </p>
-            {exampleMessages.map((ex, i) => (
+            {exampleMessages.map((ex) => (
               <div
-                key={i}
+                key={ex.question}
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm"
               >
                 {/* Header */}
