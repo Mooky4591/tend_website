@@ -76,7 +76,7 @@ export default function ForHomeowners() {
                 key={benefit.title}
                 className="flex gap-4 bg-white rounded-xl p-5 border border-slate-200"
               >
-                <span className="text-2xl shrink-0" role="img" aria-label="">
+                <span className="text-2xl shrink-0" aria-hidden="true">
                   {benefit.emoji}
                 </span>
                 <div>
