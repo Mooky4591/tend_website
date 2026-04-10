@@ -23,3 +23,6 @@ next-env.d.ts
 
 # misc
 .DS_Store
+
+# claude code local config (contains local paths and usernames)
+.claude/
