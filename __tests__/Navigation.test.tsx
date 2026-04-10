@@ -119,4 +119,61 @@ describe('Navigation', () => {
     render(<Navigation />)
     expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument()
   })
+
+  it('pressing Escape closes the mobile menu and returns focus to the hamburger button', async () => {
+    const user = userEvent.setup()
+    render(<Navigation />)
+
+    const hamburger = screen.getByRole('button', { name: 'Open navigation menu' })
+    await user.click(hamburger)
+    expect(document.getElementById('mobile-menu')).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+
+    expect(document.getElementById('mobile-menu')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Open navigation menu' })).toHaveFocus()
+  })
+
+  it('mobile menu has dialog role with an accessible label', async () => {
+    const user = userEvent.setup()
+    render(<Navigation />)
+
+    await user.click(screen.getByRole('button', { name: 'Open navigation menu' }))
+
+    expect(screen.getByRole('dialog', { name: 'Navigation menu' })).toBeInTheDocument()
+  })
+
+  it('Tab on last focusable item in mobile menu wraps to first', async () => {
+    const user = userEvent.setup()
+    render(<Navigation />)
+
+    await user.click(screen.getByRole('button', { name: 'Open navigation menu' }))
+
+    const menu = document.getElementById('mobile-menu')!
+    const focusable = Array.from(menu.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'))
+    const last = focusable[focusable.length - 1]
+    last.focus()
+    expect(last).toHaveFocus()
+
+    await user.tab()
+
+    expect(focusable[0]).toHaveFocus()
+  })
+
+  it('Shift+Tab on first focusable item in mobile menu wraps to last', async () => {
+    const user = userEvent.setup()
+    render(<Navigation />)
+
+    await user.click(screen.getByRole('button', { name: 'Open navigation menu' }))
+
+    const menu = document.getElementById('mobile-menu')!
+    const focusable = Array.from(menu.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'))
+    const first = focusable[0]
+    first.focus()
+    expect(first).toHaveFocus()
+
+    await user.tab({ shift: true })
+
+    expect(focusable[focusable.length - 1]).toHaveFocus()
+  })
 })

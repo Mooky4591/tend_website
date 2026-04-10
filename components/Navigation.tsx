@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 // PLACEHOLDER: Replace TendLogo with your actual logo asset
 function TendLogo() {
@@ -37,9 +37,14 @@ const navLinks = [
   { label: 'FAQ', href: '#faq' },
 ]
 
+const FOCUSABLE_SELECTORS = 'a[href], button:not([disabled])'
+
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleScroll() {
@@ -49,8 +54,46 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  function closeMobileMenu() {
+  // Move focus to the first menu item when the menu opens
+  useEffect(() => {
+    if (mobileMenuOpen && mobileMenuRef.current) {
+      const first = mobileMenuRef.current.querySelector<HTMLElement>(FOCUSABLE_SELECTORS)
+      first?.focus()
+    }
+  }, [mobileMenuOpen])
+
+  const closeMobileMenu = useCallback(() => {
     setMobileMenuOpen(false)
+    hamburgerRef.current?.focus()
+  }, [])
+
+  function handleMenuKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === 'Escape') {
+      closeMobileMenu()
+      return
+    }
+
+    if (e.key === 'Tab' && mobileMenuRef.current) {
+      const focusable = Array.from(
+        mobileMenuRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
+      )
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+
+      if (e.shiftKey) {
+        // Shift+Tab on first element → wrap to last
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last?.focus()
+        }
+      } else {
+        // Tab on last element → wrap to first
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first?.focus()
+        }
+      }
+    }
   }
 
   return (
@@ -94,6 +137,7 @@ export default function Navigation() {
 
         {/* Mobile hamburger */}
         <button
+          ref={hamburgerRef}
           className="md:hidden p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
@@ -116,7 +160,13 @@ export default function Navigation() {
       {mobileMenuOpen && (
         <div
           id="mobile-menu"
+          ref={mobileMenuRef}
           className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 flex flex-col gap-1"
+          onKeyDown={handleMenuKeyDown}
+          // aria-label so screen readers announce the region
+          role="dialog"
+          aria-label="Navigation menu"
+          aria-modal="false"
         >
           {navLinks.map((link) => (
             <a
