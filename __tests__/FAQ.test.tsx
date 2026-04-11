@@ -114,6 +114,17 @@ describe('FAQ', () => {
     expect(screen.getByRole('link', { name: /Ask us directly/i })).toHaveAttribute('href', '#contact')
   })
 
+  it('accordion button and panel IDs are unique across all items', () => {
+    render(<FAQ />)
+    const buttons = screen.getAllByRole('button')
+    const buttonIds = buttons.map((b) => b.getAttribute('id')).filter(Boolean)
+    expect(new Set(buttonIds).size).toBe(buttonIds.length)
+
+    const panels = document.querySelectorAll('[role="region"]')
+    const panelIds = Array.from(panels).map((p) => p.getAttribute('id')).filter(Boolean)
+    expect(new Set(panelIds).size).toBe(panelIds.length)
+  })
+
   it('each answer panel is labelled by its controlling button, not by itself', async () => {
     const user = userEvent.setup()
     render(<FAQ />)

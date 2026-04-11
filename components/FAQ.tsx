@@ -54,11 +54,10 @@ function ChevronIcon({ open }: { open: boolean }) {
   )
 }
 
-function FAQItem({ question, answer }: { question: string; answer: string }) {
+function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
   const [open, setOpen] = useState(false)
-  const slug = question.slice(0, 20).replace(/\s+/g, '-').toLowerCase()
-  const buttonId = `faq-btn-${slug}`
-  const panelId = `faq-answer-${slug}`
+  const buttonId = `faq-btn-${index}`
+  const panelId = `faq-answer-${index}`
 
   return (
     <div className="border-b border-slate-200 last:border-b-0">
@@ -113,8 +112,8 @@ export default function FAQ() {
 
         {/* Accordion */}
         <div className="border border-slate-200 rounded-2xl px-6 divide-y divide-slate-200 overflow-hidden">
-          {faqs.map((faq) => (
-            <FAQItem key={faq.question} question={faq.question} answer={faq.answer} />
+          {faqs.map((faq, i) => (
+            <FAQItem key={faq.question} question={faq.question} answer={faq.answer} index={i} />
           ))}
         </div>
       </div>

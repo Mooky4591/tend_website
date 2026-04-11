@@ -54,4 +54,17 @@ describe('Home page', () => {
     render(<Home />)
     expect(screen.queryByText('undefined')).not.toBeInTheDocument()
   })
+
+  it('renders a skip-to-main-content link (WCAG 2.4.1)', () => {
+    render(<Home />)
+    expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute(
+      'href',
+      '#main-content'
+    )
+  })
+
+  it('main landmark has id="main-content" matching the skip link target', () => {
+    render(<Home />)
+    expect(document.getElementById('main-content')).toBe(screen.getByRole('main'))
+  })
 })
