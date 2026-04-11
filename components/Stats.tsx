@@ -36,7 +36,7 @@ export default function Stats() {
                 <span className="block text-4xl font-extrabold text-brand-600 tracking-tight">
                   {stat.value}
                 </span>
-                <span className="mt-1 block text-sm font-semibold text-slate-800">{stat.label}</span>
+                <span className="mt-1 block text-sm font-semibold text-slate-800" aria-hidden="true">{stat.label}</span>
                 <span className="mt-1 block text-xs text-slate-500 leading-relaxed">{stat.detail}</span>
               </dd>
             </div>

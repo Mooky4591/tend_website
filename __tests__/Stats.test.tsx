@@ -17,7 +17,7 @@ describe('Stats', () => {
 
   it('renders stat labels', () => {
     render(<Stats />)
-    // Each label appears twice: once in sr-only <dt> and once in a visible <span>
+    // Label is in the sr-only <dt> (announced once); the visible <span> carries aria-hidden="true"
     expect(screen.getAllByText('Maintenance reminder types').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('Apps to download').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('TCPA compliant').length).toBeGreaterThanOrEqual(1)

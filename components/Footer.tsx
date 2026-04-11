@@ -15,6 +15,7 @@ const companyLinks = [
 
 const legalLinks = [
   { label: 'Privacy Policy', href: 'https://app.termly.io/policy-viewer/policy.html?policyUUID=6807f094-d6d5-4171-a4d9-1aafa1eebeb8' },
+  // PLACEHOLDER: Replace with a stable hosted URL (e.g. Termly) — Google Docs published links can break if the doc is unpublished or moved
   { label: 'Terms of Service', href: 'https://docs.google.com/document/d/e/2PACX-1vR0r80pzdX_Rl9l0hqtbGXwU0agJad8lgfU0r24Wht6tOpIebwzi8Q9XSBsN0h1_M0HDABfY4sIKgb2/pub' },
 ]
 
