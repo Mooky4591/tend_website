@@ -158,15 +158,12 @@ export default function Navigation() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div
+        <nav
           id="mobile-menu"
           ref={mobileMenuRef}
           className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 flex flex-col gap-1"
           onKeyDown={handleMenuKeyDown}
-          // aria-label so screen readers announce the region
-          role="dialog"
           aria-label="Navigation menu"
-          aria-modal="false"
         >
           {navLinks.map((link) => (
             <a
@@ -185,7 +182,7 @@ export default function Navigation() {
           >
             Book a Demo
           </a>
-        </div>
+        </nav>
       )}
     </header>
   )

@@ -134,13 +134,13 @@ describe('Navigation', () => {
     expect(screen.getByRole('button', { name: 'Open navigation menu' })).toHaveFocus()
   })
 
-  it('mobile menu has dialog role with an accessible label', async () => {
+  it('mobile menu is a navigation landmark with an accessible label', async () => {
     const user = userEvent.setup()
     render(<Navigation />)
 
     await user.click(screen.getByRole('button', { name: 'Open navigation menu' }))
 
-    expect(screen.getByRole('dialog', { name: 'Navigation menu' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Navigation menu' })).toBeInTheDocument()
   })
 
   it('Tab on last focusable item in mobile menu wraps to first', async () => {
