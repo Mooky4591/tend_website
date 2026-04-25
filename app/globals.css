@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PLACEHOLDER: Replace CSS custom properties with your final brand tokens */
+:root {
+  --brand-primary: #059669;
+  --brand-primary-dark: #047857;
+  --brand-light: #ecfdf5;
+}
+
+@layer base {
+  body {
+    @apply text-slate-900 antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
