@@ -7,9 +7,9 @@ describe('Footer', () => {
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 
-  it('renders the Tend brand name', () => {
+  it('renders the Tendr brand name', () => {
     render(<Footer />)
-    expect(screen.getByText('Tend')).toBeInTheDocument()
+    expect(screen.getByText('Tendr')).toBeInTheDocument()
   })
 
   it('renders the tagline', () => {

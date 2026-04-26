@@ -12,7 +12,7 @@ describe('HowItWorks', () => {
   it('renders all three step headings', () => {
     render(<HowItWorks />)
     expect(screen.getByText('Connect your homeowners')).toBeInTheDocument()
-    expect(screen.getByText('Tend handles onboarding')).toBeInTheDocument()
+    expect(screen.getByText('Tendr handles onboarding')).toBeInTheDocument()
     expect(screen.getByText('Automated value, forever')).toBeInTheDocument()
   })
 

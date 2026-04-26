@@ -6,37 +6,37 @@ const faqs = [
   {
     question: 'Do homeowners need to download an app or create an account?',
     answer:
-      'No. Tend works entirely over SMS. Homeowners interact through the messaging app they already have on their phone — no download, no login, no password. If they can send a text, they can use Tend.',
+      'No. Tendr works entirely over SMS. Homeowners interact through the messaging app they already have on their phone — no download, no login, no password. If they can send a text, they can use Tendr.',
   },
   {
-    question: 'How does Tend handle STOP and opt-out requests?',
+    question: 'How does Tendr handle STOP and opt-out requests?',
     answer:
       "STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, and QUIT keywords are intercepted before any other processing. When a homeowner sends one, they are immediately marked as opted out and no confirmation reply is sent — carrier-level compliance is handled automatically. Opted-out users are excluded from all reminders, nudges, and AI responses. If they text START or UNSTOP, they're automatically re-enrolled.",
   },
   {
     question: 'Can I upload my own warranty documents?',
     answer:
-      "Yes. Operators upload warranty plan documents as plain text through the platform. Tend automatically splits them into chunks, generates vector embeddings, and stores them for semantic search. When a homeowner asks a coverage question, the most relevant sections are retrieved and used as context — Tend only references what's in your actual documents.",
+      "Yes. Operators upload warranty plan documents as plain text through the platform. Tendr automatically splits them into chunks, generates vector embeddings, and stores them for semantic search. When a homeowner asks a coverage question, the most relevant sections are retrieved and used as context — Tendr only references what's in your actual documents.",
   },
   {
     question: "What happens if a homeowner doesn't respond during onboarding?",
     answer:
-      "Tend sends up to three follow-up nudges, spaced at least three days apart, with progressively different messaging. Nudges stop the moment the homeowner replies to any message — even if they haven't finished onboarding. If a homeowner never responds, they remain in the queue and can re-engage at any time.",
+      "Tendr sends up to three follow-up nudges, spaced at least three days apart, with progressively different messaging. Nudges stop the moment the homeowner replies to any message — even if they haven't finished onboarding. If a homeowner never responds, they remain in the queue and can re-engage at any time.",
   },
   {
     question: 'How is data kept separate between different warranty companies?',
     answer:
-      'Each warranty company gets its own dedicated phone number. Tend routes every message to the right company automatically, so data isolation is enforced at the infrastructure layer. Warranty documents, conversation history, billing metrics, and user records are fully isolated per company and never shared.',
+      'Each warranty company gets its own dedicated phone number. Tendr routes every message to the right company automatically, so data isolation is enforced at the infrastructure layer. Warranty documents, conversation history, billing metrics, and user records are fully isolated per company and never shared.',
   },
   {
     question: "What happens if the AI can't answer a homeowner's question?",
     answer:
-      "Tend is designed to be honest about the limits of its knowledge. If a warranty question isn't covered by the retrieved document sections, Tend tells the homeowner it doesn't have that information and suggests they contact support. It never fabricates coverage details.",
+      "Tendr is designed to be honest about the limits of its knowledge. If a warranty question isn't covered by the retrieved document sections, Tendr tells the homeowner it doesn't have that information and suggests they contact support. It never fabricates coverage details.",
   },
   {
-    question: 'Can Tend handle homes with multiple HVAC units?',
+    question: 'Can Tendr handle homes with multiple HVAC units?',
     answer:
-      "Yes. Tend collects the number of cooling and heating units upfront, then asks for details (brand, age, last service date, filter date, and location label) for each unit individually. Reminders and task completions are tracked per unit, so a homeowner can confirm a filter change on the upstairs unit without affecting the downstairs unit's schedule.",
+      "Yes. Tendr collects the number of cooling and heating units upfront, then asks for details (brand, age, last service date, filter date, and location label) for each unit individually. Reminders and task completions are tracked per unit, so a homeowner can confirm a filter change on the upstairs unit without affecting the downstairs unit's schedule.",
   },
 ]
 

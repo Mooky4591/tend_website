@@ -56,7 +56,7 @@ const features: Feature[] = [
   {
     title: 'Conversational Onboarding',
     description:
-      "No forms, no portals. Tend's AI collects a complete home profile through a natural SMS conversation. Homeowners answer in plain English — Tend handles the parsing.",
+      "No forms, no portals. Tendr's AI collects a complete home profile through a natural SMS conversation. Homeowners answer in plain English — Tendr handles the parsing.",
     icon: <ChatIcon />,
   },
   {
@@ -68,7 +68,7 @@ const features: Feature[] = [
   {
     title: 'Instant Warranty Answers',
     description:
-      'Upload your warranty docs once. Tend uses semantic search to find the relevant coverage sections and answers homeowner questions — grounded in your actual policy language, never fabricated.',
+      'Upload your warranty docs once. Tendr uses semantic search to find the relevant coverage sections and answers homeowner questions — grounded in your actual policy language, never fabricated.',
     icon: <ShieldIcon />,
   },
   {
@@ -111,7 +111,7 @@ export default function Features() {
             Everything your homeowners need. Nothing they don&apos;t.
           </h2>
           <p className="mt-4 text-lg text-slate-600">
-            Tend handles the full homeowner lifecycle — from first text to ongoing care —
+            Tendr handles the full homeowner lifecycle — from first text to ongoing care —
             so your team can focus on what matters.
           </p>
         </div>

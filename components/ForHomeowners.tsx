@@ -3,13 +3,13 @@ const homeownerBenefits = [
     emoji: '💬',
     title: 'Natural language, not a chatbot',
     description:
-      'Homeowners reply in plain English. "My furnace is making a noise" works just as well as any form ever could. Tend understands context and follows up intelligently.',
+      'Homeowners reply in plain English. "My furnace is making a noise" works just as well as any form ever could. Tendr understands context and follows up intelligently.',
   },
   {
     emoji: '🔔',
     title: 'Proactive reminders before things break',
     description:
-      "Tend tracks each homeowner's actual appliances and sends reminders timed to their specific equipment — not a generic calendar. The right nudge at the right time.",
+      "Tendr tracks each homeowner's actual appliances and sends reminders timed to their specific equipment — not a generic calendar. The right nudge at the right time.",
   },
   {
     emoji: '📋',
@@ -27,7 +27,7 @@ const homeownerBenefits = [
     emoji: '📷',
     title: 'Photo support for appliance labels',
     description:
-      "Snap a photo of a water heater label or HVAC nameplate and send it. Tend reads it, extracts the relevant data, and asks follow-ups for anything it can't make out.",
+      "Snap a photo of a water heater label or HVAC nameplate and send it. Tendr reads it, extracts the relevant data, and asks follow-ups for anything it can't make out.",
   },
 ]
 
@@ -64,7 +64,7 @@ export default function ForHomeowners() {
           </h2>
           <p className="mt-4 text-lg text-slate-600">
             Homeowners don&apos;t need to download anything, create an account, or remember a password.
-            Tend lives in the texting app they already use every day.
+            Tendr lives in the texting app they already use every day.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export default function ForHomeowners() {
                       {ex.question}
                     </div>
                   </div>
-                  {/* Tend response */}
+                  {/* Tendr response */}
                   <div className="flex justify-start">
                     <div className="max-w-[80%] bg-slate-100 text-slate-800 text-sm px-3.5 py-2.5 rounded-2xl rounded-tl-sm leading-relaxed">
                       {ex.answer}

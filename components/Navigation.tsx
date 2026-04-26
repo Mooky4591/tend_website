@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-// PLACEHOLDER: Replace TendLogo with your actual logo asset
-function TendLogo() {
+// PLACEHOLDER: Replace TendrLogo with your actual logo asset
+function TendrLogo() {
   return (
     <div className="flex items-center gap-2">
       {/* PLACEHOLDER: swap this div for an <Image> with your logo */}
@@ -25,7 +25,7 @@ function TendLogo() {
           />
         </svg>
       </div>
-      <span className="text-xl font-bold tracking-tight text-slate-900">Tend</span>
+      <span className="text-xl font-bold tracking-tight text-slate-900">Tendr</span>
     </div>
   )
 }
@@ -107,8 +107,8 @@ export default function Navigation() {
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16"
         aria-label="Main navigation"
       >
-        <a href="#" aria-label="Tend — go to homepage">
-          <TendLogo />
+        <a href="#" aria-label="Tendr — go to homepage">
+          <TendrLogo />
         </a>
 
         {/* Desktop links */}
