@@ -13,7 +13,7 @@ export default function CTA() {
           Ready to give your homeowners a smarter experience?
         </h2>
         <p className="mt-4 text-lg text-brand-100 max-w-xl mx-auto">
-          See Tend in action with a 30-minute demo. We&apos;ll walk through a live SMS conversation,
+          See Tendr in action with a 30-minute demo. We&apos;ll walk through a live SMS conversation,
           show you how warranty Q&amp;A works, and answer your integration questions.
         </p>
 

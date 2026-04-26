@@ -48,7 +48,7 @@ export default function Pricing() {
             You only pay for users who are actually using it
           </h2>
           <p className="mt-4 text-lg text-slate-600">
-            Tend is priced per active user, per month. If a homeowner completes onboarding and
+            Tendr is priced per active user, per month. If a homeowner completes onboarding and
             is actively engaged, they count. Inactive or unresponsive users don&apos;t.
           </p>
         </div>

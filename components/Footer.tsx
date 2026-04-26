@@ -33,7 +33,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </div>
-              <span className="text-lg font-bold text-white tracking-tight">Tend</span>
+              <span className="text-lg font-bold text-white tracking-tight">Tendr</span>
             </div>
             <p className="text-sm leading-relaxed">
               AI-powered home care, delivered over SMS. No app required.
@@ -103,8 +103,8 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-500">
-            {/* PLACEHOLDER: Update company name if different from "Tend" */}
-            &copy; {new Date().getFullYear()} Tend. All rights reserved.
+            {/* PLACEHOLDER: Update company name if different from "Tendr" */}
+            &copy; {new Date().getFullYear()} Tendr. All rights reserved.
           </p>
           <p className="text-xs text-slate-600">
             {/* PLACEHOLDER: Update contact email */}

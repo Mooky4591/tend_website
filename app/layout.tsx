@@ -7,11 +7,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   // PLACEHOLDER: Replace with the actual production domain before launch
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://tend.ai'),
-  title: 'Tend — AI Home Assistant Platform',
+  title: 'Tendr — AI Home Assistant Platform',
   description:
     'Give your homeowners an AI home assistant delivered entirely over SMS. Proactive maintenance reminders, instant warranty answers, and conversational onboarding — no app required.',
   openGraph: {
-    title: 'Tend — AI Home Assistant Platform',
+    title: 'Tendr — AI Home Assistant Platform',
     description:
       'Give your homeowners an AI home assistant delivered entirely over SMS. No app required.',
     type: 'website',

@@ -4,12 +4,12 @@ import FAQ from '@/components/FAQ'
 
 const questions = [
   'Do homeowners need to download an app or create an account?',
-  'How does Tend handle STOP and opt-out requests?',
+  'How does Tendr handle STOP and opt-out requests?',
   'Can I upload my own warranty documents?',
   "What happens if a homeowner doesn't respond during onboarding?",
   'How is data kept separate between different warranty companies?',
   "What happens if the AI can't answer a homeowner's question?",
-  'Can Tend handle homes with multiple HVAC units?',
+  'Can Tendr handle homes with multiple HVAC units?',
 ]
 
 describe('FAQ', () => {
@@ -55,7 +55,7 @@ describe('FAQ', () => {
     await user.click(firstButton)
 
     expect(firstButton).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByText(/No\. Tend works entirely over SMS/i)).toBeVisible()
+    expect(screen.getByText(/No\. Tendr works entirely over SMS/i)).toBeVisible()
   })
 
   it('clicking a question twice collapses it', async () => {
