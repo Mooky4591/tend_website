@@ -23,13 +23,13 @@ export default function CTA() {
             e.g., Calendly, HubSpot meetings, or a contact form
           */}
           <a
-            href="mailto:hello@tend.ai"
+            href="mailto:support@trytendr.org"
             className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg bg-white text-brand-700 font-bold hover:bg-brand-50 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-600"
           >
             Book a Demo
           </a>
           <a
-            href="mailto:hello@tend.ai"
+            href="mailto:support@trytendr.org"
             className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg border border-brand-400 text-white font-semibold hover:bg-brand-700 transition-colors"
           >
             Contact Sales
@@ -38,8 +38,7 @@ export default function CTA() {
 
         <p className="mt-4 text-xs text-brand-200">
           No commitment required · We&apos;ll respond within one business day
-          {/* PLACEHOLDER: Update contact email with your real address */}
-          {' '}· hello@tend.ai
+          {' '}· support@trytendr.org
         </p>
       </div>
     </section>

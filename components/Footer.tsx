@@ -107,8 +107,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Tendr. All rights reserved.
           </p>
           <p className="text-xs text-slate-600">
-            {/* PLACEHOLDER: Update contact email */}
-            hello@tend.ai
+            support@trytendr.org
           </p>
         </div>
       </div>
