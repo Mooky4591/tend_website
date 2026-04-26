@@ -1,9 +1,9 @@
-⏺ # Tend — Marketing Website                                                    
+⏺ # Tendr — Marketing Website                                                    
                                                             
-  Marketing landing page for [Tend](https://tend.ai), an AI-powered SMS home    
+  Marketing landing page for [Tendr](https://trytendr.org), an AI-powered SMS home    
   assistant platform for home warranty companies.
                                                                                 
-  Built with Next.js 14, TypeScript, and Tailwind CSS. Deployed on Vercel.
+  Built with Next.js 14, TypeScript, and Tailwind CSS. Deployed on Railway.
 
   ---                                                                           
    
