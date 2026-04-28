@@ -3,12 +3,13 @@ import userEvent from '@testing-library/user-event'
 import ResetPasswordPage from '@/app/reset-password/page'
 
 const mockUpdateUser = jest.fn()
+const mockSignOut = jest.fn()
 const mockPush = jest.fn()
 const mockRefresh = jest.fn()
 
 jest.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
-    auth: { updateUser: mockUpdateUser },
+    auth: { updateUser: mockUpdateUser, signOut: mockSignOut },
   }),
 }))
 
@@ -18,6 +19,7 @@ jest.mock('next/navigation', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockSignOut.mockResolvedValue({})
 })
 
 describe('ResetPasswordPage', () => {
@@ -27,7 +29,7 @@ describe('ResetPasswordPage', () => {
     expect(screen.getByRole('button', { name: 'Update password' })).toBeInTheDocument()
   })
 
-  it('redirects to /login on success', async () => {
+  it('signs out then redirects to /login on success', async () => {
     mockUpdateUser.mockResolvedValueOnce({ error: null })
     const user = userEvent.setup()
     render(<ResetPasswordPage />)
@@ -36,7 +38,20 @@ describe('ResetPasswordPage', () => {
     await user.click(screen.getByRole('button', { name: 'Update password' }))
 
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/login'))
+    expect(mockSignOut).toHaveBeenCalledTimes(1)
     expect(mockRefresh).toHaveBeenCalled()
+  })
+
+  it('does not sign out when updateUser fails', async () => {
+    mockUpdateUser.mockResolvedValueOnce({ error: { message: 'Too short.' } })
+    const user = userEvent.setup()
+    render(<ResetPasswordPage />)
+
+    await user.type(screen.getByLabelText('New password'), 'abc')
+    await user.click(screen.getByRole('button', { name: 'Update password' }))
+
+    await screen.findByRole('alert')
+    expect(mockSignOut).not.toHaveBeenCalled()
   })
 
   it('shows the Supabase error message when updateUser fails', async () => {
