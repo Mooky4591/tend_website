@@ -31,6 +31,13 @@ describe('Navigation', () => {
     ctaLinks.forEach((link) => expect(link).toHaveAttribute('href', '#contact'))
   })
 
+  it('Sign in links point to /login', () => {
+    render(<Navigation />)
+    const signInLinks = screen.getAllByRole('link', { name: 'Sign in' })
+    expect(signInLinks.length).toBeGreaterThanOrEqual(1)
+    signInLinks.forEach((link) => expect(link).toHaveAttribute('href', '/login'))
+  })
+
   it('logo link has an accessible label', () => {
     render(<Navigation />)
     expect(screen.getByRole('link', { name: 'Tendr — go to homepage' })).toBeInTheDocument()

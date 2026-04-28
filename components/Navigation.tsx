@@ -126,7 +126,13 @@ export default function Navigation() {
         </ul>
 
         {/* Desktop CTA */}
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center gap-3">
+          <a
+            href="/login"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            Sign in
+          </a>
           <a
             href="#contact"
             className="inline-flex items-center px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
@@ -176,8 +182,15 @@ export default function Navigation() {
             </a>
           ))}
           <a
+            href="/login"
+            className="py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+            onClick={closeMobileMenu}
+          >
+            Sign in
+          </a>
+          <a
             href="#contact"
-            className="mt-3 py-2.5 text-center rounded-lg bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition-colors"
+            className="mt-1 py-2.5 text-center rounded-lg bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition-colors"
             onClick={closeMobileMenu}
           >
             Book a Demo
