@@ -13,8 +13,8 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setLoading(true)
 
+    const supabase = createClient()
     try {
-      const supabase = createClient()
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
       await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
@@ -22,6 +22,10 @@ export default function ForgotPasswordPage() {
     } catch {
       // Swallow errors — always show the same success message so we
       // don't reveal whether an email address is registered.
+    } finally {
+      // Clear any lingering session so a background token refresh can't
+      // cause the middleware to redirect the success screen to /dashboard.
+      await supabase.auth.signOut()
     }
 
     setSubmitted(true)

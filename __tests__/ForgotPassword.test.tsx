@@ -3,16 +3,18 @@ import userEvent from '@testing-library/user-event'
 import ForgotPasswordPage from '@/app/forgot-password/page'
 
 const mockResetPasswordForEmail = jest.fn()
+const mockSignOut = jest.fn()
 
 jest.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
-    auth: { resetPasswordForEmail: mockResetPasswordForEmail },
+    auth: { resetPasswordForEmail: mockResetPasswordForEmail, signOut: mockSignOut },
   }),
 }))
 
 beforeEach(() => {
   jest.clearAllMocks()
   mockResetPasswordForEmail.mockResolvedValue({})
+  mockSignOut.mockResolvedValue({})
 })
 
 describe('ForgotPasswordPage', () => {
@@ -76,6 +78,27 @@ describe('ForgotPasswordPage', () => {
       'admin@example.com',
       expect.objectContaining({ redirectTo: expect.stringContaining('/auth/callback?next=/reset-password') })
     ))
+  })
+
+  it('calls signOut after sending the reset email to clear any lingering session', async () => {
+    const user = userEvent.setup()
+    render(<ForgotPasswordPage />)
+
+    await user.type(screen.getByLabelText('Email'), 'admin@example.com')
+    await user.click(screen.getByRole('button', { name: 'Send reset link' }))
+
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalledTimes(1))
+  })
+
+  it('calls signOut even when resetPasswordForEmail throws', async () => {
+    mockResetPasswordForEmail.mockRejectedValueOnce(new Error('Network error'))
+    const user = userEvent.setup()
+    render(<ForgotPasswordPage />)
+
+    await user.type(screen.getByLabelText('Email'), 'admin@example.com')
+    await user.click(screen.getByRole('button', { name: 'Send reset link' }))
+
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalledTimes(1))
   })
 
   it('success screen has a back to sign in link pointing to /login', async () => {
