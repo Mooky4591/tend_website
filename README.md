@@ -70,11 +70,20 @@
   the user's `tenant_id` from `tenant_users` and loads that company's data.
   RLS ensures a user can only ever read rows belonging to their own tenant.
 
+  ### Password reset flow
+
+  1. User clicks **Forgot password?** on `/login`
+  2. `/forgot-password` — user enters their email; `supabase.auth.resetPasswordForEmail` sends a reset link (always shows a generic success message — does not reveal whether the email is registered)
+  3. The email link goes through `/auth/callback?next=/reset-password`, which exchanges the one-time code for a session
+  4. `/reset-password` — user enters their new password; `supabase.auth.updateUser` saves it and redirects to `/login`
+
+  **Supabase redirect URL allow-list** — make sure `https://trytendr.org/auth/callback` is added in Supabase → Authentication → URL Configuration → Redirect URLs.
+
   ### Creating the first user
 
   Until an in-app invite flow is built, create users manually:
 
-  1. Supabase dashboard → **Authentication → Users → Invite user**
+  1. Supabase dashboard → **Auth → Users → Add user**
   2. Copy the new user's UUID, then run:
 
   ```sql
@@ -107,8 +116,10 @@
   ```
   app/
     login/            # /login — email/password login page
+    forgot-password/  # /forgot-password — request a password reset email
+    reset-password/   # /reset-password — set a new password (requires reset link session)
     dashboard/        # /dashboard — protected tenant dashboard
-    auth/callback/    # Supabase Auth email confirmation handler
+    auth/callback/    # Supabase Auth email confirmation + password reset handler
   components/         # Marketing page sections
   lib/supabase/       # Supabase browser and server client helpers
   supabase/migrations/# SQL migrations (run manually in Supabase SQL editor)
