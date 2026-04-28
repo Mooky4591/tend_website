@@ -36,6 +36,7 @@
   |----------|-------------|
   | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon (public) key — safe for the browser |
+  | `NEXT_PUBLIC_SITE_URL` | Canonical site URL (e.g. `https://trytendr.org`) — used as the base for password reset redirect links so the correct domain is always sent regardless of where the form is submitted from |
 
   These must also be set in Railway under **Service → Variables** before deploying.
 
