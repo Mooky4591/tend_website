@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import LoginPage, { LoginShell } from '@/app/login/page'
+import LoginPage from '@/app/login/page'
+import { LoginShell } from '@/app/login/LoginShell'
 
 const mockSignInWithPassword = jest.fn()
 const mockPush = jest.fn()
