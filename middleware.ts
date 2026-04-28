@@ -35,7 +35,8 @@ export async function middleware(request: NextRequest) {
     return redirectResponse
   }
 
-  if (user && request.nextUrl.pathname === '/login') {
+  const authOnlyPages = ['/login', '/forgot-password']
+  if (user && authOnlyPages.includes(request.nextUrl.pathname)) {
     // Copy any refreshed session cookies from supabaseResponse onto the redirect
     // so that token rotations that occurred during getUser() are not discarded.
     const redirectResponse = NextResponse.redirect(new URL('/dashboard', request.url))
@@ -49,5 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: ['/dashboard/:path*', '/login', '/forgot-password'],
 }
