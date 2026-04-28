@@ -78,6 +78,18 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument()
   })
 
+  it('shows an error UI and does not crash when the tenant query fails', async () => {
+    mockGetUser.mockResolvedValueOnce({
+      data: { user: { id: 'user-1', email: 'admin@example.com' } },
+    })
+    mockReturns.mockResolvedValueOnce({ data: null, error: { message: 'permission denied' } })
+
+    render(await DashboardPage())
+
+    expect(screen.getByText('Unable to load your account information.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'support@trytendr.org' })).toBeInTheDocument()
+  })
+
   it('uses the first membership when the user belongs to multiple tenants', async () => {
     mockGetUser.mockResolvedValueOnce({
       data: { user: { id: 'user-1', email: 'multi@example.com' } },

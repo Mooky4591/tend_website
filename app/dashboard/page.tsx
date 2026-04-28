@@ -19,13 +19,27 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login')
 
-  const { data: memberships } = await supabase
+  const { data: memberships, error: queryError } = await supabase
     .from('tenant_users')
     .select('role, tenants(id, name, company_code, support_email)')
     .eq('auth_user_id', user.id)
     .order('created_at', { ascending: true })
     .limit(1)
     .returns<TenantUserRow[]>()
+
+  if (queryError) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+          <p className="text-red-700 font-medium text-sm">Unable to load your account information.</p>
+          <p className="text-red-500 text-sm mt-1">
+            Please try signing out and back in, or contact{' '}
+            <a href="mailto:support@trytendr.org" className="underline">support@trytendr.org</a>.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   const tenantUser = memberships?.[0] ?? null
   const tenant = tenantUser?.tenants ?? null

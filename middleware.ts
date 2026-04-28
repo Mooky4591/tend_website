@@ -26,7 +26,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    // Copy any cookies set during getUser() onto the redirect so stale tokens
+    // are cleared rather than left lingering in the browser.
+    const redirectResponse = NextResponse.redirect(new URL('/login', request.url))
+    supabaseResponse.cookies.getAll().forEach(cookie =>
+      redirectResponse.cookies.set(cookie)
+    )
+    return redirectResponse
   }
 
   if (user && request.nextUrl.pathname === '/login') {

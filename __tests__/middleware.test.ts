@@ -50,6 +50,20 @@ describe('middleware', () => {
       const res = await middleware(makeRequest('/login'))
       expect(res.status).not.toBe(307)
     })
+
+    it('copies cookies onto the /dashboard → /login redirect response', async () => {
+      mockGetUser.mockImplementationOnce(async () => {
+        capturedSetAll?.([{ name: 'sb-access-token', value: 'expiring-token', options: { httpOnly: true, path: '/' } }])
+        return { data: { user: null } }
+      })
+
+      const res = await middleware(makeRequest('/dashboard'))
+
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toContain('/login')
+      const setCookie = res.headers.get('set-cookie')
+      expect(setCookie).toContain('sb-access-token=expiring-token')
+    })
   })
 
   describe('authenticated user', () => {
