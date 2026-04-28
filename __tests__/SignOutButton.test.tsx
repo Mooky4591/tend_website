@@ -18,7 +18,7 @@ jest.mock('next/navigation', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks()
-  mockSignOut.mockResolvedValue({})
+  mockSignOut.mockResolvedValue({ error: null })
 })
 
 describe('SignOutButton', () => {
@@ -27,7 +27,7 @@ describe('SignOutButton', () => {
     expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument()
   })
 
-  it('calls signOut and redirects to /login when clicked', async () => {
+  it('calls signOut and redirects to /login on success', async () => {
     const user = userEvent.setup()
     render(<SignOutButton />)
 
@@ -36,5 +36,17 @@ describe('SignOutButton', () => {
     expect(mockSignOut).toHaveBeenCalledTimes(1)
     expect(mockPush).toHaveBeenCalledWith('/login')
     expect(mockRefresh).toHaveBeenCalled()
+  })
+
+  it('shows an error message and does not redirect when signOut fails', async () => {
+    mockSignOut.mockResolvedValueOnce({ error: { message: 'Network error' } })
+    const user = userEvent.setup()
+    render(<SignOutButton />)
+
+    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+
+    expect(await screen.findByText('Sign out failed. Please try again.')).toBeInTheDocument()
+    expect(mockPush).not.toHaveBeenCalled()
+    expect(mockRefresh).not.toHaveBeenCalled()
   })
 })

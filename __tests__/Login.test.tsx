@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import LoginPage from '@/app/login/page'
+import LoginPage, { LoginShell } from '@/app/login/page'
 
 const mockSignInWithPassword = jest.fn()
 const mockPush = jest.fn()
@@ -120,6 +120,16 @@ describe('LoginPage', () => {
     render(<LoginPage />)
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(screen.queryByText(/expired or is invalid/)).not.toBeInTheDocument()
+  })
+
+  describe('LoginShell fallback', () => {
+    it('renders the brand name and a pulsing placeholder card', () => {
+      render(<LoginShell />)
+      expect(screen.getByText('Tendr')).toBeInTheDocument()
+      expect(screen.getByText('Sign in to your account')).toBeInTheDocument()
+      // Skeleton card present but no form inputs
+      expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()
+    })
   })
 
   it('renders a contact support link', () => {
