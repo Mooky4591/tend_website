@@ -67,14 +67,17 @@ describe('ForgotPasswordPage', () => {
     )).toBeInTheDocument()
   })
 
-  it('calls resetPasswordForEmail with the entered email and no redirectTo', async () => {
+  it('calls resetPasswordForEmail with the entered email and a redirectTo pointing to /auth/confirm', async () => {
     const user = userEvent.setup()
     render(<ForgotPasswordPage />)
 
     await user.type(screen.getByLabelText('Email'), 'admin@example.com')
     await user.click(screen.getByRole('button', { name: 'Send reset link' }))
 
-    await waitFor(() => expect(mockResetPasswordForEmail).toHaveBeenCalledWith('admin@example.com'))
+    await waitFor(() => expect(mockResetPasswordForEmail).toHaveBeenCalledWith(
+      'admin@example.com',
+      expect.objectContaining({ redirectTo: expect.stringContaining('/auth/confirm') })
+    ))
   })
 
   it('calls signOut after sending the reset email to clear any lingering session', async () => {
