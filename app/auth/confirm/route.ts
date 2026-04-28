@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = request.nextUrl
 
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
-  const next = searchParams.get('next') ?? '/reset-password'
+  const rawNext = searchParams.get('next') ?? ''
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/reset-password'
 
   const supabase = await createClient()
 
@@ -16,10 +17,10 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return NextResponse.redirect(new URL(next, origin))
+      return NextResponse.redirect(new URL(next, request.nextUrl))
     }
 
-    return NextResponse.redirect(new URL('/login?error=code_exchange_failed', origin))
+    return NextResponse.redirect(new URL('/login?error=code_exchange_failed', request.nextUrl))
   }
 
   if (token_hash && type) {
@@ -29,11 +30,11 @@ export async function GET(request: NextRequest) {
     })
 
     if (!error) {
-      return NextResponse.redirect(new URL(next, origin))
+      return NextResponse.redirect(new URL(next, request.nextUrl))
     }
 
-    return NextResponse.redirect(new URL('/login?error=otp_verification_failed', origin))
+    return NextResponse.redirect(new URL('/login?error=otp_verification_failed', request.nextUrl))
   }
 
-  return NextResponse.redirect(new URL('/login?error=missing_auth_params', origin))
+  return NextResponse.redirect(new URL('/login?error=missing_auth_params', request.nextUrl))
 }
