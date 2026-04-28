@@ -97,5 +97,33 @@ describe('middleware', () => {
       const res = await middleware(makeRequest('/dashboard'))
       expect(res.status).not.toBe(307)
     })
+
+    it('redirects /forgot-password to /dashboard', async () => {
+      mockGetUser.mockResolvedValueOnce({ data: { user: fakeUser } })
+      const res = await middleware(makeRequest('/forgot-password'))
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toContain('/dashboard')
+    })
+
+    it('copies refreshed session cookies onto the /forgot-password redirect response', async () => {
+      mockGetUser.mockImplementationOnce(async () => {
+        capturedSetAll?.([{ name: 'sb-access-token', value: 'new-token', options: { httpOnly: true, path: '/' } }])
+        return { data: { user: fakeUser } }
+      })
+
+      const res = await middleware(makeRequest('/forgot-password'))
+
+      expect(res.status).toBe(307)
+      expect(res.headers.get('location')).toContain('/dashboard')
+      expect(res.headers.get('set-cookie')).toContain('sb-access-token=new-token')
+    })
+  })
+
+  describe('unauthenticated user on /forgot-password', () => {
+    it('allows /forgot-password through without redirecting', async () => {
+      mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+      const res = await middleware(makeRequest('/forgot-password'))
+      expect(res.status).not.toBe(307)
+    })
   })
 })
