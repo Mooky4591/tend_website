@@ -50,6 +50,17 @@ describe('SignOutButton', () => {
     expect(mockRefresh).not.toHaveBeenCalled()
   })
 
+  it('resets loading state if router.push throws after successful sign-out', async () => {
+    mockPush.mockImplementationOnce(() => { throw new Error('Navigation failed') })
+    const user = userEvent.setup()
+    render(<SignOutButton />)
+
+    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Sign out' })).not.toBeDisabled())
+    expect(mockSignOut).toHaveBeenCalledTimes(1)
+  })
+
   it('disables the button and shows "Signing out…" while the request is in flight', async () => {
     let resolve: (v: unknown) => void
     mockSignOut.mockReturnValueOnce(new Promise(r => { resolve = r }))

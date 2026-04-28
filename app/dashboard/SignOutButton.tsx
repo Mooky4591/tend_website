@@ -19,8 +19,12 @@ export default function SignOutButton() {
       setLoading(false)
       return
     }
-    router.push('/login')
-    router.refresh()
+    try {
+      router.push('/login')
+      router.refresh()
+    } catch {
+      setLoading(false)
+    }
   }
 
   return (
