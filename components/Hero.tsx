@@ -30,7 +30,7 @@ function PhoneMockup() {
   return (
     <div
       className="relative mx-auto w-64 select-none"
-      aria-label="Example SMS conversation with Tend"
+      aria-label="Example SMS conversation with Tendr"
       role="img"
     >
       {/* Phone frame */}
@@ -153,7 +153,7 @@ export default function Hero() {
             </h1>
 
             <p className="mt-6 text-lg text-slate-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Tend delivers AI-powered home care over SMS — proactive maintenance reminders,
+              Tendr delivers AI-powered home care over SMS — proactive maintenance reminders,
               instant warranty answers, and conversational onboarding. No app. No portal. Just a text.
             </p>
 

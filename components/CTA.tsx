@@ -13,7 +13,7 @@ export default function CTA() {
           Ready to give your homeowners a smarter experience?
         </h2>
         <p className="mt-4 text-lg text-brand-100 max-w-xl mx-auto">
-          See Tend in action with a 30-minute demo. We&apos;ll walk through a live SMS conversation,
+          See Tendr in action with a 30-minute demo. We&apos;ll walk through a live SMS conversation,
           show you how warranty Q&amp;A works, and answer your integration questions.
         </p>
 
@@ -23,13 +23,13 @@ export default function CTA() {
             e.g., Calendly, HubSpot meetings, or a contact form
           */}
           <a
-            href="mailto:hello@tend.ai"
+            href="mailto:support@trytendr.org"
             className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg bg-white text-brand-700 font-bold hover:bg-brand-50 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-600"
           >
             Book a Demo
           </a>
           <a
-            href="mailto:hello@tend.ai"
+            href="mailto:support@trytendr.org"
             className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg border border-brand-400 text-white font-semibold hover:bg-brand-700 transition-colors"
           >
             Contact Sales
@@ -38,8 +38,7 @@ export default function CTA() {
 
         <p className="mt-4 text-xs text-brand-200">
           No commitment required · We&apos;ll respond within one business day
-          {/* PLACEHOLDER: Update contact email with your real address */}
-          {' '}· hello@tend.ai
+          {' '}· support@trytendr.org
         </p>
       </div>
     </section>
