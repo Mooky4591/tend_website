@@ -87,6 +87,19 @@ describe('LoginPage', () => {
     await waitFor(() => expect(screen.queryByText('Invalid login credentials')).not.toBeInTheDocument())
   })
 
+  it('resets loading state if router.push throws during navigation', async () => {
+    mockSignInWithPassword.mockResolvedValueOnce({ error: null })
+    mockPush.mockImplementationOnce(() => { throw new Error('Navigation failed') })
+    const user = userEvent.setup()
+    render(<LoginPage />)
+
+    await user.type(screen.getByLabelText('Email'), 'admin@example.com')
+    await user.type(screen.getByLabelText('Password'), 'password123')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Sign in' })).not.toBeDisabled())
+  })
+
   it('renders a contact support link', () => {
     render(<LoginPage />)
     const link = screen.getByRole('link', { name: 'Contact support' })

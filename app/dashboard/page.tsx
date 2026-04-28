@@ -19,12 +19,15 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login')
 
-  const { data: tenantUser } = await supabase
+  const { data: memberships } = await supabase
     .from('tenant_users')
     .select('role, tenants(id, name, company_code, support_email)')
     .eq('auth_user_id', user.id)
-    .single<TenantUserRow>()
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .returns<TenantUserRow[]>()
 
+  const tenantUser = memberships?.[0] ?? null
   const tenant = tenantUser?.tenants ?? null
 
   return (
