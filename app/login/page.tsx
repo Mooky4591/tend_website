@@ -24,19 +24,24 @@ function LoginForm() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
-      try {
-        router.push('/dashboard')
-        router.refresh()
-      } catch {
+      if (error) {
+        setError(error.message)
         setLoading(false)
+      } else {
+        try {
+          router.push('/dashboard')
+          router.refresh()
+        } catch {
+          setLoading(false)
+        }
       }
+    } catch {
+      setError('An unexpected error occurred. Please try again.')
+      setLoading(false)
     }
   }
 
@@ -53,7 +58,7 @@ function LoginForm() {
           className="bg-slate-900 rounded-2xl p-8 border border-slate-800 space-y-5"
         >
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
+            <div role="alert" className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
               {error}
             </div>
           )}

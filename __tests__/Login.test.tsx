@@ -137,4 +137,33 @@ describe('LoginPage', () => {
     const link = screen.getByRole('link', { name: 'Contact support' })
     expect(link).toHaveAttribute('href', 'mailto:support@trytendr.org')
   })
+
+  it('shows a generic error and re-enables the button when signInWithPassword throws', async () => {
+    mockSignInWithPassword.mockRejectedValueOnce(new Error('Network failure'))
+    const user = userEvent.setup()
+    render(<LoginPage />)
+
+    await user.type(screen.getByLabelText('Email'), 'admin@example.com')
+    await user.type(screen.getByLabelText('Password'), 'password123')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+
+    expect(await screen.findByText('An unexpected error occurred. Please try again.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sign in' })).not.toBeDisabled()
+    expect(mockPush).not.toHaveBeenCalled()
+  })
+
+  it('error container has role="alert" so screen readers announce it', async () => {
+    mockSignInWithPassword.mockResolvedValueOnce({
+      error: { message: 'Invalid login credentials' },
+    })
+    const user = userEvent.setup()
+    render(<LoginPage />)
+
+    await user.type(screen.getByLabelText('Email'), 'wrong@example.com')
+    await user.type(screen.getByLabelText('Password'), 'wrongpassword')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Invalid login credentials')
+  })
 })

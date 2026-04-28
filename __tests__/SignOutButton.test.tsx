@@ -49,4 +49,15 @@ describe('SignOutButton', () => {
     expect(mockPush).not.toHaveBeenCalled()
     expect(mockRefresh).not.toHaveBeenCalled()
   })
+
+  it('error message has role="alert" so screen readers announce it', async () => {
+    mockSignOut.mockResolvedValueOnce({ error: { message: 'Network error' } })
+    const user = userEvent.setup()
+    render(<SignOutButton />)
+
+    await user.click(screen.getByRole('button', { name: 'Sign out' }))
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Sign out failed. Please try again.')
+  })
 })
