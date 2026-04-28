@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function ResetPasswordPage() {
@@ -62,6 +63,7 @@ export default function ResetPasswordPage() {
               id="password"
               type="password"
               required
+              minLength={6}
               autoComplete="new-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -78,6 +80,12 @@ export default function ResetPasswordPage() {
             {loading ? 'Updating…' : 'Update password'}
           </button>
         </form>
+
+        <p className="mt-6 text-center text-sm">
+          <Link href="/login" className="text-slate-400 hover:text-white transition-colors">
+            Back to sign in
+          </Link>
+        </p>
       </div>
     </div>
   )

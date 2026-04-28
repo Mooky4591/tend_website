@@ -87,6 +87,16 @@ describe('ResetPasswordPage', () => {
     resolve!({ error: null })
   })
 
+  it('password input has minLength of 6 for instant client-side feedback', () => {
+    render(<ResetPasswordPage />)
+    expect(screen.getByLabelText('New password')).toHaveAttribute('minLength', '6')
+  })
+
+  it('has a back to sign in link pointing to /login', () => {
+    render(<ResetPasswordPage />)
+    expect(screen.getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/login')
+  })
+
   it('resets loading state if router.push throws after successful update', async () => {
     mockUpdateUser.mockResolvedValueOnce({ error: null })
     mockPush.mockImplementationOnce(() => { throw new Error('Navigation failed') })

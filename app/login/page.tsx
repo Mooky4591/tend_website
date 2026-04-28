@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LoginShell } from './LoginShell'
 
@@ -104,12 +105,12 @@ function LoginForm() {
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
 
-          <a
+          <Link
             href="/forgot-password"
             className="block text-center text-xs text-slate-500 hover:text-slate-300 transition-colors"
           >
             Forgot password?
-          </a>
+          </Link>
         </form>
 
         <p className="mt-6 text-center text-xs text-slate-600">
