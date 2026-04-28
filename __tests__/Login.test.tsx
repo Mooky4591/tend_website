@@ -5,6 +5,7 @@ import LoginPage from '@/app/login/page'
 const mockSignInWithPassword = jest.fn()
 const mockPush = jest.fn()
 const mockRefresh = jest.fn()
+const mockSearchParams = jest.fn(() => new URLSearchParams())
 
 jest.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
@@ -14,6 +15,7 @@ jest.mock('@/lib/supabase/client', () => ({
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, refresh: mockRefresh }),
+  useSearchParams: () => mockSearchParams(),
 }))
 
 beforeEach(() => {
@@ -98,6 +100,26 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'Sign in' })).not.toBeDisabled())
+  })
+
+  it('shows a user-friendly error when redirected back with ?error=auth_callback_failed', () => {
+    mockSearchParams.mockReturnValueOnce(new URLSearchParams('error=auth_callback_failed'))
+    render(<LoginPage />)
+    expect(
+      screen.getByText('Your sign-in link has expired or is invalid. Please try again.')
+    ).toBeInTheDocument()
+  })
+
+  it('shows no error on load when the error param is absent', () => {
+    render(<LoginPage />)
+    expect(screen.queryByText(/expired or is invalid/)).not.toBeInTheDocument()
+  })
+
+  it('ignores unknown error param values on load', () => {
+    mockSearchParams.mockReturnValueOnce(new URLSearchParams('error=some_unknown_code'))
+    render(<LoginPage />)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByText(/expired or is invalid/)).not.toBeInTheDocument()
   })
 
   it('renders a contact support link', () => {

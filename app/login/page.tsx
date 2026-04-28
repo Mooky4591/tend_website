@@ -1,13 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+
+const CALLBACK_ERRORS: Record<string, string> = {
+  auth_callback_failed: 'Your sign-in link has expired or is invalid. Please try again.',
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const [error, setError] = useState<string | null>(() => {
+    const key = searchParams.get('error') ?? ''
+    return CALLBACK_ERRORS[key] ?? null
+  })
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 

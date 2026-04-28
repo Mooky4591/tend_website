@@ -8,6 +8,9 @@ CREATE TABLE tenant_users (
   UNIQUE (tenant_id, auth_user_id)
 );
 
+-- Index: every RLS policy and the dashboard query filter on auth_user_id
+CREATE INDEX tenant_users_auth_user_id_idx ON tenant_users (auth_user_id);
+
 -- RLS: tenant_users
 ALTER TABLE tenant_users ENABLE ROW LEVEL SECURITY;
 
