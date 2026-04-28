@@ -15,7 +15,11 @@ export default function ForgotPasswordPage() {
 
     const supabase = createClient()
     try {
-      await supabase.auth.resetPasswordForEmail(email)
+      await supabase.auth.resetPasswordForEmail(email, 
+        {
+       redirectTo: 'https://trytendr.org/auth/callback'
+       }
+      )
     } catch {
       // Swallow errors — always show the same success message so we
       // don't reveal whether an email address is registered.
