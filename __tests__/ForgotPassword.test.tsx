@@ -90,6 +90,17 @@ describe('ForgotPasswordPage', () => {
     await waitFor(() => expect(mockSignOut).toHaveBeenCalledTimes(1))
   })
 
+  it('calls signOut even when resetPasswordForEmail throws', async () => {
+    mockResetPasswordForEmail.mockRejectedValueOnce(new Error('Network error'))
+    const user = userEvent.setup()
+    render(<ForgotPasswordPage />)
+
+    await user.type(screen.getByLabelText('Email'), 'admin@example.com')
+    await user.click(screen.getByRole('button', { name: 'Send reset link' }))
+
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalledTimes(1))
+  })
+
   it('success screen has a back to sign in link pointing to /login', async () => {
     const user = userEvent.setup()
     render(<ForgotPasswordPage />)
