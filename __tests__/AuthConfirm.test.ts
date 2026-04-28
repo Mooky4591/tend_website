@@ -71,4 +71,25 @@ describe('GET /auth/confirm', () => {
     expect(mockExchangeCodeForSession).not.toHaveBeenCalled()
     expect(res.headers.get('location')).toContain('/login?error=missing_auth_params')
   })
+
+  describe('open redirect protection on next param', () => {
+    it('falls back to /reset-password when next is an absolute URL', async () => {
+      const res = await GET(makeRequest({ code: 'abc123', next: 'https://evil.com' }))
+      const location = res.headers.get('location') ?? ''
+      expect(location).not.toContain('evil.com')
+      expect(location).toContain('/reset-password')
+    })
+
+    it('falls back to /reset-password when next is a protocol-relative URL', async () => {
+      const res = await GET(makeRequest({ code: 'abc123', next: '//evil.com' }))
+      const location = res.headers.get('location') ?? ''
+      expect(location).not.toContain('evil.com')
+      expect(location).toContain('/reset-password')
+    })
+
+    it('allows a safe relative path through', async () => {
+      const res = await GET(makeRequest({ code: 'abc123', next: '/dashboard' }))
+      expect(res.headers.get('location')).toContain('/dashboard')
+    })
+  })
 })
