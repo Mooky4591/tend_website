@@ -30,7 +30,13 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && request.nextUrl.pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Copy any refreshed session cookies from supabaseResponse onto the redirect
+    // so that token rotations that occurred during getUser() are not discarded.
+    const redirectResponse = NextResponse.redirect(new URL('/dashboard', request.url))
+    supabaseResponse.cookies.getAll().forEach(cookie =>
+      redirectResponse.cookies.set(cookie)
+    )
+    return redirectResponse
   }
 
   return supabaseResponse
