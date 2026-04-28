@@ -19,6 +19,9 @@ export default function ForgotPasswordPage() {
       await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
       })
+      // Clear any lingering session so a background token refresh can't
+      // cause the middleware to redirect the success screen to /dashboard.
+      await supabase.auth.signOut()
     } catch {
       // Swallow errors — always show the same success message so we
       // don't reveal whether an email address is registered.
