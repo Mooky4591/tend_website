@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'Tend — AI Home Assistant Platform'
+export const alt = 'Tendr — AI Home Assistant Platform'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -31,7 +31,7 @@ export default function OGImage() {
             marginBottom: 20,
           }}
         >
-          Tend
+          Tendr
         </div>
 
         {/* Headline */}

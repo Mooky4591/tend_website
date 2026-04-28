@@ -1,22 +1,22 @@
 const smsMessages = [
   {
     role: 'assistant' as const,
-    text: "Hi Maria! 👋 I'm Tend, your AI home assistant from Armadillo Home Warranty. I'll help keep your home in great shape. What's your home address?",
+    text: "Hi Maria! 👋 I'm Tendr, your AI home assistant from Armadillo Home Warranty. I'll help keep your home at 342 Oak Bluff Dr in great shape. What type of roof do you have, and roughly how old is it?",
     time: '9:01 AM',
   },
   {
     role: 'user' as const,
-    text: '342 Oak Bluff Dr, Scottsdale AZ 85255',
+    text: 'Tile, about 12 years old',
     time: '9:03 AM',
   },
   {
     role: 'assistant' as const,
-    text: '✓ Found it! Built 2001, 2,340 sq ft — and looks like you have a pool! What type of roof, and roughly how old?',
+    text: 'Got it — tile roof, ~2014. How many HVAC units do you have?',
     time: '9:03 AM',
   },
   {
     role: 'user' as const,
-    text: 'Tile, about 12 years old',
+    text: 'Just one, a Carrier',
     time: '9:05 AM',
   },
   {
@@ -30,7 +30,7 @@ function PhoneMockup() {
   return (
     <div
       className="relative mx-auto w-64 select-none"
-      aria-label="Example SMS conversation with Tend"
+      aria-label="Example SMS conversation with Tendr"
       role="img"
     >
       {/* Phone frame */}
@@ -153,7 +153,7 @@ export default function Hero() {
             </h1>
 
             <p className="mt-6 text-lg text-slate-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Tend delivers AI-powered home care over SMS — proactive maintenance reminders,
+              Tendr delivers AI-powered home care over SMS — proactive maintenance reminders,
               instant warranty answers, and conversational onboarding. No app. No portal. Just a text.
             </p>
 

@@ -5,7 +5,6 @@
 
   Built with Next.js 14, TypeScript, and Tailwind CSS. Deployed on Railway.
 
-  ---
 
   ## Getting Started
 
