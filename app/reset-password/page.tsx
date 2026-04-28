@@ -1,24 +1,14 @@
 'use client'
 
-import { Suspense, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { LoginShell } from './LoginShell'
 
-const CALLBACK_ERRORS: Record<string, string> = {
-  auth_callback_failed: 'Your sign-in link has expired or is invalid. Please try again.',
-}
-
-function LoginForm() {
-  const [email, setEmail] = useState('')
+export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
-  const searchParams = useSearchParams()
-  const [error, setError] = useState<string | null>(() => {
-    const key = searchParams.get('error') ?? ''
-    return CALLBACK_ERRORS[key] ?? null
-  })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -28,14 +18,15 @@ function LoginForm() {
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { error } = await supabase.auth.updateUser({ password })
 
       if (error) {
         setError(error.message)
         setLoading(false)
       } else {
+        await supabase.auth.signOut()
         try {
-          router.push('/dashboard')
+          router.push('/login')
           router.refresh()
         } catch {
           setLoading(false)
@@ -52,7 +43,7 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
-          <p className="mt-2 text-slate-400 text-sm">Sign in to your account</p>
+          <p className="mt-2 text-slate-400 text-sm">Set your new password</p>
         </div>
 
         <form
@@ -66,30 +57,15 @@ function LoginForm() {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-              placeholder="you@company.com"
-            />
-          </div>
-
-          <div>
             <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
-              Password
+              New password
             </label>
             <input
               id="password"
               type="password"
               required
-              autoComplete="current-password"
+              minLength={6}
+              autoComplete="new-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
@@ -102,35 +78,16 @@ function LoginForm() {
             disabled={loading}
             className="w-full bg-brand-600 hover:bg-brand-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-colors text-sm"
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? 'Updating…' : 'Update password'}
           </button>
-
-          <Link
-            href="/forgot-password"
-            className="block text-center text-xs text-slate-500 hover:text-slate-300 transition-colors"
-          >
-            Forgot password?
-          </Link>
         </form>
 
-        <p className="mt-6 text-center text-xs text-slate-600">
-          Need access?{' '}
-          <a
-            href="mailto:support@trytendr.org"
-            className="text-slate-400 hover:text-white transition-colors"
-          >
-            Contact support
-          </a>
+        <p className="mt-6 text-center text-sm">
+          <Link href="/login" className="text-slate-400 hover:text-white transition-colors">
+            Back to sign in
+          </Link>
         </p>
       </div>
     </div>
-  )
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<LoginShell />}>
-      <LoginForm />
-    </Suspense>
   )
 }

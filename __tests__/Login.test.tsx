@@ -139,6 +139,11 @@ describe('LoginPage', () => {
     expect(link).toHaveAttribute('href', 'mailto:support@trytendr.org')
   })
 
+  it('renders a forgot password link pointing to /forgot-password', () => {
+    render(<LoginPage />)
+    expect(screen.getByRole('link', { name: 'Forgot password?' })).toHaveAttribute('href', '/forgot-password')
+  })
+
   it('shows a generic error and re-enables the button when signInWithPassword throws', async () => {
     mockSignInWithPassword.mockRejectedValueOnce(new Error('Network failure'))
     const user = userEvent.setup()
