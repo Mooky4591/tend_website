@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
     try {
       await supabase.auth.resetPasswordForEmail(email, 
         {
-       redirectTo: 'https://trytendr.org/auth/callback'
+       redirectTo: 'https://trytendr.org/auth/confirm?next=/reset-password'
        }
       )
     } catch {
