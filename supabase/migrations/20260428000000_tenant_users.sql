@@ -3,7 +3,7 @@ CREATE TABLE tenant_users (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id    UUID        NOT NULL REFERENCES tenants(id)    ON DELETE CASCADE,
   auth_user_id UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role         TEXT        NOT NULL DEFAULT 'admin' CHECK (role IN ('admin', 'viewer')),
+  role         TEXT        NOT NULL DEFAULT 'viewer' CHECK (role IN ('admin', 'viewer')),
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (tenant_id, auth_user_id)
 );
