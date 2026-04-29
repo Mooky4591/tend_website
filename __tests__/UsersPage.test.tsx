@@ -87,6 +87,7 @@ describe('UsersPage', () => {
         { id: 'u1', first_name: 'Dana', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: 'pending', opted_out: true, created_at: '2026-01-01' },
         { id: 'u2', first_name: 'Eva', phone_number: '+2', city: null, state: null, onboarding_complete: true, onboarding_status: 'complete', opted_out: false, created_at: '2026-01-02' },
         { id: 'u3', first_name: 'Frank', phone_number: '+3', city: null, state: null, onboarding_complete: false, onboarding_status: 'queued', opted_out: false, created_at: '2026-01-03' },
+        { id: 'u4', first_name: 'Grace', phone_number: '+4', city: null, state: null, onboarding_complete: false, onboarding_status: 'failed', opted_out: false, created_at: '2026-01-04' },
       ],
     })
 
@@ -95,5 +96,27 @@ describe('UsersPage', () => {
     expect(screen.getByText('Opted out')).toBeInTheDocument()
     expect(screen.getAllByText('Complete')).toHaveLength(1)
     expect(screen.getByText('Queued')).toBeInTheDocument()
+    expect(screen.getByText('Failed')).toBeInTheDocument()
+  })
+
+  it('shows — when first_name is null', async () => {
+    mockUsersOrder.mockResolvedValueOnce({
+      data: [{ id: 'u1', first_name: null, phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, created_at: '2026-01-01' }],
+    })
+    render(await UsersPage())
+    expect(screen.getByRole('link', { name: '—' })).toBeInTheDocument()
+  })
+
+  it('handles null homeowners response without crashing', async () => {
+    mockUsersOrder.mockResolvedValueOnce({ data: null })
+    render(await UsersPage())
+    expect(screen.getByText('No homeowners yet')).toBeInTheDocument()
+    expect(screen.getByText('0 total')).toBeInTheDocument()
+  })
+
+  it('shows empty state when user has no tenant membership', async () => {
+    mockTenantSingle.mockResolvedValueOnce({ data: null })
+    render(await UsersPage())
+    expect(screen.getByText('No homeowners yet')).toBeInTheDocument()
   })
 })
