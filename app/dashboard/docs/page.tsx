@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import UploadForm from './UploadForm'
+import DeleteDocButton from './DeleteDocButton'
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -60,14 +61,7 @@ export default async function DocsPage() {
                       {d.chunk_count} chunks · uploaded {formatDate(d.uploaded_at)}
                     </p>
                   </div>
-                  <form action={deleteDoc.bind(null, d.plan_name)}>
-                    <button
-                      type="submit"
-                      className="text-xs text-red-500 hover:text-red-700 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </form>
+                  <DeleteDocButton action={deleteDoc.bind(null, d.plan_name)} planName={d.plan_name} />
                 </div>
               ))}
             </div>

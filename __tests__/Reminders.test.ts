@@ -100,6 +100,12 @@ describe('PATCH /api/reminders/[id]', () => {
     const res = await PATCH(makeIdRequest({ dueDate: '2026-07-01', reminderType: 'hvac_service' }), { params: { id: 'rem-1' } })
     expect(res.status).toBe(200)
   })
+
+  it('returns 404 when the reminder id does not exist', async () => {
+    mockReminderUpdate.mockResolvedValueOnce({ data: null, error: { code: 'PGRST116', message: 'The result contains 0 rows' } })
+    const res = await PATCH(makeIdRequest({ dueDate: '2026-07-01' }), { params: { id: 'nonexistent' } })
+    expect(res.status).toBe(404)
+  })
 })
 
 describe('DELETE /api/reminders/[id]', () => {

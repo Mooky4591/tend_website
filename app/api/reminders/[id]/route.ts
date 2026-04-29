@@ -25,6 +25,9 @@ export async function PATCH(
     .select()
     .single()
 
+  if (error?.code === 'PGRST116') {
+    return NextResponse.json({ error: 'Reminder not found' }, { status: 404 })
+  }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   return NextResponse.json(data)
