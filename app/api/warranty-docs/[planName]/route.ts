@@ -16,7 +16,7 @@ export async function DELETE(
     .single()
   if (!membership) return NextResponse.json({ error: 'No tenant' }, { status: 403 })
 
-  const planName = decodeURIComponent(params.planName)
+  const { planName } = params
 
   const { error } = await supabase
     .from('warranty_documents')
