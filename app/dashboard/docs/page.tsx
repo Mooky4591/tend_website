@@ -27,9 +27,9 @@ export default async function DocsPage() {
     'use server'
     const sc = createClient()
     const { data: { user: u } } = await sc.auth.getUser()
-    if (!u) return
+    if (!u) throw new Error('Unauthorized')
     const { data: m } = await sc.from('tenant_users').select('tenant_id').eq('auth_user_id', u.id).single()
-    if (!m) return
+    if (!m) throw new Error('No tenant')
     const { error } = await sc.from('warranty_documents').delete().eq('tenant_id', m.tenant_id).eq('plan_name', planName)
     if (error) throw error
     revalidatePath('/dashboard/docs')
