@@ -12,9 +12,16 @@ export default async function BillingPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: membership } = await supabase
+    .from('tenant_users')
+    .select('tenant_id')
+    .eq('auth_user_id', user.id)
+    .single()
+
   const { data: snapshots } = await supabase
     .from('monthly_billing_snapshots')
     .select('billing_month, active_users, new_users, reminders_sent, conversations')
+    .eq('tenant_id', membership?.tenant_id ?? '')
     .order('billing_month', { ascending: false })
 
   return (

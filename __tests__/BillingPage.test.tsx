@@ -3,7 +3,8 @@ import BillingPage from '@/app/dashboard/billing/page'
 
 const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
-const mockSnapshotsOrder = jest.fn()
+const mockTenantSingle = jest.fn()
+const mockSnapshotsEq = jest.fn()
 
 jest.mock('next/navigation', () => ({
   redirect: (path: string) => { mockRedirect(path); throw new Error(`NEXT_REDIRECT:${path}`) },
@@ -12,16 +13,25 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/lib/supabase/server', () => ({
   createClient: () => ({
     auth: { getUser: mockGetUser },
-    from: () => ({
-      select: () => ({ order: mockSnapshotsOrder }),
-    }),
+    from: (table: string) => {
+      if (table === 'tenant_users') {
+        return { select: () => ({ eq: () => ({ single: mockTenantSingle }) }) }
+      }
+      if (table === 'monthly_billing_snapshots') {
+        return { select: () => ({ eq: () => ({ order: mockSnapshotsEq }) }) }
+      }
+      throw new Error(`Unexpected table in mock: ${table}`)
+    },
   }),
 }))
+
+const MEMBERSHIP = { tenant_id: 'tenant-1' }
 
 beforeEach(() => {
   jest.clearAllMocks()
   mockGetUser.mockResolvedValue({ data: { user: { id: 'staff-1' } } })
-  mockSnapshotsOrder.mockResolvedValue({ data: [] })
+  mockTenantSingle.mockResolvedValue({ data: MEMBERSHIP })
+  mockSnapshotsEq.mockResolvedValue({ data: [] })
 })
 
 describe('BillingPage', () => {
@@ -36,7 +46,7 @@ describe('BillingPage', () => {
   })
 
   it('renders a row for each billing snapshot', async () => {
-    mockSnapshotsOrder.mockResolvedValueOnce({
+    mockSnapshotsEq.mockResolvedValueOnce({
       data: [
         { billing_month: '2026-04-01', active_users: 42, new_users: 5, reminders_sent: 18, conversations: 130 },
         { billing_month: '2026-03-01', active_users: 38, new_users: 3, reminders_sent: 12, conversations: 95 },
@@ -52,7 +62,7 @@ describe('BillingPage', () => {
   })
 
   it('renders all five columns (month, active, new, reminders, conversations)', async () => {
-    mockSnapshotsOrder.mockResolvedValueOnce({
+    mockSnapshotsEq.mockResolvedValueOnce({
       data: [{ billing_month: '2026-04-01', active_users: 10, new_users: 2, reminders_sent: 5, conversations: 20 }],
     })
 
@@ -67,5 +77,11 @@ describe('BillingPage', () => {
   it('shows the support contact CTA', async () => {
     render(await BillingPage())
     expect(screen.getByRole('link', { name: 'support@trytendr.org' })).toBeInTheDocument()
+  })
+
+  it('shows empty state when user has no tenant membership', async () => {
+    mockTenantSingle.mockResolvedValueOnce({ data: null })
+    render(await BillingPage())
+    expect(screen.getByText('No billing data yet')).toBeInTheDocument()
   })
 })
