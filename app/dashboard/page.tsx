@@ -27,22 +27,13 @@ export default async function DashboardPage() {
   const tenantId = membership?.tenant_id ?? null
   const tenantName = (membership?.tenants as { name?: string } | null)?.name ?? 'Dashboard'
 
-  const [{ data: users }, { data: reminders }] = await Promise.all([
-    supabase
-      .from('users')
-      .select('id, onboarding_complete, opted_out')
-      .eq('tenant_id', tenantId ?? ''),
-    supabase
-      .from('reminders')
-      .select('user_id'),
-  ])
+  const { data: users } = await supabase
+    .from('users')
+    .select('onboarding_complete, opted_out')
+    .eq('tenant_id', tenantId ?? '')
 
-  const userIdsWithReminders = new Set((reminders ?? []).map(r => r.user_id))
   const total = users?.length ?? 0
-  const fullyProvisioned = users?.filter(
-    u => u.onboarding_complete && userIdsWithReminders.has(u.id)
-  ).length ?? 0
-  const onboardingComplete = users?.filter(u => u.onboarding_complete).length ?? 0
+  const fullyProvisioned = users?.filter(u => u.onboarding_complete).length ?? 0
   const optedOut = users?.filter(u => u.opted_out).length ?? 0
 
   return (
@@ -52,17 +43,12 @@ export default async function DashboardPage() {
         <p className="text-slate-500 text-sm mt-1">Usage overview</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard label="Total homeowners" value={total} />
         <StatCard
           label="Fully provisioned"
           value={fullyProvisioned}
-          sub="Onboarding complete + reminders scheduled"
-        />
-        <StatCard
-          label="Onboarding complete"
-          value={onboardingComplete}
-          sub="Includes fully provisioned"
+          sub="Onboarding complete"
         />
         <StatCard label="Opted out" value={optedOut} />
       </div>

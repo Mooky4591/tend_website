@@ -5,7 +5,6 @@ const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
 const mockTenantSingle = jest.fn()
 const mockUsersEq = jest.fn()
-const mockRemindersSelect = jest.fn()
 
 jest.mock('next/navigation', () => ({
   redirect: (path: string) => { mockRedirect(path); throw new Error(`NEXT_REDIRECT:${path}`) },
@@ -20,8 +19,6 @@ jest.mock('@/lib/supabase/server', () => ({
           return { select: () => ({ eq: () => ({ single: mockTenantSingle }) }) }
         case 'users':
           return { select: () => ({ eq: mockUsersEq }) }
-        case 'reminders':
-          return { select: mockRemindersSelect }
         default:
           throw new Error(`Unexpected table in mock: ${table}`)
       }
@@ -37,7 +34,6 @@ beforeEach(() => {
   mockGetUser.mockResolvedValue({ data: { user: AUTHED_USER } })
   mockTenantSingle.mockResolvedValue({ data: MEMBERSHIP })
   mockUsersEq.mockResolvedValue({ data: [] })
-  mockRemindersSelect.mockResolvedValue({ data: [] })
 })
 
 describe('DashboardPage', () => {
@@ -60,33 +56,30 @@ describe('DashboardPage', () => {
 
   it('shows zero counts when there are no users', async () => {
     render(await DashboardPage())
-    // Four stat cards, all showing 0
-    expect(screen.getAllByText('0')).toHaveLength(4)
+    expect(screen.getAllByText('0')).toHaveLength(3)
   })
 
-  it('counts fully provisioned as onboarding_complete AND has a reminder', async () => {
+  it('counts fully provisioned as onboarding_complete', async () => {
     mockUsersEq.mockResolvedValueOnce({
       data: [
-        { id: 'u1', onboarding_complete: true, opted_out: false },  // has reminder → fully provisioned
-        { id: 'u2', onboarding_complete: true, opted_out: false },  // no reminder → not fully provisioned
-        { id: 'u3', onboarding_complete: false, opted_out: false }, // not onboarded
+        { onboarding_complete: true, opted_out: false },
+        { onboarding_complete: true, opted_out: false },
+        { onboarding_complete: false, opted_out: false },
       ],
     })
-    mockRemindersSelect.mockResolvedValueOnce({ data: [{ user_id: 'u1' }] })
 
     render(await DashboardPage())
 
     expect(screen.getByText('Total homeowners').closest('div')).toHaveTextContent('3')
-    expect(screen.getByText('Fully provisioned').closest('div')).toHaveTextContent('1')
-    expect(screen.getByText('Onboarding complete').closest('div')).toHaveTextContent('2')
+    expect(screen.getByText('Fully provisioned').closest('div')).toHaveTextContent('2')
   })
 
   it('counts opted-out users correctly', async () => {
     mockUsersEq.mockResolvedValueOnce({
       data: [
-        { id: 'u1', onboarding_complete: false, opted_out: true },
-        { id: 'u2', onboarding_complete: false, opted_out: true },
-        { id: 'u3', onboarding_complete: false, opted_out: false },
+        { onboarding_complete: false, opted_out: true },
+        { onboarding_complete: false, opted_out: true },
+        { onboarding_complete: false, opted_out: false },
       ],
     })
 
@@ -97,8 +90,7 @@ describe('DashboardPage', () => {
 
   it('handles null users response without crashing', async () => {
     mockUsersEq.mockResolvedValueOnce({ data: null })
-    mockRemindersSelect.mockResolvedValueOnce({ data: null })
     render(await DashboardPage())
-    expect(screen.getAllByText('0')).toHaveLength(4)
+    expect(screen.getAllByText('0')).toHaveLength(3)
   })
 })
