@@ -40,7 +40,8 @@ export default async function DocsPage() {
     if (!u) return
     const { data: m } = await sc.from('tenant_users').select('tenant_id').eq('auth_user_id', u.id).single()
     if (!m) return
-    await sc.from('warranty_documents').delete().eq('tenant_id', m.tenant_id).eq('plan_name', planName)
+    const { error } = await sc.from('warranty_documents').delete().eq('tenant_id', m.tenant_id).eq('plan_name', planName)
+    if (error) throw error
     revalidatePath('/dashboard/docs')
   }
 
