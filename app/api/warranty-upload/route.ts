@@ -35,7 +35,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No text could be extracted from this PDF' }, { status: 422 })
   }
 
-  const embeddings = await embedChunks(chunks)
+  let embeddings: number[][]
+  try {
+    embeddings = await embedChunks(chunks)
+  } catch {
+    return NextResponse.json({ error: 'Failed to generate embeddings' }, { status: 502 })
+  }
 
   // Atomic swap: snapshot old IDs, insert new, then delete old
   const { data: existing } = await supabase

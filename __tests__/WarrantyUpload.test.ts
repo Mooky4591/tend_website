@@ -151,6 +151,14 @@ describe('POST /api/warranty-upload', () => {
     expect(res.status).toBe(415)
   })
 
+  it('returns 502 when embedChunks throws', async () => {
+    mockEmbedChunks.mockRejectedValueOnce(new Error('OpenAI unavailable'))
+    const res = await POST(makeRequest('Plan A'))
+    expect(res.status).toBe(502)
+    const body = await res.json()
+    expect(body.error).toContain('embeddings')
+  })
+
   it('returns 500 when insert fails', async () => {
     mockDocInsert.mockResolvedValueOnce({ error: { message: 'DB error' } })
     const res = await POST(makeRequest('Plan A'))

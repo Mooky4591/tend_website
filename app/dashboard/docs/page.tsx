@@ -14,24 +14,13 @@ export default async function DocsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: rows } = await supabase
+  type DocRow = { plan_name: string; chunk_count: number; uploaded_at: string }
+  const { data } = await supabase
     .from('warranty_documents')
-    .select('plan_name, created_at')
-    .order('created_at', { ascending: false })
+    .select('plan_name, chunk_count:count(), uploaded_at:created_at.max()')
 
-  // Deduplicate — keep first occurrence (most recent) per plan_name, count chunks
-  const seen = new Set<string>()
-  const chunkCounts = (rows ?? []).reduce<Record<string, number>>((acc, r) => {
-    acc[r.plan_name] = (acc[r.plan_name] ?? 0) + 1
-    return acc
-  }, {})
-  const docs: Array<{ plan_name: string; uploaded_at: string; chunk_count: number }> = []
-  for (const r of rows ?? []) {
-    if (!seen.has(r.plan_name)) {
-      seen.add(r.plan_name)
-      docs.push({ plan_name: r.plan_name, uploaded_at: r.created_at, chunk_count: chunkCounts[r.plan_name] })
-    }
-  }
+  const docs = ((data ?? []) as unknown as DocRow[])
+    .sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at))
 
   async function deleteDoc(planName: string) {
     'use server'
