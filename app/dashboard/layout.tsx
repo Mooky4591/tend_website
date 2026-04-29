@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import SignOutButton from './SignOutButton'
+import DashboardNav from './DashboardNav'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
@@ -16,6 +17,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <SignOutButton />
         </div>
       </header>
+      <DashboardNav />
       <main>{children}</main>
     </div>
   )
