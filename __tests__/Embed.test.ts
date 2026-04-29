@@ -5,19 +5,14 @@
 import { embedChunks } from '@/lib/embed'
 import OpenAI from 'openai'
 
-jest.mock('openai', () =>
-  jest.fn().mockImplementation(() => ({
-    embeddings: { create: jest.fn() },
-  }))
-)
-
-// The module-level singleton in lib/embed.ts is instance[0].
-// Capture it once after all modules are loaded.
-let mockCreate: jest.Mock
-
-beforeAll(() => {
-  mockCreate = (OpenAI as jest.Mock).mock.results[0].value.embeddings.create
+jest.mock('openai', () => {
+  const createFn = jest.fn()
+  const MockOpenAI = jest.fn(() => ({ embeddings: { create: createFn } }))
+  ;(MockOpenAI as any).__create = createFn
+  return MockOpenAI
 })
+
+const mockCreate = (OpenAI as any).__create as jest.Mock
 
 beforeEach(() => {
   jest.clearAllMocks()
