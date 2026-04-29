@@ -69,6 +69,11 @@ describe('POST /api/reminders', () => {
     expect(body.id).toBe('rem-1')
   })
 
+  it('accepts an optional unitId and still returns 201', async () => {
+    const res = await POST(makeRequest('POST', { userId: 'u1', reminderType: 'hvac_filter', dueDate: '2026-06-01', unitId: 'unit-99' }))
+    expect(res.status).toBe(201)
+  })
+
   it('returns 500 when DB insert fails', async () => {
     mockReminderInsert.mockResolvedValueOnce({ data: null, error: { message: 'DB error' } })
     const res = await POST(makeRequest('POST', { userId: 'u1', reminderType: 'hvac_filter', dueDate: '2026-06-01' }))
@@ -105,6 +110,12 @@ describe('PATCH /api/reminders/[id]', () => {
     mockReminderUpdate.mockResolvedValueOnce({ data: null, error: { code: 'PGRST116', message: 'The result contains 0 rows' } })
     const res = await PATCH(makeIdRequest({ dueDate: '2026-07-01' }), { params: { id: 'nonexistent' } })
     expect(res.status).toBe(404)
+  })
+
+  it('returns 500 for non-PGRST116 DB errors on PATCH', async () => {
+    mockReminderUpdate.mockResolvedValueOnce({ data: null, error: { code: 'PGRST301', message: 'connection timeout' } })
+    const res = await PATCH(makeIdRequest({ dueDate: '2026-07-01' }), { params: { id: 'rem-1' } })
+    expect(res.status).toBe(500)
   })
 })
 

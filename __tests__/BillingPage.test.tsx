@@ -84,4 +84,10 @@ describe('BillingPage', () => {
     render(await BillingPage())
     expect(screen.getByText('No billing data yet')).toBeInTheDocument()
   })
+
+  it('handles null snapshots response without crashing', async () => {
+    mockSnapshotsEq.mockResolvedValueOnce({ data: null })
+    render(await BillingPage())
+    expect(screen.getByText('No billing data yet')).toBeInTheDocument()
+  })
 })

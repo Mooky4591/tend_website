@@ -141,6 +141,13 @@ describe('POST /api/warranty-upload', () => {
     expect(mockDocDeleteIn).not.toHaveBeenCalled()
   })
 
+  it('treats null existing data as no prior chunks and skips delete', async () => {
+    mockDocSelectEq.mockResolvedValueOnce({ data: null })
+    const res = await POST(makeRequest('Plan A'))
+    expect(res.status).toBe(200)
+    expect(mockDocDeleteIn).not.toHaveBeenCalled()
+  })
+
   it('returns 415 when file is not a PDF', async () => {
     const req = new NextRequest('http://localhost/api/warranty-upload', { method: 'POST' })
     const mockFile = { size: 100, type: 'text/html', arrayBuffer: jest.fn() }
