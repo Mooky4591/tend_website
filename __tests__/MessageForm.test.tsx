@@ -87,6 +87,43 @@ describe('MessageForm', () => {
     expect(mockRefresh).not.toHaveBeenCalled()
   })
 
+  it('disables the button and shows Sending… for the full fetch round-trip, not just the refresh', async () => {
+    let resolveFetch: (v: Response) => void
+    ;(global.fetch as jest.Mock).mockReturnValueOnce(
+      new Promise(r => { resolveFetch = r as (v: Response) => void })
+    )
+    const user = userEvent.setup()
+    render(<MessageForm userId="u1" />)
+
+    await user.type(screen.getByPlaceholderText(/Type a message/), 'Hello')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+
+    // Fetch is still in-flight — button must be disabled right now
+    expect(screen.getByRole('button', { name: 'Sending…' })).toBeDisabled()
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+
+    // Resolve the fetch so the component can clean up
+    resolveFetch!({ ok: true, json: async () => ({ ok: true }) } as Response)
+  })
+
+  it('ignores a second click while a send is already in flight', async () => {
+    let resolveFetch: (v: Response) => void
+    ;(global.fetch as jest.Mock).mockReturnValueOnce(
+      new Promise(r => { resolveFetch = r as (v: Response) => void })
+    )
+    const user = userEvent.setup()
+    render(<MessageForm userId="u1" />)
+
+    await user.type(screen.getByPlaceholderText(/Type a message/), 'Hello')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+    // Second click while in-flight
+    await user.click(screen.getByRole('button', { name: 'Sending…' }))
+
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+
+    resolveFetch!({ ok: true, json: async () => ({ ok: true }) } as Response)
+  })
+
   it('submits on Enter and does not submit on Shift+Enter', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ ok: true }) })
     const user = userEvent.setup()

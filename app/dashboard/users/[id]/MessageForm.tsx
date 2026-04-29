@@ -6,28 +6,37 @@ import { useRouter } from 'next/navigation'
 export default function MessageForm({ userId }: { userId: string }) {
   const [message, setMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [isSending, setIsSending] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
+  // busy covers both the fetch round-trip and the subsequent router.refresh() transition
+  const busy = isSending || isPending
+
   async function handleSend() {
     const trimmed = message.trim()
-    if (!trimmed) return
+    if (!trimmed || busy) return
     setError(null)
+    setIsSending(true)
 
-    const res = await fetch('/api/send-message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, message: trimmed }),
-    })
+    try {
+      const res = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, message: trimmed }),
+      })
 
-    if (!res.ok) {
-      const { error: msg } = await res.json()
-      setError(msg ?? 'Failed to send')
-      return
+      if (!res.ok) {
+        const { error: msg } = await res.json()
+        setError(msg ?? 'Failed to send')
+        return
+      }
+
+      setMessage('')
+      startTransition(() => router.refresh())
+    } finally {
+      setIsSending(false)
     }
-
-    setMessage('')
-    startTransition(() => router.refresh())
   }
 
   return (
@@ -46,14 +55,14 @@ export default function MessageForm({ userId }: { userId: string }) {
               handleSend()
             }
           }}
-          disabled={isPending}
+          disabled={busy}
         />
         <button
           onClick={handleSend}
-          disabled={isPending || !message.trim()}
+          disabled={busy || !message.trim()}
           className="px-4 py-2 bg-slate-900 text-white text-sm rounded-xl disabled:opacity-40 hover:bg-slate-700 transition-colors self-end"
         >
-          {isPending ? 'Sending…' : 'Send'}
+          {busy ? 'Sending…' : 'Send'}
         </button>
       </div>
       <p className="text-xs text-slate-400 mt-1">Sends via SMS and appears in the conversation thread.</p>
