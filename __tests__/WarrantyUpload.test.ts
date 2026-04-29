@@ -41,6 +41,7 @@ function makeRequest(planName?: string, fileSize = 1024) {
   const req = new NextRequest('http://localhost/api/warranty-upload', { method: 'POST' })
   const mockFile = {
     size: fileSize,
+    type: 'application/pdf',
     arrayBuffer: jest.fn().mockResolvedValue(Buffer.from('pdf content').buffer),
   }
   const fd = {
@@ -81,7 +82,7 @@ describe('POST /api/warranty-upload', () => {
   it('returns 400 when plan_name is missing', async () => {
     const req = new NextRequest('http://localhost/api/warranty-upload', { method: 'POST' })
     jest.spyOn(req, 'formData').mockResolvedValue({
-      get: (key: string) => (key === 'file' ? { size: 100, arrayBuffer: jest.fn() } : null),
+      get: (key: string) => (key === 'file' ? { size: 100, type: 'application/pdf', arrayBuffer: jest.fn() } : null),
     } as unknown as FormData)
     const res = await POST(req)
     expect(res.status).toBe(400)
@@ -140,9 +141,28 @@ describe('POST /api/warranty-upload', () => {
     expect(mockDocDeleteIn).not.toHaveBeenCalled()
   })
 
+  it('returns 415 when file is not a PDF', async () => {
+    const req = new NextRequest('http://localhost/api/warranty-upload', { method: 'POST' })
+    const mockFile = { size: 100, type: 'text/html', arrayBuffer: jest.fn() }
+    jest.spyOn(req, 'formData').mockResolvedValue({
+      get: (key: string) => key === 'plan_name' ? 'Plan A' : mockFile,
+    } as unknown as FormData)
+    const res = await POST(req)
+    expect(res.status).toBe(415)
+  })
+
   it('returns 500 when insert fails', async () => {
     mockDocInsert.mockResolvedValueOnce({ error: { message: 'DB error' } })
     const res = await POST(makeRequest('Plan A'))
     expect(res.status).toBe(500)
+  })
+
+  it('returns 500 when old-chunk delete fails after insert succeeds', async () => {
+    mockDocSelectEq.mockResolvedValueOnce({ data: [{ id: 'old-1' }] })
+    mockDocDeleteIn.mockResolvedValueOnce({ error: { message: 'delete failed' } })
+    const res = await POST(makeRequest('Plan A'))
+    expect(res.status).toBe(500)
+    const body = await res.json()
+    expect(body.error).toContain('Chunks inserted but old chunks could not be removed')
   })
 })

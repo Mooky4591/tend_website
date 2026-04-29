@@ -27,7 +27,8 @@ CREATE POLICY "conversations: tenant members can select"
 CREATE POLICY "conversations: tenant members can insert"
   ON conversations FOR INSERT
   WITH CHECK (
-    tenant_id IN (
+    role = 'staff'
+    AND tenant_id IN (
       SELECT tenant_id FROM tenant_users WHERE auth_user_id = auth.uid()
     )
   );

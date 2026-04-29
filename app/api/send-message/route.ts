@@ -31,14 +31,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Tenant has no Twilio number configured' }, { status: 500 })
   }
 
-  await sendSms(tenant.twilio_phone_number, homeowner.phone_number, message.trim())
+  const smsError = await sendSms(tenant.twilio_phone_number, homeowner.phone_number, message.trim())
+    .then(() => null)
+    .catch((err: unknown) => err)
 
-  await supabase.from('conversations').insert({
+  if (smsError) {
+    return NextResponse.json({ error: 'SMS delivery failed' }, { status: 502 })
+  }
+
+  const { error: insertError } = await supabase.from('conversations').insert({
     user_id: userId,
     tenant_id: homeowner.tenant_id,
     role: 'staff',
     content: message.trim(),
   })
+
+  if (insertError) {
+    return NextResponse.json(
+      { error: 'Message sent but could not be saved: ' + insertError.message },
+      { status: 500 },
+    )
+  }
 
   return NextResponse.json({ ok: true })
 }

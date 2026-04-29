@@ -22,6 +22,9 @@ export async function POST(request: NextRequest) {
   if (!file || !planName) {
     return NextResponse.json({ error: 'file and plan_name are required' }, { status: 400 })
   }
+  if (file.type !== 'application/pdf') {
+    return NextResponse.json({ error: 'Only PDF files are accepted' }, { status: 415 })
+  }
   if (file.size > 10 * 1024 * 1024) {
     return NextResponse.json({ error: 'File exceeds 10 MB limit' }, { status: 413 })
   }
@@ -60,7 +63,17 @@ export async function POST(request: NextRequest) {
   }
 
   if (oldIds.length > 0) {
-    await supabase.from('warranty_documents').delete().in('id', oldIds)
+    const { error: deleteError } = await supabase
+      .from('warranty_documents')
+      .delete()
+      .in('id', oldIds)
+
+    if (deleteError) {
+      return NextResponse.json(
+        { error: 'Chunks inserted but old chunks could not be removed: ' + deleteError.message },
+        { status: 500 },
+      )
+    }
   }
 
   return NextResponse.json({ chunksInserted: chunks.length })

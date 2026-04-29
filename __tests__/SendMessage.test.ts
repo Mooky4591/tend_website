@@ -98,6 +98,27 @@ describe('POST /api/send-message', () => {
     })
   })
 
+  it('returns 502 when Twilio throws', async () => {
+    mockSendSms.mockRejectedValueOnce(new Error('Twilio unreachable'))
+    const res = await POST(makeRequest({ userId: 'u1', message: 'Hi' }))
+    expect(res.status).toBe(502)
+    expect(await res.json()).toMatchObject({ error: 'SMS delivery failed' })
+  })
+
+  it('does not insert a conversation row when Twilio fails', async () => {
+    mockSendSms.mockRejectedValueOnce(new Error('Twilio unreachable'))
+    await POST(makeRequest({ userId: 'u1', message: 'Hi' }))
+    expect(mockConvInsert).not.toHaveBeenCalled()
+  })
+
+  it('returns 500 when conversation insert fails after SMS sends', async () => {
+    mockConvInsert.mockResolvedValueOnce({ error: { message: 'role constraint' } })
+    const res = await POST(makeRequest({ userId: 'u1', message: 'Hi' }))
+    expect(res.status).toBe(500)
+    const body = await res.json()
+    expect(body.error).toContain('Message sent but could not be saved')
+  })
+
   it('returns 200 with ok:true on success', async () => {
     const res = await POST(makeRequest({ userId: 'u1', message: 'Hi' }))
     expect(res.status).toBe(200)
