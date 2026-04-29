@@ -3,7 +3,8 @@ import DashboardPage from '@/app/dashboard/page'
 
 const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
-const mockReturns = jest.fn()
+const mockTenantSingle = jest.fn()
+const mockUsersEq = jest.fn()
 
 jest.mock('next/navigation', () => ({
   redirect: (path: string) => { mockRedirect(path); throw new Error(`NEXT_REDIRECT:${path}`) },
@@ -12,104 +13,84 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/lib/supabase/server', () => ({
   createClient: () => ({
     auth: { getUser: mockGetUser },
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          order: () => ({
-            limit: () => ({
-              returns: mockReturns,
-            }),
-          }),
-        }),
-      }),
-    }),
+    from: (table: string) => {
+      switch (table) {
+        case 'tenant_users':
+          return { select: () => ({ eq: () => ({ single: mockTenantSingle }) }) }
+        case 'users':
+          return { select: () => ({ eq: mockUsersEq }) }
+        default:
+          throw new Error(`Unexpected table in mock: ${table}`)
+      }
+    },
   }),
 }))
 
+const AUTHED_USER = { id: 'user-1', email: 'admin@acme.com' }
+const MEMBERSHIP = { tenant_id: 'tenant-1', tenants: { name: 'Acme Warranty' } }
+
 beforeEach(() => {
   jest.clearAllMocks()
+  mockGetUser.mockResolvedValue({ data: { user: AUTHED_USER } })
+  mockTenantSingle.mockResolvedValue({ data: MEMBERSHIP })
+  mockUsersEq.mockResolvedValue({ data: [] })
 })
 
 describe('DashboardPage', () => {
   it('redirects to /login when no session exists', async () => {
     mockGetUser.mockResolvedValueOnce({ data: { user: null } })
-
     await expect(DashboardPage()).rejects.toThrow('NEXT_REDIRECT:/login')
     expect(mockRedirect).toHaveBeenCalledWith('/login')
   })
 
-  it('renders the tenant name and user email when authenticated', async () => {
-    mockGetUser.mockResolvedValueOnce({
-      data: { user: { id: 'user-1', email: 'admin@armadillo.com' } },
-    })
-    mockReturns.mockResolvedValueOnce({
-      data: [{
-        role: 'admin',
-        tenants: { id: 'tenant-1', name: 'Armadillo Warranty', company_code: 'armadillo', support_email: null },
-      }],
-    })
-
+  it('renders the tenant name when authenticated', async () => {
     render(await DashboardPage())
-
-    expect(screen.getByText('Armadillo Warranty')).toBeInTheDocument()
-    expect(screen.getByText(/admin@armadillo\.com/)).toBeInTheDocument()
-    expect(screen.getByText(/admin/)).toBeInTheDocument()
+    expect(screen.getByText('Acme Warranty')).toBeInTheDocument()
   })
 
-  it('falls back to "Dashboard" heading when user has no tenant memberships', async () => {
-    mockGetUser.mockResolvedValueOnce({
-      data: { user: { id: 'user-1', email: 'admin@example.com' } },
-    })
-    mockReturns.mockResolvedValueOnce({ data: [] })
-
+  it('falls back to "Dashboard" heading when tenant query returns null', async () => {
+    mockTenantSingle.mockResolvedValueOnce({ data: null })
     render(await DashboardPage())
-
     expect(screen.getByText('Dashboard')).toBeInTheDocument()
   })
 
-  it('falls back to "Dashboard" heading when membership data is null', async () => {
-    mockGetUser.mockResolvedValueOnce({
-      data: { user: { id: 'user-1', email: 'admin@example.com' } },
-    })
-    mockReturns.mockResolvedValueOnce({ data: null })
-
+  it('shows zero counts when there are no users', async () => {
     render(await DashboardPage())
-
-    expect(screen.getByText('Dashboard')).toBeInTheDocument()
+    expect(screen.getAllByText('0')).toHaveLength(3)
   })
 
-  it('shows an error UI and does not crash when the tenant query fails', async () => {
-    mockGetUser.mockResolvedValueOnce({
-      data: { user: { id: 'user-1', email: 'admin@example.com' } },
-    })
-    mockReturns.mockResolvedValueOnce({ data: null, error: { message: 'permission denied' } })
-
-    render(await DashboardPage())
-
-    expect(screen.getByText('Unable to load your account information.')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'support@trytendr.org' })).toBeInTheDocument()
-  })
-
-  it('uses the first membership when the user belongs to multiple tenants', async () => {
-    mockGetUser.mockResolvedValueOnce({
-      data: { user: { id: 'user-1', email: 'multi@example.com' } },
-    })
-    mockReturns.mockResolvedValueOnce({
+  it('counts fully provisioned as onboarding_complete', async () => {
+    mockUsersEq.mockResolvedValueOnce({
       data: [
-        {
-          role: 'admin',
-          tenants: { id: 'tenant-1', name: 'First Company', company_code: 'first', support_email: null },
-        },
-        {
-          role: 'viewer',
-          tenants: { id: 'tenant-2', name: 'Second Company', company_code: 'second', support_email: null },
-        },
+        { onboarding_complete: true, opted_out: false },
+        { onboarding_complete: true, opted_out: false },
+        { onboarding_complete: false, opted_out: false },
       ],
     })
 
     render(await DashboardPage())
 
-    expect(screen.getByText('First Company')).toBeInTheDocument()
-    expect(screen.queryByText('Second Company')).not.toBeInTheDocument()
+    expect(screen.getByText('Total homeowners').closest('div')).toHaveTextContent('3')
+    expect(screen.getByText('Fully provisioned').closest('div')).toHaveTextContent('2')
+  })
+
+  it('counts opted-out users correctly', async () => {
+    mockUsersEq.mockResolvedValueOnce({
+      data: [
+        { onboarding_complete: false, opted_out: true },
+        { onboarding_complete: false, opted_out: true },
+        { onboarding_complete: false, opted_out: false },
+      ],
+    })
+
+    render(await DashboardPage())
+
+    expect(screen.getByText('Opted out').closest('div')).toHaveTextContent('2')
+  })
+
+  it('handles null users response without crashing', async () => {
+    mockUsersEq.mockResolvedValueOnce({ data: null })
+    render(await DashboardPage())
+    expect(screen.getAllByText('0')).toHaveLength(3)
   })
 })
