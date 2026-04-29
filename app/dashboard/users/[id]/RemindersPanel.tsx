@@ -35,6 +35,7 @@ export default function RemindersPanel({
   userId: string
 }) {
   const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValues, setEditValues] = useState<{ reminderType: string; dueDate: string }>({ reminderType: '', dueDate: '' })
@@ -42,41 +43,62 @@ export default function RemindersPanel({
   const [newValues, setNewValues] = useState({ reminderType: 'hvac_filter', dueDate: '' })
   const [error, setError] = useState<string | null>(null)
 
+  // busy covers both the fetch round-trip and the subsequent router.refresh() transition
+  const busy = isSubmitting || isPending
+
   function refresh() {
     startTransition(() => router.refresh())
   }
 
   async function handleDelete(id: string) {
+    if (busy) return
     setError(null)
-    const res = await fetch(`/api/reminders/${id}`, { method: 'DELETE' })
-    if (!res.ok) { setError('Failed to delete'); return }
-    refresh()
+    setIsSubmitting(true)
+    try {
+      const res = await fetch(`/api/reminders/${id}`, { method: 'DELETE' })
+      if (!res.ok) { setError('Failed to delete'); return }
+      refresh()
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   async function handleSaveEdit(id: string) {
+    if (busy) return
     setError(null)
-    const res = await fetch(`/api/reminders/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editValues),
-    })
-    if (!res.ok) { setError('Failed to save'); return }
-    setEditingId(null)
-    refresh()
+    setIsSubmitting(true)
+    try {
+      const res = await fetch(`/api/reminders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editValues),
+      })
+      if (!res.ok) { setError('Failed to save'); return }
+      setEditingId(null)
+      refresh()
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   async function handleAdd() {
     if (!newValues.dueDate) { setError('Due date is required'); return }
+    if (busy) return
     setError(null)
-    const res = await fetch('/api/reminders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, reminderType: newValues.reminderType, dueDate: newValues.dueDate }),
-    })
-    if (!res.ok) { setError('Failed to add reminder'); return }
-    setAdding(false)
-    setNewValues({ reminderType: 'hvac_filter', dueDate: '' })
-    refresh()
+    setIsSubmitting(true)
+    try {
+      const res = await fetch('/api/reminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, reminderType: newValues.reminderType, dueDate: newValues.dueDate }),
+      })
+      if (!res.ok) { setError('Failed to add reminder'); return }
+      setAdding(false)
+      setNewValues({ reminderType: 'hvac_filter', dueDate: '' })
+      refresh()
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -86,7 +108,7 @@ export default function RemindersPanel({
         <button
           onClick={() => setAdding(true)}
           className="text-xs px-3 py-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors"
-          disabled={isPending}
+          disabled={busy}
         >
           + Add
         </button>
@@ -115,13 +137,14 @@ export default function RemindersPanel({
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleSaveEdit(r.id)}
-                    disabled={isPending}
+                    disabled={busy}
                     className="text-xs px-3 py-1 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditingId(null)}
+                    disabled={busy}
                     className="text-xs px-3 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
                   >
                     Cancel
@@ -141,13 +164,14 @@ export default function RemindersPanel({
                       setEditingId(r.id)
                       setEditValues({ reminderType: r.reminder_type, dueDate: r.due_date })
                     }}
+                    disabled={busy}
                     className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(r.id)}
-                    disabled={isPending}
+                    disabled={busy}
                     className="text-xs text-red-500 hover:text-red-700 transition-colors"
                   >
                     Delete
@@ -180,13 +204,14 @@ export default function RemindersPanel({
             <div className="flex gap-2">
               <button
                 onClick={handleAdd}
-                disabled={isPending}
+                disabled={busy}
                 className="text-xs px-3 py-1 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors"
               >
                 Add
               </button>
               <button
                 onClick={() => { setAdding(false); setError(null) }}
+                disabled={busy}
                 className="text-xs px-3 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Cancel

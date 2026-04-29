@@ -134,4 +134,60 @@ describe('RemindersPanel', () => {
     expect(await screen.findByText('Due date is required')).toBeInTheDocument()
     expect(global.fetch).not.toHaveBeenCalled()
   })
+
+  it('ignores a second Delete click while the first is in flight', async () => {
+    let resolveFetch: (v: Response) => void
+    ;(global.fetch as jest.Mock).mockReturnValueOnce(
+      new Promise(r => { resolveFetch = r as (v: Response) => void })
+    )
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+
+    await user.click(screen.getAllByRole('button', { name: 'Delete' })[0])
+    // All action buttons are now disabled — second click must be a no-op
+    await user.click(screen.getAllByRole('button', { name: 'Delete' })[1])
+
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+
+    resolveFetch!({ ok: true, json: async () => ({ ok: true }) } as Response)
+  })
+
+  it('ignores a second Save click while the first is in flight', async () => {
+    let resolveFetch: (v: Response) => void
+    ;(global.fetch as jest.Mock).mockReturnValueOnce(
+      new Promise(r => { resolveFetch = r as (v: Response) => void })
+    )
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+
+    await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    // Save is now disabled — second click must be a no-op
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+
+    resolveFetch!({ ok: true, json: async () => ({}) } as Response)
+  })
+
+  it('ignores a second Add click while the first is in flight', async () => {
+    let resolveFetch: (v: Response) => void
+    ;(global.fetch as jest.Mock).mockReturnValueOnce(
+      new Promise(r => { resolveFetch = r as (v: Response) => void })
+    )
+    const user = userEvent.setup()
+    const { container } = render(<RemindersPanel reminders={[]} userId="u1" />)
+
+    await user.click(screen.getByRole('button', { name: '+ Add' }))
+    const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement
+    await user.type(dateInput, '2026-08-01')
+
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    // Add is now disabled — second click must be a no-op
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+
+    resolveFetch!({ ok: true, json: async () => ({ id: 'new' }) } as Response)
+  })
 })
