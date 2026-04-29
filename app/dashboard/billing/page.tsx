@@ -68,7 +68,7 @@ export default async function BillingPage() {
           <a href="mailto:support@trytendr.org" className="text-slate-900 underline">
             support@trytendr.org
           </a>{' '}
-          and we'll get back to you within one business day.
+          and we&apos;ll get back to you within one business day.
         </p>
       </div>
     </div>
