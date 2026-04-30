@@ -2,11 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* PLACEHOLDER: Replace CSS custom properties with your final brand tokens */
 :root {
-  --brand-primary: #059669;
-  --brand-primary-dark: #047857;
-  --brand-light: #ecfdf5;
+  --brand-primary: #21B6A8;
+  --brand-primary-dark: #178C84;
+  --brand-light: #DDF7F3;
+  --navy: #0B1F3A;
+  --deep-slate: #243241;
 }
 
 @layer base {
