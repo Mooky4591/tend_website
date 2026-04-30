@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 function TendrLogo() {
   return (
-    <Image src="/logo.png" alt="Tendr" width={120} height={40} priority style={{ background: 'rgba(255,255,255,0.95)' }} />
+    <Image src="/logo.png" alt="Tendr" width={120} height={40} priority />
   )
 }
 
