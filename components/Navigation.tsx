@@ -1,32 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 
-// PLACEHOLDER: Replace TendrLogo with your actual logo asset
 function TendrLogo() {
   return (
-    <div className="flex items-center gap-2">
-      {/* PLACEHOLDER: swap this div for an <Image> with your logo */}
-      <div
-        className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center"
-        aria-hidden="true"
-      >
-        <svg
-          className="w-5 h-5 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-          />
-        </svg>
-      </div>
-      <span className="text-xl font-bold tracking-tight text-slate-900">Tendr</span>
-    </div>
+    <Image src="/logo.png" alt="Tendr" width={120} height={40} priority />
   )
 }
 
