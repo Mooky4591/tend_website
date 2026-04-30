@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 function TendrLogo() {
   return (
-    <Image src="/logo.png" alt="Tendr" width={120} height={40} priority />
+    <Image src="/logo.png" alt="Tendr" width={120} height={40} priority style={{ background: 'rgba(255,255,255,0.95)' }} />
   )
 }
 
@@ -77,7 +77,7 @@ export default function Navigation() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-200 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm transition-shadow duration-200 ${
         scrolled ? 'shadow-sm border-b border-slate-200' : ''
       }`}
       role="banner"
