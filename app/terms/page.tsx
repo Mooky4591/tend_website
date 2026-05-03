@@ -71,7 +71,16 @@ export default function TermsPage() {
           <h2 className="text-xl font-semibold" id="electronic-communications-transactions-and-signatures">18. ELECTRONIC COMMUNICATIONS, TRANSACTIONS, AND SIGNATURES</h2><p>You consent to electronic communications and records.</p>
           <h2 className="text-xl font-semibold" id="miscellaneous">19. MISCELLANEOUS</h2><p>These Legal Terms and posted policies constitute the entire agreement.</p>
           <h2 className="text-xl font-semibold" id="contact-us">20. CONTACT US</h2>
-          <ul className="list-disc pl-6 space-y-1"><li>Name: Scott Robinson (Tendr)</li><li>Email: support@trytendr.org</li><li>Address: 4841 Creek Ridge Ct, Douglasville, GA 30135, United States</li></ul>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>Name: Scott Robinson (Tendr)</li>
+            <li>
+              Email:{' '}
+              <a className="text-brand-700 underline" href="mailto:support@trytendr.org">
+                support@trytendr.org
+              </a>
+            </li>
+            <li>Address: 4841 Creek Ridge Ct, Douglasville, GA 30135, United States</li>
+          </ul>
         </section>
       </div>
     </main>
