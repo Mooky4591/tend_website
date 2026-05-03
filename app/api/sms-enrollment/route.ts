@@ -1,5 +1,5 @@
-import { createHash } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
+import { buildRateLimitKey, checkRateLimit, getTrustedClientIp } from '@/lib/rate-limit'
 import { createClient } from '@/lib/supabase/server'
 
 const CONSENT_LANGUAGE_VERSION = 'tendr-sms-consent-v1'
@@ -9,24 +9,6 @@ const SOURCE_URL = 'https://trytendr.org/sms-enrollment'
 
 const RATE_LIMIT_WINDOW_SECONDS = 15 * 60
 const RATE_LIMIT_MAX_ATTEMPTS = 8
-
-function getTrustedClientIp(request: NextRequest) {
-  const trustedHeaders = [
-    'cf-connecting-ip',
-    'true-client-ip',
-    'x-real-ip',
-    'x-vercel-forwarded-for',
-  ]
-
-  for (const header of trustedHeaders) {
-    const value = request.headers.get(header)?.trim()
-    if (value) {
-      return { ip: value, source: header }
-    }
-  }
-
-  return { ip: null, source: 'none' }
-}
 
 function isAllowedOrigin(request: NextRequest) {
   const origin = request.headers.get('origin')
@@ -39,10 +21,6 @@ function isAllowedOrigin(request: NextRequest) {
   } catch {
     return false
   }
-}
-
-function rateLimitKey(ip: string | null, userAgent: string | null) {
-  return `${ip ?? 'unknown'}::${userAgent ?? 'unknown'}`
 }
 
 export async function POST(request: NextRequest) {
@@ -77,14 +55,13 @@ export async function POST(request: NextRequest) {
   const { ip, source } = getTrustedClientIp(request)
 
   const supabase = createClient()
-  const fingerprint = createHash('sha256').update(rateLimitKey(ip, userAgent)).digest('hex')
-  const { data: allowed, error: rateLimitError } = await supabase.rpc('check_sms_enrollment_rate_limit', {
-    rate_key: fingerprint,
-    max_attempts: RATE_LIMIT_MAX_ATTEMPTS,
-    window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+  const fingerprint = buildRateLimitKey('sms-enrollment', ip, userAgent)
+  const { allowed } = await checkRateLimit(supabase, fingerprint, {
+    maxAttempts: RATE_LIMIT_MAX_ATTEMPTS,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
   })
 
-  if (rateLimitError || !allowed) {
+  if (!allowed) {
     return NextResponse.redirect(new URL('/sms-enrollment?status=rate-limited', request.url), { status: 303 })
   }
 
