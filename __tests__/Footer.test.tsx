@@ -53,7 +53,7 @@ describe('Footer', () => {
   it('renders legal links', () => {
     render(<Footer />)
     expect(screen.getByRole('link', { name: 'Privacy Policy' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Terms of Service' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Terms of Use' })).toBeInTheDocument()
   })
 
   it('legal links point to expected privacy and terms URLs', () => {
@@ -62,7 +62,7 @@ describe('Footer', () => {
       'href',
       '/privacy-policy'
     )
-    expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Terms of Use' })).toHaveAttribute(
       'href',
       '/terms'
     )
@@ -71,7 +71,7 @@ describe('Footer', () => {
   it('legal policy links stay internal (no new-tab attributes)', () => {
     render(<Footer />)
     const privacyLink = screen.getByRole('link', { name: 'Privacy Policy' })
-    const tosLink = screen.getByRole('link', { name: 'Terms of Service' })
+    const tosLink = screen.getByRole('link', { name: 'Terms of Use' })
     expect(privacyLink).not.toHaveAttribute('target', '_blank')
     expect(privacyLink).not.toHaveAttribute('rel', 'noopener noreferrer')
     expect(tosLink).not.toHaveAttribute('target', '_blank')
