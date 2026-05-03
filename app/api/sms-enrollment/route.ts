@@ -6,15 +6,74 @@ const TERMS_URL = 'https://trytendr.org/terms'
 const PRIVACY_URL = 'https://trytendr.org/privacy-policy'
 const SOURCE_URL = 'https://trytendr.org/sms-enrollment'
 
-function getClientIp(request: NextRequest) {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0]?.trim() || null
-  const realIp = request.headers.get('x-real-ip')
-  return realIp?.trim() || null
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
+const RATE_LIMIT_MAX_ATTEMPTS = 8
+
+const requestCounts = new Map<string, { count: number; resetAt: number }>()
+
+function getTrustedClientIp(request: NextRequest) {
+  const trustedHeaders = [
+    'cf-connecting-ip',
+    'true-client-ip',
+    'x-real-ip',
+    'x-vercel-forwarded-for',
+  ]
+
+  for (const header of trustedHeaders) {
+    const value = request.headers.get(header)?.trim()
+    if (value) {
+      return { ip: value, source: header }
+    }
+  }
+
+  return { ip: null, source: 'none' }
+}
+
+function isAllowedOrigin(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  const host = request.headers.get('host')
+  if (!origin || !host) return false
+
+  try {
+    const originUrl = new URL(origin)
+    return originUrl.host === host
+  } catch {
+    return false
+  }
+}
+
+function rateLimitKey(ip: string | null, userAgent: string | null) {
+  return `${ip ?? 'unknown'}::${userAgent ?? 'unknown'}`
+}
+
+function isRateLimited(key: string) {
+  const now = Date.now()
+  const current = requestCounts.get(key)
+
+  if (!current || current.resetAt <= now) {
+    requestCounts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return false
+  }
+
+  if (current.count >= RATE_LIMIT_MAX_ATTEMPTS) {
+    return true
+  }
+
+  current.count += 1
+  return false
 }
 
 export async function POST(request: NextRequest) {
+  if (!isAllowedOrigin(request)) {
+    return NextResponse.redirect(new URL('/sms-enrollment?status=invalid-origin', request.url), { status: 303 })
+  }
+
   const form = await request.formData()
+  const website = String(form.get('website') ?? '').trim()
+
+  if (website) {
+    return NextResponse.redirect(new URL('/sms-enrollment?status=success', request.url), { status: 303 })
+  }
 
   const fullName = String(form.get('fullName') ?? '').trim()
   const mobilePhone = String(form.get('mobilePhone') ?? '').trim()
@@ -32,6 +91,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(new URL('/sms-enrollment?status=no-consent', request.url), { status: 303 })
   }
 
+  const userAgent = request.headers.get('user-agent')
+  const { ip, source } = getTrustedClientIp(request)
+
+  if (isRateLimited(rateLimitKey(ip, userAgent))) {
+    return NextResponse.redirect(new URL('/sms-enrollment?status=rate-limited', request.url), { status: 303 })
+  }
+
   const supabase = createClient()
   const { error } = await supabase.from('sms_opt_ins').insert({
     full_name: fullName,
@@ -45,8 +111,9 @@ export async function POST(request: NextRequest) {
     consent_language_version: CONSENT_LANGUAGE_VERSION,
     terms_url: TERMS_URL,
     privacy_policy_url: PRIVACY_URL,
-    ip_address: getClientIp(request),
-    user_agent: request.headers.get('user-agent'),
+    ip_address: ip,
+    user_agent: userAgent,
+    ip_source: source,
   })
 
   if (error) {

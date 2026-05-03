@@ -23,6 +23,14 @@ const statusCopy: Record<string, { tone: string; message: string }> = {
     tone: 'border-rose-200 bg-rose-50 text-rose-900',
     message: 'We could not save your enrollment right now. Please try again or contact support@trytendr.org.',
   },
+  'invalid-origin': {
+    tone: 'border-rose-200 bg-rose-50 text-rose-900',
+    message: 'Invalid submission origin. Please submit the form directly from trytendr.org.',
+  },
+  'rate-limited': {
+    tone: 'border-amber-200 bg-amber-50 text-amber-900',
+    message: 'Too many enrollment attempts. Please wait and try again shortly.',
+  },
 }
 
 export default function SmsEnrollmentPage({
@@ -56,6 +64,14 @@ export default function SmsEnrollmentPage({
           )}
 
           <form className="mt-6 space-y-5" action="/api/sms-enrollment" method="post">
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden"
+              aria-hidden="true"
+            />
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-2 text-sm font-medium text-slate-700">
                 Full Name

@@ -1,0 +1,2 @@
+ALTER TABLE sms_opt_ins
+ADD COLUMN IF NOT EXISTS ip_source TEXT NOT NULL DEFAULT 'none';
