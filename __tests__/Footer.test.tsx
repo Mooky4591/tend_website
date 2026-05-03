@@ -56,11 +56,11 @@ describe('Footer', () => {
     expect(screen.getByRole('link', { name: 'Terms of Service' })).toBeInTheDocument()
   })
 
-  it('legal links point to the real policy URLs', () => {
+  it('legal links point to expected privacy and terms URLs', () => {
     render(<Footer />)
     expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute(
       'href',
-      'https://app.termly.io/policy-viewer/policy.html?policyUUID=6807f094-d6d5-4171-a4d9-1aafa1eebeb8'
+      '/privacy-policy'
     )
     expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute(
       'href',
@@ -68,12 +68,12 @@ describe('Footer', () => {
     )
   })
 
-  it('legal links open in a new tab with safe rel attribute', () => {
+  it('external terms link opens in a new tab with safe rel attribute', () => {
     render(<Footer />)
     const privacyLink = screen.getByRole('link', { name: 'Privacy Policy' })
     const tosLink = screen.getByRole('link', { name: 'Terms of Service' })
-    expect(privacyLink).toHaveAttribute('target', '_blank')
-    expect(privacyLink).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(privacyLink).not.toHaveAttribute('target', '_blank')
+    expect(privacyLink).not.toHaveAttribute('rel', 'noopener noreferrer')
     expect(tosLink).toHaveAttribute('target', '_blank')
     expect(tosLink).toHaveAttribute('rel', 'noopener noreferrer')
   })
