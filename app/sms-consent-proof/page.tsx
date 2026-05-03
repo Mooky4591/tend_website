@@ -50,7 +50,7 @@ export default function SmsConsentProofPage() {
 
               <div className="rounded-lg border border-slate-200 bg-white p-4">
                 <label className="flex items-start gap-3">
-                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-slate-300" />
+                  <input type="checkbox" readOnly className="mt-1 h-4 w-4 rounded border-slate-300" />
                   <span className="text-sm leading-6 text-slate-700">{consentDisclosure}</span>
                 </label>
                 <div className="mt-3 text-sm text-slate-700">
@@ -133,7 +133,12 @@ export default function SmsConsentProofPage() {
             <li>Message frequency varies.</li>
             <li>Message and data rates may apply.</li>
           </ul>
-          <p className="mt-5 text-sm text-slate-600">Support contact: support@trytendr.org</p>
+          <p className="mt-5 text-sm text-slate-600">
+            Support contact:{' '}
+            <a className="text-brand-700 underline" href="mailto:support@trytendr.org">
+              support@trytendr.org
+            </a>
+          </p>
         </section>
       </div>
     </main>
