@@ -8,7 +8,7 @@ export default function TermsPage() {
     <main className="bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Tendr - Terms of Use</h1>
-        <p className="mt-3 text-sm text-slate-600">Last updated March 30, 2026</p>
+        <p className="mt-3 text-sm text-slate-600">Last updated May 3, 2026</p>
 
         <section className="mt-8 space-y-4 leading-7">
           <h2 className="text-xl font-semibold">AGREEMENT TO OUR LEGAL TERMS</h2>
