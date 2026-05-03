@@ -8,7 +8,7 @@ export default function TermsPage() {
     <main className="bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Tendr - Terms of Use</h1>
-        <p className="mt-3 text-sm text-slate-600">Last updated March 30, 2026</p>
+        <p className="mt-3 text-sm text-slate-600">Last updated May 3, 2026</p>
 
         <section className="mt-8 space-y-4 leading-7">
           <h2 className="text-xl font-semibold">AGREEMENT TO OUR LEGAL TERMS</h2>
@@ -52,7 +52,7 @@ export default function TermsPage() {
 
         <section className="mt-8 space-y-4 leading-7">
           <h2 className="text-xl font-semibold" id="our-services">1. OUR SERVICES</h2><p>Tendr provides an AI-powered SMS home assistant that helps homeowners manage home maintenance, warranty coverage questions, claim support, claim status updates, and related product recommendations.</p>
-          <h2 className="text-xl font-semibold" id="sms-terms">2. SMS TERMS</h2><p>By opting in to Tendr SMS messages, you agree to receive text messages related to warranty assistance, claim support, claim status updates, home maintenance reminders, and related product recommendations. Message frequency varies. Message and data rates may apply. Reply STOP to cancel. Reply HELP for help.</p>
+          <h2 className="text-xl font-semibold" id="sms-terms">2. SMS TERMS</h2><p>By opting in to Tendr SMS messages, you agree to receive text messages from Tendr related to warranty assistance, claim support, claim status updates, home maintenance reminders, and related product recommendations. Message frequency varies. Message and data rates may apply. Reply STOP to cancel. Reply HELP for help. Consent to receive SMS messages is not required to purchase or use warranty services.</p>
           <h2 className="text-xl font-semibold" id="intellectual-property-rights">3. INTELLECTUAL PROPERTY RIGHTS</h2><p>We are the owner or licensee of all intellectual property rights in our Services.</p>
           <h2 className="text-xl font-semibold" id="user-representations">4. USER REPRESENTATIONS</h2><p>By using the Services, you represent and warrant that you have legal capacity and will comply with these Legal Terms.</p>
           <h2 className="text-xl font-semibold" id="prohibited-activities">5. PROHIBITED ACTIVITIES</h2><p>You agree not to misuse the Services, including through unauthorized access, malicious material, or unlawful activity.</p>
