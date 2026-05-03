@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildRateLimitKey, checkRateLimit, getTrustedClientIp } from '@/lib/rate-limit'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const CONSENT_LANGUAGE_VERSION = 'tendr-sms-consent-v1'
 const TERMS_URL = 'https://trytendr.org/terms'
@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
   const userAgent = request.headers.get('user-agent')
   const { ip, source } = getTrustedClientIp(request)
 
-  const supabase = createClient()
-  const fingerprint = buildRateLimitKey('sms-enrollment', ip, userAgent)
+  const supabase = createAdminClient()
+  const fingerprint = buildRateLimitKey('sms-enrollment', ip, null)
   const { allowed } = await checkRateLimit(supabase, fingerprint, {
     maxAttempts: RATE_LIMIT_MAX_ATTEMPTS,
     windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
