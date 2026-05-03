@@ -64,18 +64,18 @@ describe('Footer', () => {
     )
     expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute(
       'href',
-      'https://docs.google.com/document/d/e/2PACX-1vR0r80pzdX_Rl9l0hqtbGXwU0agJad8lgfU0r24Wht6tOpIebwzi8Q9XSBsN0h1_M0HDABfY4sIKgb2/pub'
+      '/terms'
     )
   })
 
-  it('external terms link opens in a new tab with safe rel attribute', () => {
+  it('legal policy links stay internal (no new-tab attributes)', () => {
     render(<Footer />)
     const privacyLink = screen.getByRole('link', { name: 'Privacy Policy' })
     const tosLink = screen.getByRole('link', { name: 'Terms of Service' })
     expect(privacyLink).not.toHaveAttribute('target', '_blank')
     expect(privacyLink).not.toHaveAttribute('rel', 'noopener noreferrer')
-    expect(tosLink).toHaveAttribute('target', '_blank')
-    expect(tosLink).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(tosLink).not.toHaveAttribute('target', '_blank')
+    expect(tosLink).not.toHaveAttribute('rel', 'noopener noreferrer')
   })
 
   it('has labelled navigation regions', () => {

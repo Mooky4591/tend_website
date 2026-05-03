@@ -27,7 +27,27 @@ export default function TermsPage() {
         <section className="mt-8 space-y-4 leading-7">
           <h2 className="text-xl font-semibold">TABLE OF CONTENTS</h2>
           <ol className="list-decimal pl-6 space-y-1">
-            <li>Our Services</li><li>SMS Terms</li><li>Intellectual Property Rights</li><li>User Representations</li><li>Prohibited Activities</li><li>User Generated Contributions</li><li>Contribution License</li><li>Services Management</li><li>Term and Termination</li><li>Modifications and Interruptions</li><li>Governing Law</li><li>Dispute Resolution</li><li>Corrections</li><li>Disclaimer</li><li>Limitations of Liability</li><li>Indemnification</li><li>User Data</li><li>Electronic Communications, Transactions, and Signatures</li><li>Miscellaneous</li><li>Contact Us</li>
+            <li>Our Services</li>
+            <li>SMS Terms</li>
+            <li>Intellectual Property Rights</li>
+            <li>User Representations</li>
+            <li>Prohibited Activities</li>
+            <li>User Generated Contributions</li>
+            <li>Contribution License</li>
+            <li>Services Management</li>
+            <li>Term and Termination</li>
+            <li>Modifications and Interruptions</li>
+            <li>Governing Law</li>
+            <li>Dispute Resolution</li>
+            <li>Corrections</li>
+            <li>Disclaimer</li>
+            <li>Limitations of Liability</li>
+            <li>Indemnification</li>
+            <li>User Data</li>
+            <li>Electronic Communications, Transactions, and Signatures</li>
+            <li>Miscellaneous</li>
+            <li>Contact Us</li>
+
           </ol>
         </section>
 
@@ -52,6 +72,7 @@ export default function TermsPage() {
           <h2 className="text-xl font-semibold">18. ELECTRONIC COMMUNICATIONS, TRANSACTIONS, AND SIGNATURES</h2><p>You consent to electronic communications and records.</p>
           <h2 className="text-xl font-semibold">19. MISCELLANEOUS</h2><p>These Legal Terms and posted policies constitute the entire agreement.</p>
           <h2 className="text-xl font-semibold">20. CONTACT US</h2>
+
           <ul className="list-disc pl-6 space-y-1"><li>Name: Scott Robinson (Tendr)</li><li>Email: <a className="text-brand-700 underline" href="mailto:support@trytendr.org">support@trytendr.org</a></li><li>Address: 4841 Creek Ridge Ct, Douglasville, GA 30135, United States</li></ul>
         </section>
       </div>
