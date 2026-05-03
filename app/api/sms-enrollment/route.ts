@@ -1,3 +1,4 @@
+import { createHash } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
@@ -6,10 +7,8 @@ const TERMS_URL = 'https://trytendr.org/terms'
 const PRIVACY_URL = 'https://trytendr.org/privacy-policy'
 const SOURCE_URL = 'https://trytendr.org/sms-enrollment'
 
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
+const RATE_LIMIT_WINDOW_SECONDS = 15 * 60
 const RATE_LIMIT_MAX_ATTEMPTS = 8
-
-const requestCounts = new Map<string, { count: number; resetAt: number }>()
 
 function getTrustedClientIp(request: NextRequest) {
   const trustedHeaders = [
@@ -46,23 +45,6 @@ function rateLimitKey(ip: string | null, userAgent: string | null) {
   return `${ip ?? 'unknown'}::${userAgent ?? 'unknown'}`
 }
 
-function isRateLimited(key: string) {
-  const now = Date.now()
-  const current = requestCounts.get(key)
-
-  if (!current || current.resetAt <= now) {
-    requestCounts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return false
-  }
-
-  if (current.count >= RATE_LIMIT_MAX_ATTEMPTS) {
-    return true
-  }
-
-  current.count += 1
-  return false
-}
-
 export async function POST(request: NextRequest) {
   if (!isAllowedOrigin(request)) {
     return NextResponse.redirect(new URL('/sms-enrollment?status=invalid-origin', request.url), { status: 303 })
@@ -94,11 +76,18 @@ export async function POST(request: NextRequest) {
   const userAgent = request.headers.get('user-agent')
   const { ip, source } = getTrustedClientIp(request)
 
-  if (isRateLimited(rateLimitKey(ip, userAgent))) {
+  const supabase = createClient()
+  const fingerprint = createHash('sha256').update(rateLimitKey(ip, userAgent)).digest('hex')
+  const { data: allowed, error: rateLimitError } = await supabase.rpc('check_sms_enrollment_rate_limit', {
+    rate_key: fingerprint,
+    max_attempts: RATE_LIMIT_MAX_ATTEMPTS,
+    window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+  })
+
+  if (rateLimitError || !allowed) {
     return NextResponse.redirect(new URL('/sms-enrollment?status=rate-limited', request.url), { status: 303 })
   }
 
-  const supabase = createClient()
   const { error } = await supabase.from('sms_opt_ins').insert({
     full_name: fullName,
     mobile_phone: mobilePhone,
