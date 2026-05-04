@@ -1,13 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-
-type Message = {
-  id: string
-  role: 'user' | 'assistant' | 'staff'
-  content: string
-  created_at: string
-}
+import type { Message } from '@/types'
 
 function bubble(role: Message['role']) {
   if (role === 'user') return 'self-start bg-slate-100 text-slate-800'

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getTenantId } from '@/lib/auth'
 
 function statusBadge(u: { onboarding_complete: boolean; onboarding_status: string | null; opted_out: boolean }) {
   if (u.opted_out) return <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Opted out</span>
@@ -15,16 +16,12 @@ export default async function UsersPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: membership } = await supabase
-    .from('tenant_users')
-    .select('tenant_id')
-    .eq('auth_user_id', user.id)
-    .single()
+  const tenantId = await getTenantId(supabase, user.id)
 
   const { data: homeowners } = await supabase
     .from('users')
     .select('id, first_name, phone_number, city, state, onboarding_complete, onboarding_status, opted_out, created_at')
-    .eq('tenant_id', membership?.tenant_id ?? '')
+    .eq('tenant_id', tenantId ?? '')
     .order('created_at', { ascending: false })
 
   return (

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { sendMessage } from '@/lib/api/client'
 
 export default function MessageForm({ userId }: { userId: string }) {
   const [message, setMessage] = useState('')
@@ -20,11 +21,7 @@ export default function MessageForm({ userId }: { userId: string }) {
     setIsSending(true)
 
     try {
-      const res = await fetch('/api/send-message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, message: trimmed }),
-      })
+      const res = await sendMessage(userId, trimmed)
 
       if (!res.ok) {
         const { error: msg } = await res.json()

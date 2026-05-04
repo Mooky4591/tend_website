@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { CONSENT_LANGUAGE, TERMS_URL, PRIVACY_POLICY_URL } from '@/lib/sms-consent'
+import { isValidPhone, isValidEmail } from '@/lib/validators'
+import { submitSmsEnrollment } from '@/lib/api/client'
 
 interface FormState {
   full_name: string
@@ -47,10 +49,10 @@ export default function SmsEnrollmentForm() {
     if (!form.full_name.trim()) errs.full_name = 'Full name is required'
     if (!form.phone.trim()) {
       errs.phone = 'Mobile phone number is required'
-    } else if (form.phone.replace(/\D/g, '').length < 10) {
+    } else if (!isValidPhone(form.phone)) {
       errs.phone = 'Enter a valid phone number (at least 10 digits)'
     }
-    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+    if (form.email.trim() && !isValidEmail(form.email.trim())) {
       errs.email = 'Enter a valid email address'
     }
     if (!form.home_address.trim()) errs.home_address = 'Home address is required'
@@ -66,11 +68,7 @@ export default function SmsEnrollmentForm() {
     setError(null)
 
     try {
-      const res = await fetch('/api/sms-enrollment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
+      const res = await submitSmsEnrollment(form)
       if (!res.ok) {
         const body = await res.json()
         setError(body.error ?? 'Submission failed. Please try again.')

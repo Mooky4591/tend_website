@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getTenantId } from '@/lib/auth'
 import UploadForm from './UploadForm'
 import DeleteDocButton from './DeleteDocButton'
 
@@ -28,9 +29,9 @@ export default async function DocsPage() {
     const sc = createClient()
     const { data: { user: u } } = await sc.auth.getUser()
     if (!u) throw new Error('Unauthorized')
-    const { data: m } = await sc.from('tenant_users').select('tenant_id').eq('auth_user_id', u.id).single()
-    if (!m) throw new Error('No tenant')
-    const { error } = await sc.from('warranty_documents').delete().eq('tenant_id', m.tenant_id).eq('plan_name', planName)
+    const tenantId = await getTenantId(sc, u.id)
+    if (!tenantId) throw new Error('No tenant')
+    const { error } = await sc.from('warranty_documents').delete().eq('tenant_id', tenantId).eq('plan_name', planName)
     if (error) throw error
     revalidatePath('/dashboard/docs')
   }
