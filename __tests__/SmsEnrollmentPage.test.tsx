@@ -120,6 +120,35 @@ describe('SmsEnrollmentForm', () => {
     expect(screen.getByText('DB error')).toBeInTheDocument()
   })
 
+  it('does not call fetch when required fields are empty', async () => {
+    render(<SmsEnrollmentForm />)
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
+  it('shows a field error when phone has fewer than 10 digits', async () => {
+    render(<SmsEnrollmentForm />)
+    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
+    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '12345' } })
+    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
+    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+    expect(screen.getByText(/valid phone number/i)).toBeInTheDocument()
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
+  it('shows a field error when email is malformed', async () => {
+    render(<SmsEnrollmentForm />)
+    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
+    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
+    fireEvent.change(screen.getByLabelText(/email address/i), { target: { value: 'not-an-email' } })
+    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
+    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+    expect(screen.getByText(/valid email address/i)).toBeInTheDocument()
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
   it('disables the submit button while submitting', async () => {
     let resolve: (v: unknown) => void
     mockFetch.mockReturnValueOnce(new Promise(r => { resolve = r }))

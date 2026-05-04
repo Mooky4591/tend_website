@@ -124,12 +124,27 @@ describe('POST /api/sms-enrollment', () => {
     }))
   })
 
-  it('trims whitespace from text fields before storing', async () => {
+  it('trims whitespace and normalizes phone to E.164 before storing', async () => {
     await POST(makeRequest({ ...validBody, full_name: '  Jane  ', phone: ' 5551234567 ' }))
     expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({
       full_name: 'Jane',
-      phone: '5551234567',
+      phone: '+15551234567',
     }))
+  })
+
+  it('normalizes an 11-digit phone starting with 1 to E.164', async () => {
+    await POST(makeRequest({ ...validBody, phone: '15551234567' }))
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ phone: '+15551234567' }))
+  })
+
+  it('returns 400 when email is provided but malformed', async () => {
+    const res = await POST(makeRequest({ ...validBody, email: 'not-an-email' }))
+    expect(res.status).toBe(400)
+  })
+
+  it('accepts a valid email when provided', async () => {
+    const res = await POST(makeRequest({ ...validBody, email: 'jane@example.com' }))
+    expect(res.status).toBe(201)
   })
 
   it('stores null for optional fields when omitted', async () => {

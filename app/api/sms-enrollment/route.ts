@@ -40,6 +40,13 @@ export async function POST(request: NextRequest) {
   if (phoneDigits.length < 10 || phoneDigits.length > 15) {
     return NextResponse.json({ error: 'phone must be a valid dialable number' }, { status: 400 })
   }
+  // Normalize to E.164: 10-digit US numbers get +1 prefix; all others get + prefix
+  const normalizedPhone = phoneDigits.length === 10 ? `+1${phoneDigits}` : `+${phoneDigits}`
+
+  const emailValue = email?.trim() || null
+  if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+    return NextResponse.json({ error: 'email must be a valid email address' }, { status: 400 })
+  }
 
   const h = headers()
   const ip = (h.get('x-forwarded-for')?.split(',')[0]?.trim()) ?? h.get('x-real-ip') ?? null
@@ -49,8 +56,8 @@ export async function POST(request: NextRequest) {
 
   const { error } = await supabase.from('sms_enrollments').insert({
     full_name: full_name.trim(),
-    phone: phone.trim(),
-    email: email?.trim() || null,
+    phone: normalizedPhone,
+    email: emailValue,
     home_address: home_address.trim(),
     warranty_provider: warranty_provider.trim(),
     system_or_appliance: system_or_appliance?.trim() || null,
