@@ -12,7 +12,6 @@ Auth confirmation route handler that supports both PKCE code exchange and OTP to
 - Redirect to `/login?error=code_exchange_failed`, `/login?error=otp_verification_failed`, or `/login?error=missing_auth_params` on failure.
 
 ## Not Allowed
-- Do not use `createClient()` from `@/lib/supabase/server` without `await` — this route awaits it.
 - Do not accept both `code` and `token_hash` at the same time; `code` is checked first and takes priority.
 - Do not render JSX or HTML.
 - Do not perform any database reads or writes beyond authentication calls.
