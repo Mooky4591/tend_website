@@ -36,7 +36,7 @@ function PhoneMockup() {
       {/* Phone frame */}
       <div className="relative bg-slate-800 rounded-[2.8rem] p-2.5 shadow-2xl shadow-black/60 border border-slate-700/50">
         {/* Top notch */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-slate-900 rounded-full z-10" />
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-deep-slate rounded-full z-10" />
 
         {/* Screen */}
         <div className="bg-white rounded-[2.2rem] overflow-hidden pt-8">
@@ -115,12 +115,12 @@ function PhoneMockup() {
 export default function Hero() {
   return (
     <section
-      className="relative bg-slate-950 text-white pt-16 overflow-hidden"
+      className="relative bg-navy text-white pt-16 overflow-hidden"
       aria-labelledby="hero-headline"
     >
       {/* Background gradient */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-950 opacity-80"
+        className="absolute inset-0 bg-gradient-to-br from-navy via-deep-slate to-brand-900 opacity-80"
         aria-hidden="true"
       />
       {/* Subtle grid pattern */}

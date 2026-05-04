@@ -60,7 +60,7 @@ export default function MessageForm({ userId }: { userId: string }) {
         <button
           onClick={handleSend}
           disabled={busy || !message.trim()}
-          className="px-4 py-2 bg-slate-900 text-white text-sm rounded-xl disabled:opacity-40 hover:bg-slate-700 transition-colors self-end"
+          className="px-4 py-2 bg-navy text-white text-sm rounded-xl disabled:opacity-40 hover:bg-deep-slate transition-colors self-end"
         >
           {busy ? 'Sending…' : 'Send'}
         </button>
