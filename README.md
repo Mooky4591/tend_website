@@ -141,8 +141,6 @@ app/
     warranty-docs/
       [planName]/           # GET — list warranty documents for a specific plan
     warranty-upload/        # POST — upload a warranty PDF
-    sms-enrollment/         # POST — store A2P SMS opt-in record
-  sms-enrollment/           # /sms-enrollment — public A2P SMS opt-in form
   sms-consent-proof/        # /sms-consent-proof — A2P 10DLC consent flow documentation
   terms/                    # /terms — Terms of Use
   privacy-policy/           # /privacy-policy — Privacy Policy
@@ -152,7 +150,6 @@ lib/
   embed.ts                  # OpenAI embedding helper for warranty document search
   pdf.ts                    # PDF text extraction helper
   twilio.ts                 # Twilio SMS client (lazy singleton)
-  sms-consent.ts            # Shared A2P consent language constants
 supabase/migrations/        # SQL migrations (run manually in Supabase SQL editor)
 __tests__/                  # Jest + React Testing Library (one file per component/route)
 middleware.ts               # Redirects unauthenticated users away from /dashboard
