@@ -5,4 +5,5 @@ export const CONSENT_LANGUAGE_VERSION = '2026-05-04'
 
 export const TERMS_URL = 'https://trytendr.org/terms'
 export const PRIVACY_POLICY_URL = 'https://trytendr.org/privacy-policy'
-export const ENROLLMENT_SOURCE_URL = 'https://trytendr.org/sms-enrollment'
+export const ENROLLMENT_SOURCE_URL =
+  `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://trytendr.org'}/sms-enrollment`

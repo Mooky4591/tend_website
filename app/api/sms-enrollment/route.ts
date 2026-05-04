@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   }
 
   const h = headers()
-  const ip = h.get('x-forwarded-for') ?? h.get('x-real-ip') ?? null
+  const ip = (h.get('x-forwarded-for')?.split(',')[0]?.trim()) ?? h.get('x-real-ip') ?? null
   const userAgent = h.get('user-agent') ?? null
 
   const supabase = createClient()

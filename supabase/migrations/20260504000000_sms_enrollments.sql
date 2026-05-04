@@ -10,6 +10,7 @@ CREATE TABLE sms_enrollments (
   system_or_appliance      TEXT,
   sms_consent              BOOLEAN     NOT NULL,
   consent_language_version TEXT        NOT NULL,
+  consent_language         TEXT        NOT NULL,
   consent_source_url       TEXT        NOT NULL,
   terms_url                TEXT        NOT NULL,
   privacy_policy_url       TEXT        NOT NULL,
