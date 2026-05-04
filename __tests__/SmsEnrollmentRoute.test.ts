@@ -141,6 +141,31 @@ describe('POST /api/sms-enrollment', () => {
     }))
   })
 
+  it('returns 400 for a malformed (non-JSON) request body', async () => {
+    const req = new NextRequest('http://localhost/api/sms-enrollment', {
+      method: 'POST',
+      body: '{invalid json',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const res = await POST(req)
+    expect(res.status).toBe(400)
+  })
+
+  it('returns 400 when phone contains no dialable digits', async () => {
+    const res = await POST(makeRequest({ ...validBody, phone: 'not-a-phone' }))
+    expect(res.status).toBe(400)
+  })
+
+  it('returns 400 when phone has fewer than 10 digits', async () => {
+    const res = await POST(makeRequest({ ...validBody, phone: '12345' }))
+    expect(res.status).toBe(400)
+  })
+
+  it('accepts a phone with formatting characters', async () => {
+    const res = await POST(makeRequest({ ...validBody, phone: '(555) 123-4567' }))
+    expect(res.status).toBe(201)
+  })
+
   it('returns 500 when the DB insert fails', async () => {
     mockInsert.mockResolvedValueOnce({ error: { message: 'constraint violation' } })
     const res = await POST(makeRequest(validBody))

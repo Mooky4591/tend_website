@@ -20,7 +20,12 @@ export interface SmsEnrollmentBody {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json() as SmsEnrollmentBody
+  let body: SmsEnrollmentBody
+  try {
+    body = await request.json() as SmsEnrollmentBody
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
 
   const { full_name, phone, email, home_address, warranty_provider, system_or_appliance, sms_consent } = body
 
@@ -29,6 +34,11 @@ export async function POST(request: NextRequest) {
       { error: 'full_name, phone, home_address, and warranty_provider are required' },
       { status: 400 },
     )
+  }
+
+  const phoneDigits = phone.trim().replace(/\D/g, '')
+  if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+    return NextResponse.json({ error: 'phone must be a valid dialable number' }, { status: 400 })
   }
 
   const h = headers()
