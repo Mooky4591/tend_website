@@ -124,30 +124,38 @@ the Railway service before the first deploy.
 
 ```
 app/
-  login/              # /login — email/password login page
-  forgot-password/    # /forgot-password — request a password reset email
-  reset-password/     # /reset-password — set a new password (requires reset link session)
-  dashboard/          # /dashboard — protected tenant dashboard
-    users/            # homeowner list and detail pages
-    docs/             # warranty document upload and management
-  auth/callback/      # Supabase Auth email confirmation + password reset handler
+  login/                    # /login — email/password login page
+  forgot-password/          # /forgot-password — request a password reset email
+  reset-password/           # /reset-password — set a new password (requires reset link session)
+  dashboard/                # /dashboard — protected tenant dashboard
+    billing/                # /dashboard/billing — billing overview
+    users/                  # homeowner list and detail pages
+    docs/                   # warranty document upload and management
+  auth/
+    callback/               # Supabase Auth email confirmation + password reset handler
+    confirm/                # Supabase Auth OTP/magic-link confirmation handler
   api/
-    reminders/        # POST — create a maintenance reminder
-    send-message/     # POST — send an SMS message via Twilio
-    warranty-docs/    # GET — list warranty documents for a tenant
-    warranty-upload/  # POST — upload a warranty PDF
-  sms-consent-proof/  # /sms-consent-proof — public A2P 10DLC consent flow documentation
-  terms/              # /terms — Terms of Use
-  privacy-policy/     # /privacy-policy — Privacy Policy
-components/           # Marketing landing page sections (Hero, Features, Pricing, etc.)
+    reminders/              # GET/POST — maintenance reminders collection
+      [id]/                 # PATCH/DELETE — individual reminder by ID
+    send-message/           # POST — send an SMS message via Twilio
+    warranty-docs/
+      [planName]/           # GET — list warranty documents for a specific plan
+    warranty-upload/        # POST — upload a warranty PDF
+    sms-enrollment/         # POST — store A2P SMS opt-in record
+  sms-enrollment/           # /sms-enrollment — public A2P SMS opt-in form
+  sms-consent-proof/        # /sms-consent-proof — A2P 10DLC consent flow documentation
+  terms/                    # /terms — Terms of Use
+  privacy-policy/           # /privacy-policy — Privacy Policy
+components/                 # Marketing landing page sections (Hero, Features, Pricing, etc.)
 lib/
-  supabase/           # Supabase browser and server client helpers
-  embed.ts            # OpenAI embedding helper for warranty document search
-  pdf.ts              # PDF text extraction helper
-  twilio.ts           # Twilio SMS client (lazy singleton)
-supabase/migrations/  # SQL migrations (run manually in Supabase SQL editor)
-__tests__/            # Jest + React Testing Library (one file per component/route)
-middleware.ts         # Redirects unauthenticated users away from /dashboard
+  supabase/                 # Supabase browser and server client helpers
+  embed.ts                  # OpenAI embedding helper for warranty document search
+  pdf.ts                    # PDF text extraction helper
+  twilio.ts                 # Twilio SMS client (lazy singleton)
+  sms-consent.ts            # Shared A2P consent language constants
+supabase/migrations/        # SQL migrations (run manually in Supabase SQL editor)
+__tests__/                  # Jest + React Testing Library (one file per component/route)
+middleware.ts               # Redirects unauthenticated users away from /dashboard
 ```
 
 ---
@@ -156,6 +164,7 @@ middleware.ts         # Redirects unauthenticated users away from /dashboard
 
 | Item | Location |
 |------|----------|
+| Logo (Footer) | `components/Footer.tsx` — still using placeholder icon/text |
 | Contact / booking link | `CTA.tsx` |
 | Dashboard UI | `app/dashboard/page.tsx` |
 | User invite flow | not yet built |
