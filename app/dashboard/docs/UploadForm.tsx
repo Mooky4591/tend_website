@@ -95,7 +95,7 @@ export default function UploadForm() {
         <button
           onClick={handleUpload}
           disabled={busy || !file || !planName.trim()}
-          className="self-start px-4 py-2 bg-slate-900 text-white text-sm rounded-xl disabled:opacity-40 hover:bg-slate-700 transition-colors"
+          className="self-start px-4 py-2 bg-navy text-white text-sm rounded-xl disabled:opacity-40 hover:bg-deep-slate transition-colors"
         >
           {busy ? 'Uploading…' : 'Upload'}
         </button>

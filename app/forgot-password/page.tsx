@@ -35,10 +35,10 @@ export default function ForgotPasswordPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-navy flex items-center justify-center px-4">
         <div className="w-full max-w-sm text-center">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
-          <div className="mt-8 bg-slate-900 rounded-2xl p-8 border border-slate-800">
+          <div className="mt-8 bg-deep-slate rounded-2xl p-8 border border-slate-800">
             <p className="text-slate-300 text-sm">
               If that email is registered, you&apos;ll receive a password reset link shortly.
             </p>
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-navy flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-900 rounded-2xl p-8 border border-slate-800 space-y-5"
+          className="bg-deep-slate rounded-2xl p-8 border border-slate-800 space-y-5"
         >
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">

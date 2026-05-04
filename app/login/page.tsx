@@ -48,7 +48,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-navy flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
@@ -57,7 +57,7 @@ function LoginForm() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-900 rounded-2xl p-8 border border-slate-800 space-y-5"
+          className="bg-deep-slate rounded-2xl p-8 border border-slate-800 space-y-5"
         >
           {error && (
             <div role="alert" className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">

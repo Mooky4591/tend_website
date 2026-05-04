@@ -107,7 +107,7 @@ export default function RemindersPanel({
         <h2 className="text-sm font-semibold text-slate-700">Scheduled Reminders</h2>
         <button
           onClick={() => setAdding(true)}
-          className="text-xs px-3 py-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors"
+          className="text-xs px-3 py-1.5 bg-navy text-white rounded-lg hover:bg-deep-slate transition-colors"
           disabled={busy}
         >
           + Add
@@ -138,7 +138,7 @@ export default function RemindersPanel({
                   <button
                     onClick={() => handleSaveEdit(r.id)}
                     disabled={busy}
-                    className="text-xs px-3 py-1 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                    className="text-xs px-3 py-1 bg-navy text-white rounded-lg hover:bg-deep-slate transition-colors"
                   >
                     Save
                   </button>
@@ -205,7 +205,7 @@ export default function RemindersPanel({
               <button
                 onClick={handleAdd}
                 disabled={busy}
-                className="text-xs px-3 py-1 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                className="text-xs px-3 py-1 bg-navy text-white rounded-lg hover:bg-deep-slate transition-colors"
               >
                 Add
               </button>

@@ -23,18 +23,14 @@ const config: Config = {
           900: '#0D524D',
           950: '#0B1F3A', // Tendr Navy (re-used as darkest stop)
         },
-        // Override dark slate stops to match brand palette
-        slate: {
-          900: '#243241', // Deep Slate
-          950: '#0B1F3A', // Tendr Navy
-        },
-        // Semantic utility tokens
-        navy:    '#0B1F3A',
-        sand:    '#F7F3EA', // Warm Sand
-        mint:    '#DDF7F3', // Soft Mint
-        gold:    '#F5B942', // Alert Gold
-        success: '#3BAA66', // Success Green
-        error:   '#D65A4A', // Error Red
+        // Semantic tokens — use these instead of overriding slate stops
+        navy:         '#0B1F3A', // Tendr Navy
+        'deep-slate': '#243241', // Deep Slate
+        sand:         '#F7F3EA', // Warm Sand
+        mint:         '#DDF7F3', // Soft Mint
+        gold:         '#F5B942', // Alert Gold
+        success:      '#3BAA66', // Success Green
+        error:        '#D65A4A', // Error Red
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
