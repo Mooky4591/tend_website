@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import Navigation from '@/components/Navigation'
 
 describe('Navigation', () => {
-  it('renders the Tendr brand name', () => {
+  it('renders the Tendr logo', () => {
     render(<Navigation />)
-    expect(screen.getByText('Tendr')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Tendr' })).toBeInTheDocument()
   })
 
   it('renders all desktop nav link labels', () => {
