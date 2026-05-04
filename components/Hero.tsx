@@ -120,7 +120,7 @@ export default function Hero() {
     >
       {/* Background gradient */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-navy via-deep-slate to-brand-950 opacity-80"
+        className="absolute inset-0 bg-gradient-to-br from-navy via-deep-slate to-brand-900 opacity-80"
         aria-hidden="true"
       />
       {/* Subtle grid pattern */}

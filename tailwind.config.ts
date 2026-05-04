@@ -21,7 +21,6 @@ const config: Config = {
           700: '#178C84',
           800: '#126E67',
           900: '#0D524D',
-          950: '#0B1F3A', // Tendr Navy (re-used as darkest stop)
         },
         // Semantic tokens — use these instead of overriding slate stops
         navy:         '#0B1F3A', // Tendr Navy
