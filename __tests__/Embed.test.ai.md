@@ -15,6 +15,7 @@ Unit tests for `lib/embed.ts` (`embedChunks`). Verifies batching behavior, resul
 
 ## Required Patterns
 - `@jest-environment node` directive required.
+- OpenAI mock must use `{ __esModule: true, default: MockOpenAI }` so the default-import binding resolves to the mock constructor.
 
 ## Tests Required
 - Returns empty array for empty input without calling the API.

@@ -23,6 +23,7 @@ Unit tests for `lib/services/warrantyDocs.ts`. Verifies success, all error paths
 
 ## Required Patterns
 - `@jest-environment node` directive required.
+- The inner `eq()` mock for `plan_name` in `makeSupabase` must be a named variable (`mockPlanNameEq`) exposed as `_mockPlanNameEq` on the returned object so tests can assert on its call arguments.
 
 ## Tests Required
 - Returns `{ chunksInserted: N }` on success.

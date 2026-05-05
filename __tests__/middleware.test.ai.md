@@ -15,6 +15,7 @@ Integration tests for `middleware.ts`. Verifies route protection (unauthenticate
 
 ## Required Patterns
 - `@jest-environment node` directive required.
+- `@supabase/ssr` mock must NOT use `{ virtual: true }` — the package is installed in `node_modules` and virtual mode bypasses real module resolution.
 
 ## Tests Required
 - Unauthenticated: redirects `/dashboard` and `/dashboard/*` to `/login`.

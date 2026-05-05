@@ -20,14 +20,16 @@ function makeSupabase({
 } = {}) {
   const mockInsert = jest.fn().mockResolvedValue({ error: insertError })
   const mockDeleteIn = jest.fn().mockResolvedValue({ error: deleteError })
+  const mockPlanNameEq = jest.fn().mockResolvedValue({ data: existing })
   return {
     from: () => ({
-      select: () => ({ eq: () => ({ eq: jest.fn().mockResolvedValue({ data: existing }) }) }),
+      select: () => ({ eq: () => ({ eq: mockPlanNameEq }) }),
       insert: mockInsert,
       delete: () => ({ in: mockDeleteIn }),
     }),
     _mockInsert: mockInsert,
     _mockDeleteIn: mockDeleteIn,
+    _mockPlanNameEq: mockPlanNameEq,
   } as any // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
