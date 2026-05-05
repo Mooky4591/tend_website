@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { unauthorized, badRequest, notFound, serverError, ok } from '@/lib/api-response'
 
 export async function PATCH(
   request: NextRequest,
@@ -7,7 +8,7 @@ export async function PATCH(
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) return unauthorized()
 
   const body = await request.json() as { reminderType?: string; dueDate?: string }
   const updates: Record<string, string> = {}
@@ -15,7 +16,7 @@ export async function PATCH(
   if (body.dueDate) updates.due_date = body.dueDate
 
   if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    return badRequest('No fields to update')
   }
 
   const { data, error } = await supabase
@@ -25,12 +26,10 @@ export async function PATCH(
     .select()
     .single()
 
-  if (error?.code === 'PGRST116') {
-    return NextResponse.json({ error: 'Reminder not found' }, { status: 404 })
-  }
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error?.code === 'PGRST116') return notFound('Reminder not found')
+  if (error) return serverError(error.message)
 
-  return NextResponse.json(data)
+  return ok(data)
 }
 
 export async function DELETE(
@@ -39,14 +38,14 @@ export async function DELETE(
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) return unauthorized()
 
   const { error } = await supabase
     .from('reminders')
     .delete()
     .eq('id', params.id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return serverError(error.message)
 
-  return NextResponse.json({ ok: true })
+  return ok({ ok: true })
 }

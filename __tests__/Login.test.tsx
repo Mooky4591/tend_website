@@ -124,9 +124,9 @@ describe('LoginPage', () => {
   })
 
   describe('LoginShell fallback', () => {
-    it('renders the brand name and a pulsing placeholder card', () => {
+    it('renders the brand logo and a pulsing placeholder card', () => {
       render(<LoginShell />)
-      expect(screen.getByText('Tendr')).toBeInTheDocument()
+      expect(screen.getByRole('img', { name: 'Tendr' })).toBeInTheDocument()
       expect(screen.getByText('Sign in to your account')).toBeInTheDocument()
       // Skeleton card present but no form inputs
       expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()

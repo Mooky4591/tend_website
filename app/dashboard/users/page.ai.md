@@ -5,7 +5,7 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
-- Resolve `tenant_id` from `tenant_users`.
+- Resolve `tenant_id` via `getTenantId` from `@/lib/auth`.
 - Query the `users` table for the tenant's homeowners, ordered by `created_at` descending.
 - Render a table with columns: Name, Phone, Location, Status.
 - Apply `statusBadge` to determine the correct badge color and label per row.

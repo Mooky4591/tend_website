@@ -6,7 +6,7 @@ Server Component page (`DocsPage`) that lists uploaded warranty plan documents (
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
 - Query `warranty_documents` for `plan_name`, chunk count, and latest `created_at`, then sort descending by upload date.
-- Define `deleteDoc` as a `'use server'` action that re-authenticates, resolves tenant, deletes, and calls `revalidatePath('/dashboard/docs')`.
+- Define `deleteDoc` as a `'use server'` action that re-authenticates, resolves tenant via `getTenantId` from `@/lib/auth`, deletes, and calls `revalidatePath('/dashboard/docs')`.
 - Render the document list with `DeleteDocButton` (bound action) and the `UploadForm` side by side.
 
 ## Not Allowed

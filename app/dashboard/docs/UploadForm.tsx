@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { uploadWarrantyDoc } from '@/lib/api/client'
 
 export default function UploadForm() {
   const router = useRouter()
@@ -30,11 +31,7 @@ export default function UploadForm() {
     setIsUploading(true)
 
     try {
-      const formData = new FormData()
-      formData.set('plan_name', planName.trim())
-      formData.set('file', file)
-
-      const res = await fetch('/api/warranty-upload', { method: 'POST', body: formData })
+      const res = await uploadWarrantyDoc(planName.trim(), file)
       const json = await res.json()
 
       if (!res.ok) {

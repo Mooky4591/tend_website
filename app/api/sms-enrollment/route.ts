@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { normalizePhone, isValidEmail } from '@/lib/validators'
+import { badRequest, serverError, created } from '@/lib/api-response'
 import {
   CONSENT_LANGUAGE,
   CONSENT_LANGUAGE_VERSION,
@@ -24,28 +26,21 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json() as SmsEnrollmentBody
   } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    return badRequest('Invalid request body')
   }
 
   const { full_name, phone, email, home_address, warranty_provider, system_or_appliance, sms_consent } = body
 
   if (!full_name?.trim() || !phone?.trim() || !home_address?.trim() || !warranty_provider?.trim()) {
-    return NextResponse.json(
-      { error: 'full_name, phone, home_address, and warranty_provider are required' },
-      { status: 400 },
-    )
+    return badRequest('full_name, phone, home_address, and warranty_provider are required')
   }
 
-  const phoneDigits = phone.trim().replace(/\D/g, '')
-  if (phoneDigits.length < 10 || phoneDigits.length > 15) {
-    return NextResponse.json({ error: 'phone must be a valid dialable number' }, { status: 400 })
-  }
-  // Normalize to E.164: 10-digit US numbers get +1 prefix; all others get + prefix
-  const normalizedPhone = phoneDigits.length === 10 ? `+1${phoneDigits}` : `+${phoneDigits}`
+  const phoneResult = normalizePhone(phone)
+  if ('error' in phoneResult) return badRequest(phoneResult.error)
 
   const emailValue = email?.trim() || null
-  if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
-    return NextResponse.json({ error: 'email must be a valid email address' }, { status: 400 })
+  if (emailValue && !isValidEmail(emailValue)) {
+    return badRequest('email must be a valid email address')
   }
 
   const h = headers()
@@ -56,7 +51,7 @@ export async function POST(request: NextRequest) {
 
   const { error } = await supabase.from('sms_enrollments').insert({
     full_name: full_name.trim(),
-    phone: normalizedPhone,
+    phone: phoneResult.value,
     email: emailValue,
     home_address: home_address.trim(),
     warranty_provider: warranty_provider.trim(),
@@ -71,7 +66,7 @@ export async function POST(request: NextRequest) {
     user_agent: userAgent,
   })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return serverError(error.message)
 
-  return NextResponse.json({ ok: true }, { status: 201 })
+  return created({ ok: true })
 }

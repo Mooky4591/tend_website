@@ -18,7 +18,7 @@ Client Component (`ConversationPanel`) that renders a scrollable list of convers
 
 ## Public Interfaces
 - `export default function ConversationPanel({ messages }: { messages: Message[] }): JSX.Element`
-- `type Message = { id: string; role: 'user' | 'assistant' | 'staff'; content: string; created_at: string }` — local type.
+- `Message` is imported from `@/types` — do not re-declare it locally.
 
 ## Required Patterns
 - `'use client'` directive required.

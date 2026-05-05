@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getTenantId } from '@/lib/auth'
 
 function formatMonth(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
@@ -12,16 +13,12 @@ export default async function BillingPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: membership } = await supabase
-    .from('tenant_users')
-    .select('tenant_id')
-    .eq('auth_user_id', user.id)
-    .single()
+  const tenantId = await getTenantId(supabase, user.id)
 
   const { data: snapshots } = await supabase
     .from('monthly_billing_snapshots')
     .select('billing_month, active_users, new_users, reminders_sent, conversations')
-    .eq('tenant_id', membership?.tenant_id ?? '')
+    .eq('tenant_id', tenantId ?? '')
     .order('billing_month', { ascending: false })
 
   return (

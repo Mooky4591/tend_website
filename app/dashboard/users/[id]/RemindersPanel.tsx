@@ -2,24 +2,9 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-
-type Reminder = {
-  id: string
-  reminder_type: string
-  due_date: string
-  sent: boolean
-}
-
-const REMINDER_TYPES = [
-  'hvac_filter',
-  'hvac_service',
-  'water_heater_flush',
-  'roof_inspection',
-  'gutter_cleaning',
-  'plumbing_inspection',
-  'electrical_inspection',
-  'other',
-]
+import type { Reminder } from '@/types'
+import { REMINDER_TYPES } from '@/lib/constants'
+import { createReminder, updateReminder, deleteReminder } from '@/lib/api/client'
 
 function formatDate(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
@@ -55,7 +40,7 @@ export default function RemindersPanel({
     setError(null)
     setIsSubmitting(true)
     try {
-      const res = await fetch(`/api/reminders/${id}`, { method: 'DELETE' })
+      const res = await deleteReminder(id)
       if (!res.ok) { setError('Failed to delete'); return }
       refresh()
     } finally {
@@ -68,11 +53,7 @@ export default function RemindersPanel({
     setError(null)
     setIsSubmitting(true)
     try {
-      const res = await fetch(`/api/reminders/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editValues),
-      })
+      const res = await updateReminder(id, editValues)
       if (!res.ok) { setError('Failed to save'); return }
       setEditingId(null)
       refresh()
@@ -87,11 +68,7 @@ export default function RemindersPanel({
     setError(null)
     setIsSubmitting(true)
     try {
-      const res = await fetch('/api/reminders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, reminderType: newValues.reminderType, dueDate: newValues.dueDate }),
-      })
+      const res = await createReminder(userId, newValues.reminderType, newValues.dueDate)
       if (!res.ok) { setError('Failed to add reminder'); return }
       setAdding(false)
       setNewValues({ reminderType: 'hvac_filter', dueDate: '' })
