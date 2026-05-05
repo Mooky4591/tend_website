@@ -4,9 +4,10 @@
 import { chunkText, extractAndChunk } from '@/lib/pdf'
 
 const mockGetText = jest.fn()
+const mockDestroy = jest.fn().mockResolvedValue(undefined)
 
 jest.mock('pdf-parse', () => ({
-  PDFParse: jest.fn().mockImplementation(() => ({ getText: mockGetText })),
+  PDFParse: jest.fn().mockImplementation(() => ({ getText: mockGetText, destroy: mockDestroy })),
 }))
 
 beforeEach(() => {
@@ -80,5 +81,17 @@ describe('extractAndChunk', () => {
     const buf = Buffer.from('test-content')
     await extractAndChunk(buf)
     expect(PDFParse).toHaveBeenCalledWith({ data: buf })
+  })
+
+  it('calls destroy() after a successful extraction', async () => {
+    mockGetText.mockResolvedValue({ text: 'hello world' })
+    await extractAndChunk(Buffer.from('fake'))
+    expect(mockDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls destroy() even when getText() throws', async () => {
+    mockGetText.mockRejectedValue(new Error('parse error'))
+    await expect(extractAndChunk(Buffer.from('fake'))).rejects.toThrow('parse error')
+    expect(mockDestroy).toHaveBeenCalledTimes(1)
   })
 })

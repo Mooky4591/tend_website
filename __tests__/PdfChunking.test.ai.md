@@ -22,7 +22,7 @@ Unit tests for all exports of `lib/pdf.ts`: `chunkText` and `extractAndChunk`. V
 
 ## Required Patterns
 - `@jest-environment node` directive required (uses `Buffer`).
-- Mock shape must match pdf-parse v2 API: `{ PDFParse: jest.fn().mockImplementation(() => ({ getText: mockGetText })) }`.
+- Mock shape must match pdf-parse v2 API: `{ PDFParse: jest.fn().mockImplementation(() => ({ getText: mockGetText, destroy: mockDestroy })) }`.
 
 ## Tests Required
 - `chunkText`: returns empty array for empty string.
@@ -35,3 +35,5 @@ Unit tests for all exports of `lib/pdf.ts`: `chunkText` and `extractAndChunk`. V
 - `extractAndChunk`: returns chunked text from a valid PDF buffer.
 - `extractAndChunk`: returns empty array when PDF has no extractable text.
 - `extractAndChunk`: passes the buffer as `data` to the `PDFParse` constructor.
+- `extractAndChunk`: calls `destroy()` after a successful extraction.
+- `extractAndChunk`: calls `destroy()` even when `getText()` throws.
