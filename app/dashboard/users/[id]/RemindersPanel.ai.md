@@ -7,9 +7,7 @@ Client Component (`RemindersPanel`) that manages the full CRUD lifecycle for a h
 - Render the list of reminders with `reminder_type`, `due_date`, and a "Sent" indicator.
 - Toggle an inline edit form per reminder (`editingId` state).
 - Render an "add" form when `adding === true`.
-- Call `DELETE /api/reminders/${id}` to delete a reminder.
-- Call `PATCH /api/reminders/${id}` with `{ reminderType, dueDate }` to update.
-- Call `POST /api/reminders` with `{ userId, reminderType, dueDate }` to create.
+- Call `deleteReminder`, `updateReminder`, and `createReminder` from `@/lib/api/client` for all API mutations.
 - Show a shared `error` state for any operation failure.
 - Refresh via `startTransition(() => router.refresh())` after mutations.
 
@@ -21,8 +19,8 @@ Client Component (`RemindersPanel`) that manages the full CRUD lifecycle for a h
 
 ## Public Interfaces
 - `export default function RemindersPanel({ reminders, userId }: { reminders: Reminder[]; userId: string }): JSX.Element`
-- `type Reminder = { id: string; reminder_type: string; due_date: string; sent: boolean }` — local type.
-- `REMINDER_TYPES` — local constant array of valid reminder type strings.
+- `Reminder` is imported from `@/types` — do not re-declare it locally.
+- `REMINDER_TYPES` is imported from `@/lib/constants` — do not redeclare it locally.
 
 ## Required Patterns
 - `'use client'` directive required.

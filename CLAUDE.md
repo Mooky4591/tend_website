@@ -80,6 +80,5 @@ The following files do **not** need sibling `.ai.md` files:
 - `.md` documentation files
 - Images and asset files
 - Lockfiles (`package-lock.json`, `yarn.lock`, etc.)
-- `__tests__/**` test files
 
 If any `.ai.md` files already exist for exempt files, they should be removed to avoid stale or conflicting contract guidance.
