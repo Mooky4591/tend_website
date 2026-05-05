@@ -22,7 +22,7 @@ Server Component page (`BillingPage`) that displays a read-only table of monthly
 
 ## Required Patterns
 - Auth check and redirect before any database queries.
-- Null-safe access: `membership?.tenant_id ?? ''` when querying snapshots.
+- Resolve `tenant_id` via `getTenantId(supabase, user.id)` from `@/lib/auth`; use `tenantId ?? ''` when querying snapshots.
 - `toLocaleString()` for all numeric values in the table cells.
 - Empty-state row spanning all 5 columns when `snapshots` is empty.
 

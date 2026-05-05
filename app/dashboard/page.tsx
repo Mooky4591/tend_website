@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getTenantId } from '@/lib/auth'
 
 type StatCardProps = { label: string; value: number; sub?: string }
 

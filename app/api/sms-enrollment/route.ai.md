@@ -5,8 +5,8 @@ Public (unauthenticated) route handler that records a homeowner's SMS enrollment
 
 ## Allowed Responsibilities
 - Parse and validate the `SmsEnrollmentBody` request payload.
-- Normalize the phone number to E.164 format (10-digit US → `+1XXXXXXXXXX`, other → `+XXXXXXXXXX`).
-- Validate email format if provided.
+- Delegate phone normalization to `normalizePhone` from `@/lib/validators`.
+- Delegate email format validation to `isValidEmail` from `@/lib/validators`.
 - Capture `ip_address` and `user_agent` from request headers.
 - Insert one row into `sms_enrollments` with all consent fields populated from `lib/sms-consent` constants.
 - Return 201 on success.
@@ -23,8 +23,8 @@ Public (unauthenticated) route handler that records a homeowner's SMS enrollment
 
 ## Required Patterns
 - Required fields: `full_name`, `phone`, `home_address`, `warranty_provider`. Return 400 if any are missing/blank.
-- Phone must be stripped of non-digits and have 10–15 digits; return 400 otherwise.
-- E.164 normalization: 10-digit → `+1${digits}`, else `+${digits}`.
+- Call `normalizePhone(phone)` from `@/lib/validators`; return 400 with `phoneResult.error` if `'error' in phoneResult`.
+- Call `isValidEmail(email)` from `@/lib/validators` when email is provided; return 400 if invalid.
 - `sms_consent` must be stored as `sms_consent === true` (boolean coercion).
 - IP is extracted from `x-forwarded-for` (first entry) or `x-real-ip`.
 - `CONSENT_LANGUAGE`, `CONSENT_LANGUAGE_VERSION`, `TERMS_URL`, `PRIVACY_POLICY_URL`, `ENROLLMENT_SOURCE_URL` must all be written to the row.
