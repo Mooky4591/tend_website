@@ -12,7 +12,12 @@ export function chunkText(text: string): string[] {
 
 export async function extractAndChunk(buffer: Buffer): Promise<string[]> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse: (buf: Buffer) => Promise<{ text: string }> = require('pdf-parse')
-  const { text } = await pdfParse(buffer)
-  return chunkText(text)
+  const { PDFParse } = require('pdf-parse')
+  const parser = new PDFParse({ data: buffer })
+  try {
+    const { text } = await parser.getText()
+    return chunkText(text)
+  } finally {
+    await parser.destroy()
+  }
 }

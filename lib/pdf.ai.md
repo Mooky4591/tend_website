@@ -19,7 +19,7 @@ Server-side utility module providing `extractAndChunk` (extracts text from a PDF
 
 ## Required Patterns
 - `chunkText`: `size = 500` words, `step = size - 50` (50-word overlap).
-- `extractAndChunk`: `require('pdf-parse')` inside the function body with an ESLint disable comment.
+- `extractAndChunk`: destructures `PDFParse` from `require('pdf-parse')` (v2 API) inside the function body with an ESLint disable comment; calls `new PDFParse({ data: buffer })`, wraps `getText()` in `try/finally`, and calls `await parser.destroy()` in the `finally` block so resources are always released.
 - Empty-string chunks are filtered with `.filter(Boolean)` (via `if (chunk.trim()) chunks.push(chunk)`).
 
 ## Tests Required
@@ -28,6 +28,8 @@ Server-side utility module providing `extractAndChunk` (extracts text from a PDF
 - `chunkText` filters out empty/whitespace-only chunks.
 - `extractAndChunk` returns an array of strings when given a valid PDF buffer.
 - `extractAndChunk` returns an empty array for a PDF with no extractable text.
+- `extractAndChunk` calls `destroy()` after a successful extraction.
+- `extractAndChunk` calls `destroy()` even when `getText()` throws.
 
 ## Notes for AI Agents
 - The 50-word overlap is intentional for retrieval quality. Do not remove it.
