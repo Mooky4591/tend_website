@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { uploadWarrantyDoc } from '@/lib/services/warrantyDocs'
 import { getTenantId } from '@/lib/auth'
-import { unauthorized, forbidden, badRequest, unsupportedMedia, payloadTooLarge } from '@/lib/api-response'
+import { unauthorized, forbidden, badRequest, unsupportedMedia, payloadTooLarge, unprocessableEntity, badGateway, serverError, ok } from '@/lib/api-response'
 
 export async function POST(request: NextRequest) {
   const supabase = createClient()
@@ -30,8 +30,10 @@ export async function POST(request: NextRequest) {
   const result = await uploadWarrantyDoc(supabase, tenantId, planName, buffer)
 
   if ('error' in result) {
-    return NextResponse.json({ error: result.error }, { status: result.status })
+    if (result.status === 422) return unprocessableEntity(result.error)
+    if (result.status === 502) return badGateway(result.error)
+    return serverError(result.error)
   }
 
-  return NextResponse.json({ chunksInserted: result.chunksInserted })
+  return ok({ chunksInserted: result.chunksInserted })
 }

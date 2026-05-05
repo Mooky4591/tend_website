@@ -28,7 +28,7 @@ Route handler for PDF warranty document uploads. Owns only HTTP concerns: authen
 - Return 415 if `file.type !== 'application/pdf'`.
 - Return 413 if `file.size > 10 * 1024 * 1024`.
 - Pass trimmed `plan_name` to `uploadWarrantyDoc`.
-- Return `NextResponse.json({ error }, { status })` when the service returns an error descriptor.
+- Translate service error descriptors to named helpers: `unprocessableEntity` for 422, `badGateway` for 502, `serverError` for all other failures.
 - Return `ok({ chunksInserted })` on success.
 
 ## Tests Required

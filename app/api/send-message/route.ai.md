@@ -24,8 +24,8 @@ Route handler for sending a staff-originated SMS to a homeowner. Owns only HTTP 
 - Auth check before any other work; return 401 if no user.
 - Return 400 if `userId` or `message` is missing/empty after trim.
 - Pass trimmed `message` to `sendMessageToHomeowner`.
-- Return `NextResponse.json({ error }, { status })` when the service returns an error descriptor.
-- Return `ok({ ok: true })` (from `@/lib/api-response`) on success.
+- Translate service error descriptors to named helpers: `notFound` for 404, `badGateway` for 502, `serverError` for all other failures.
+- Return `ok({ ok: true })` on success.
 
 ## Tests Required
 - POST returns 401 when no authenticated user.

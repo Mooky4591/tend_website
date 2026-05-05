@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendMessageToHomeowner } from '@/lib/services/messaging'
-import { unauthorized, badRequest, ok } from '@/lib/api-response'
+import { unauthorized, badRequest, notFound, serverError, badGateway, ok } from '@/lib/api-response'
 
 export async function POST(request: NextRequest) {
   const supabase = createClient()
@@ -14,7 +14,11 @@ export async function POST(request: NextRequest) {
   }
 
   const err = await sendMessageToHomeowner(supabase, userId, message.trim())
-  if (err) return NextResponse.json({ error: err.error }, { status: err.status })
+  if (err) {
+    if (err.status === 404) return notFound(err.error)
+    if (err.status === 502) return badGateway(err.error)
+    return serverError(err.error)
+  }
 
   return ok({ ok: true })
 }
