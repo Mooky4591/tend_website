@@ -5,13 +5,14 @@ Client Component (`MessageForm`) that lets dashboard staff send an SMS to a home
 
 ## Allowed Responsibilities
 - Collect a message string from a `<textarea>`.
-- POST `{ userId, message }` to `/api/send-message` on button click or Enter keypress (without Shift).
+- Call `sendMessage` from `@/lib/api/client` on button click or Enter keypress (without Shift).
 - Display an error from the API response on failure.
 - Clear the textarea and call `router.refresh()` in a transition on success.
 - Show a "Sending…" / "Send" label based on `busy` state.
 
 ## Not Allowed
 - Do not call Supabase directly; all persistence and SMS delivery is owned by the API route.
+- Do not call `fetch` directly; use `sendMessage` from `@/lib/api/client`.
 - Do not allow sending an empty or whitespace-only message (`trimmed` check).
 - Do not send while `busy === true`.
 - Do not handle opt-out status here; the API route and RLS handle that.

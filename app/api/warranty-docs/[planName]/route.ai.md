@@ -5,9 +5,9 @@ Route handler that deletes all `warranty_documents` rows for a given `planName` 
 
 ## Allowed Responsibilities
 - Authenticate the calling user via `createClient()` from `@/lib/supabase/server`.
-- Resolve the caller's `tenant_id` from the `tenant_users` table.
+- Resolve the caller's `tenant_id` via `getTenantId` from `@/lib/auth`.
 - Delete all rows in `warranty_documents` matching both `tenant_id` and `plan_name`.
-- Return `{ ok: true }` on success.
+- Return `{ ok: true }` on success using `ok` from `@/lib/api-response`.
 
 ## Not Allowed
 - Do not delete documents belonging to other tenants; always filter by resolved `tenant_id`.
@@ -20,9 +20,10 @@ Route handler that deletes all `warranty_documents` rows for a given `planName` 
 - `export async function DELETE(_request: NextRequest, { params }: { params: { planName: string } }): Promise<NextResponse>`
 
 ## Required Patterns
-- Auth check first; return 401 if no user.
-- Tenant membership check second; return 403 if no `tenant_users` row found.
+- Auth check first; return `unauthorized()` from `@/lib/api-response` if no user.
+- Tenant membership check via `getTenantId`; return `forbidden()` from `@/lib/api-response` if null.
 - Delete filtered by both `tenant_id` and `plan_name`.
+- Return `serverError(error.message)` on Supabase failure; `ok({ ok: true })` on success.
 
 ## Tests Required
 - DELETE returns 401 when no authenticated user.

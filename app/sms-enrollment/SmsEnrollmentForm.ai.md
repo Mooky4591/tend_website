@@ -6,8 +6,8 @@ Client Component (`SmsEnrollmentForm`) that collects homeowner SMS enrollment da
 ## Allowed Responsibilities
 - Manage `FormState` and `FieldErrors` state.
 - Client-side validate required fields (`full_name`, `phone`, `home_address`, `warranty_provider`) and optional fields (`email`, `system_or_appliance`).
-- Validate email format when provided; validate phone has at least 10 digits.
-- POST `FormState` JSON to `/api/sms-enrollment`.
+- Validate phone using `isValidPhone` from `@/lib/validators`; validate email using `isValidEmail` from `@/lib/validators`.
+- Call `submitSmsEnrollment` from `@/lib/api/client` to POST the form data.
 - Render success state with different copy depending on `form.sms_consent`.
 - Render the consent checkbox using `CONSENT_LANGUAGE` from `lib/sms-consent`.
 
@@ -15,7 +15,9 @@ Client Component (`SmsEnrollmentForm`) that collects homeowner SMS enrollment da
 - Do not hardcode the consent language text; always import from `@/lib/sms-consent`.
 - Do not pre-check the `sms_consent` checkbox; it must start `false`.
 - Do not call Supabase directly.
+- Do not call `fetch` directly; use `submitSmsEnrollment` from `@/lib/api/client`.
 - Do not normalize the phone number to E.164 here; that normalization belongs in the API route.
+- Do not inline phone/email validation logic; use `isValidPhone`/`isValidEmail` from `@/lib/validators`.
 
 ## Public Interfaces
 - `export default function SmsEnrollmentForm(): JSX.Element`

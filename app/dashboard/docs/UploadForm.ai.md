@@ -6,7 +6,7 @@ Client Component (`UploadForm`) that collects a plan name and PDF file, posts th
 ## Allowed Responsibilities
 - Collect `planName` (text) and `file` (PDF, max 10 MB) from the user.
 - Client-side validate: both fields required, file size ≤ 10 MB.
-- POST `multipart/form-data` to `/api/warranty-upload`.
+- Call `uploadWarrantyDoc` from `@/lib/api/client` to upload the file.
 - Display success message with `chunksInserted` count from the API response.
 - Display error message from the API response or a generic fallback.
 - Reset `planName`, `file`, and the file input ref (`fileRef.current.value = ''`) after success.
@@ -14,6 +14,7 @@ Client Component (`UploadForm`) that collects a plan name and PDF file, posts th
 
 ## Not Allowed
 - Do not call Supabase directly; data mutation is owned by the API route.
+- Do not call `fetch` directly; use `uploadWarrantyDoc` from `@/lib/api/client`.
 - Do not accept non-PDF files (the `<input>` has `accept="application/pdf"`).
 - Do not proceed with upload if `busy` is true (debounce guard).
 - Do not render outside this form card; do not own the document list.
