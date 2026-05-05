@@ -80,6 +80,12 @@ describe('uploadWarrantyDoc service', () => {
     expect(callOrder).toEqual(['insert', 'delete'])
   })
 
+  it('queries existing chunks filtered by the correct plan_name', async () => {
+    const supabase = makeSupabase()
+    await uploadWarrantyDoc(supabase, 'tenant-1', 'Plan A', Buffer.from('pdf'))
+    expect(supabase._mockPlanNameEq).toHaveBeenCalledWith('plan_name', 'Plan A')
+  })
+
   it('does not call delete when there are no existing chunks', async () => {
     const supabase = makeSupabase({ existing: [] })
     await uploadWarrantyDoc(supabase, 'tenant-1', 'New Plan', Buffer.from('pdf'))
