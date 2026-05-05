@@ -19,7 +19,7 @@ Server-side utility module providing `extractAndChunk` (extracts text from a PDF
 
 ## Required Patterns
 - `chunkText`: `size = 500` words, `step = size - 50` (50-word overlap).
-- `extractAndChunk`: `require('pdf-parse')` inside the function body with an ESLint disable comment.
+- `extractAndChunk`: destructures `PDFParse` from `require('pdf-parse')` (v2 API) inside the function body with an ESLint disable comment; calls `new PDFParse({ data: buffer }).getText()`.
 - Empty-string chunks are filtered with `.filter(Boolean)` (via `if (chunk.trim()) chunks.push(chunk)`).
 
 ## Tests Required
