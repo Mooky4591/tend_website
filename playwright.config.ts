@@ -41,8 +41,13 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
+      // Public vars — read by both browser bundles and server-side client
       NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_TEST_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.SUPABASE_TEST_ANON_KEY!,
+      // Server-side aliases — ensures API routes that use the non-public
+      // convention are also pointed at the test project, not production
+      SUPABASE_URL: process.env.SUPABASE_TEST_URL!,
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_TEST_SERVICE_ROLE_KEY!,
     },
   },
 })
