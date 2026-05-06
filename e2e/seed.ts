@@ -218,8 +218,13 @@ async function verifyRLSPolicies(): Promise<void> {
   })
 
   if (signInError || !signInData.session) {
-    console.warn('  ⚠️  Skipping RLS verification (sign-in failed):', signInError?.message)
-    return
+    console.error(
+      `\n  ❌  RLS verification failed — could not sign in as the E2E user.\n` +
+      `      Error: ${signInError?.message ?? 'no session returned'}\n\n` +
+      `      Check E2E_TEST_EMAIL / E2E_TEST_PASSWORD in .env.local and ensure\n` +
+      `      the auth user exists in the test Supabase project.\n`
+    )
+    process.exit(1)
   }
 
   // anon key + user JWT → PostgREST uses "authenticated" role with auth.uid() set

@@ -38,7 +38,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
       NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_TEST_URL!,

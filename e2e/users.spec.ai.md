@@ -27,7 +27,7 @@ End-to-end tests for /dashboard/users and /dashboard/users/[id]. Uses real Supab
 
 ## Public Interfaces
 - No exports — test file only.
-- getFirstUserId(page) is a local helper, not exported.
+- getSeedState() is a local helper that reads e2e/.seed-state.json (written by seed.ts) and returns { aliceId } or null. Not exported.
 
 ## Tests Required
 - Users list: Homeowners heading and total count visible.
