@@ -21,15 +21,11 @@ test.describe('billing page', () => {
   })
 
   test('shows either billing rows or a "No billing data yet" empty state', async ({ page }) => {
-    const rows = page.locator('tbody tr')
-    const count = await rows.count()
-    if (count === 1) {
-      // Only row is the empty state
-      await expect(page.locator('text=No billing data yet')).toBeVisible()
+    const emptyState = page.locator('text=No billing data yet')
+    if (await emptyState.isVisible()) {
+      await expect(emptyState).toBeVisible()
     } else {
-      // Real billing rows present — first cell in each row should be a month string
-      const firstCell = rows.first().locator('td').first()
-      await expect(firstCell).toBeVisible()
+      await expect(page.locator('tbody tr').first().locator('td').first()).toBeVisible()
     }
   })
 

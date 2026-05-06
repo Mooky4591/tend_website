@@ -62,11 +62,12 @@ async function ensureAuthUser(): Promise<string> {
 }
 
 async function ensureTenant(): Promise<string> {
-  const { data: existing } = await supabase
+  const { data: existing, error: queryError } = await supabase
     .from('tenants')
     .select('id')
     .eq('name', TENANT_NAME)
     .maybeSingle()
+  if (queryError) throw queryError
 
   if (existing) {
     console.log(`  Tenant already exists (${existing.id})`)
@@ -84,12 +85,13 @@ async function ensureTenant(): Promise<string> {
 }
 
 async function linkUserToTenant(authUserId: string, tenantId: string): Promise<void> {
-  const { data: existing } = await supabase
+  const { data: existing, error: queryError } = await supabase
     .from('tenant_users')
     .select('id')
     .eq('tenant_id', tenantId)
     .eq('auth_user_id', authUserId)
     .maybeSingle()
+  if (queryError) throw queryError
 
   if (existing) {
     console.log('  Auth user already linked to tenant')
@@ -230,11 +232,12 @@ async function ensureSecondAuthUser(): Promise<string> {
 }
 
 async function ensureSecondTenant(): Promise<string> {
-  const { data: existing } = await supabase
+  const { data: existing, error: queryError } = await supabase
     .from('tenants')
     .select('id')
     .eq('name', TENANT_B_NAME)
     .maybeSingle()
+  if (queryError) throw queryError
 
   if (existing) {
     console.log(`  Tenant B already exists (${existing.id})`)
