@@ -107,9 +107,12 @@ async function clearTenantData(tenantId: string): Promise<void> {
 
   if (existingUsers?.length) {
     const ids = existingUsers.map(u => u.id)
-    await supabase.from('reminders').delete().in('user_id', ids)
-    await supabase.from('conversations').delete().in('user_id', ids)
-    await supabase.from('users').delete().in('id', ids)
+    const { error: remErr } = await supabase.from('reminders').delete().in('user_id', ids)
+    if (remErr) throw new Error(`Failed to delete reminders: ${remErr.message}`)
+    const { error: convErr } = await supabase.from('conversations').delete().in('user_id', ids)
+    if (convErr) throw new Error(`Failed to delete conversations: ${convErr.message}`)
+    const { error: userErr } = await supabase.from('users').delete().in('id', ids)
+    if (userErr) throw new Error(`Failed to delete users: ${userErr.message}`)
     console.log(`  Cleared ${ids.length} existing homeowner(s) and their data`)
   } else {
     console.log('  No existing homeowners to clear')
