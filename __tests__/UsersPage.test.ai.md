@@ -17,6 +17,9 @@ Integration tests for `app/dashboard/users/page.tsx`. Verifies auth redirect, ho
 ## Not Allowed
 - Do not make real network requests.
 
+## Required Patterns
+- The `from()` mock must throw `new Error(\`Unexpected table: \${table}\`)` for any unhandled table name so accidental calls to unknown tables are caught immediately.
+
 ## Public Interfaces
 - No exports — test file only.
 

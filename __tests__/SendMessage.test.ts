@@ -24,6 +24,7 @@ jest.mock('@/lib/supabase/server', () => ({
       if (table === 'conversations') {
         return { insert: mockConvInsert }
       }
+      throw new Error(`Unexpected table: ${table}`)
     },
   }),
 }))

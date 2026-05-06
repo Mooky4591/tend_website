@@ -20,14 +20,16 @@ function makeSupabase({
 } = {}) {
   const mockInsert = jest.fn().mockResolvedValue({ error: insertError })
   const mockDeleteIn = jest.fn().mockResolvedValue({ error: deleteError })
+  const mockPlanNameEq = jest.fn().mockResolvedValue({ data: existing })
   return {
     from: () => ({
-      select: () => ({ eq: () => ({ eq: jest.fn().mockResolvedValue({ data: existing }) }) }),
+      select: () => ({ eq: () => ({ eq: mockPlanNameEq }) }),
       insert: mockInsert,
       delete: () => ({ in: mockDeleteIn }),
     }),
     _mockInsert: mockInsert,
     _mockDeleteIn: mockDeleteIn,
+    _mockPlanNameEq: mockPlanNameEq,
   } as any // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
@@ -76,6 +78,12 @@ describe('uploadWarrantyDoc service', () => {
     } as any // eslint-disable-line @typescript-eslint/no-explicit-any
     await uploadWarrantyDoc(supabase, 'tenant-1', 'Plan A', Buffer.from('pdf'))
     expect(callOrder).toEqual(['insert', 'delete'])
+  })
+
+  it('queries existing chunks filtered by the correct plan_name', async () => {
+    const supabase = makeSupabase()
+    await uploadWarrantyDoc(supabase, 'tenant-1', 'Plan A', Buffer.from('pdf'))
+    expect(supabase._mockPlanNameEq).toHaveBeenCalledWith('plan_name', 'Plan A')
   })
 
   it('does not call delete when there are no existing chunks', async () => {

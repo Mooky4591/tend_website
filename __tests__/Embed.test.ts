@@ -9,7 +9,7 @@ jest.mock('openai', () => {
   const createFn = jest.fn()
   const MockOpenAI = jest.fn(() => ({ embeddings: { create: createFn } }))
   ;(MockOpenAI as any).__create = createFn
-  return MockOpenAI
+  return { __esModule: true, default: MockOpenAI }
 })
 
 const mockCreate = (OpenAI as any).__create as jest.Mock

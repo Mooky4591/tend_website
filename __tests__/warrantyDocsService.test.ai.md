@@ -23,12 +23,14 @@ Unit tests for `lib/services/warrantyDocs.ts`. Verifies success, all error paths
 
 ## Required Patterns
 - `@jest-environment node` directive required.
+- The inner `eq()` mock for `plan_name` in `makeSupabase` must be a named variable (`mockPlanNameEq`) exposed as `_mockPlanNameEq` on the returned object so tests can assert on its call arguments.
 
 ## Tests Required
 - Returns `{ chunksInserted: N }` on success.
 - Returns `{ status: 422 }` when `extractAndChunk` returns an empty array.
 - Returns `{ status: 502 }` when `embedChunks` throws.
 - Inserted rows include correct `tenant_id`, `plan_name`, `chunk_index`, `content`, and `embedding`.
+- Existing-chunks query filters by the correct `plan_name` (asserted via `_mockPlanNameEq`).
 - `insert` is called before `delete` (atomic swap order verified via call order tracking).
 - `delete` is not called when there are no existing chunks.
 - Returns `{ status: 500 }` with error containing "Chunks inserted but old chunks could not be removed" when delete fails after insert succeeds.

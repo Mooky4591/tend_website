@@ -18,7 +18,7 @@ jest.mock('@supabase/ssr', () => ({
     capturedSetAll = cookies.setAll
     return { auth: { getUser: mockGetUser } }
   },
-}), { virtual: true })
+}))
 
 function makeRequest(path: string) {
   return new NextRequest(new URL(`http://localhost${path}`))

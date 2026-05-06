@@ -26,6 +26,7 @@ jest.mock('@/lib/supabase/server', () => ({
       if (table === 'users') {
         return { select: () => ({ eq: () => ({ order: mockUsersOrder }) }) }
       }
+      throw new Error(`Unexpected table: ${table}`)
     },
   }),
 }))

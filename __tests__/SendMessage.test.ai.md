@@ -17,6 +17,7 @@ Integration tests for `app/api/send-message/route.ts` (POST handler). Verifies a
 
 ## Required Patterns
 - `@jest-environment node` directive required.
+- The `from()` mock must throw `new Error(\`Unexpected table: \${table}\`)` for any unhandled table name so accidental calls to unknown tables are caught immediately.
 
 ## Tests Required
 - Returns 401 when unauthenticated.
