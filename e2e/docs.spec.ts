@@ -36,7 +36,7 @@ test.describe('warranty docs page', () => {
     }
   })
 
-  test('clicking Upload without a plan name shows validation error', async ({ page }) => {
+  test('Upload button stays disabled when file is set but plan name is empty', async ({ page }) => {
     await page.locator('#upload-pdf-file').setInputFiles({
       name: 'test.pdf',
       mimeType: 'application/pdf',
