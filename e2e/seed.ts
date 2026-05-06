@@ -23,6 +23,9 @@ const SERVICE_ROLE_KEY = process.env.SUPABASE_TEST_SERVICE_ROLE_KEY
 const ANON_KEY = process.env.SUPABASE_TEST_ANON_KEY
 const E2E_EMAIL = process.env.E2E_TEST_EMAIL
 const E2E_PASSWORD = process.env.E2E_TEST_PASSWORD
+// Optional — only needed for multi-tenant isolation tests
+const E2E_EMAIL_B = process.env.E2E_TEST_EMAIL_B
+const E2E_PASSWORD_B = process.env.E2E_TEST_PASSWORD_B
 
 if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !ANON_KEY || !E2E_EMAIL || !E2E_PASSWORD) {
   console.error(
@@ -36,6 +39,7 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 })
 
 const TENANT_NAME = 'E2E Test Tenant'
+const TENANT_B_NAME = 'E2E Tenant B'
 
 async function ensureAuthUser(): Promise<string> {
   const { data: { users }, error } = await supabase.auth.admin.listUsers({ perPage: 1000 })
@@ -205,6 +209,70 @@ async function seedReminders(aliceId: string): Promise<void> {
   console.log('  Created 2 reminders for E2E Alice')
 }
 
+async function ensureSecondAuthUser(): Promise<string> {
+  const { data: { users }, error } = await supabase.auth.admin.listUsers({ perPage: 1000 })
+  if (error) throw error
+
+  const existing = users.find(u => u.email === E2E_EMAIL_B)
+  if (existing) {
+    console.log(`  Tenant B auth user already exists (${existing.id})`)
+    return existing.id
+  }
+
+  const { data, error: createError } = await supabase.auth.admin.createUser({
+    email: E2E_EMAIL_B!,
+    password: E2E_PASSWORD_B!,
+    email_confirm: true,
+  })
+  if (createError) throw createError
+  console.log(`  Created tenant B auth user (${data.user.id})`)
+  return data.user.id
+}
+
+async function ensureSecondTenant(): Promise<string> {
+  const { data: existing } = await supabase
+    .from('tenants')
+    .select('id')
+    .eq('name', TENANT_B_NAME)
+    .maybeSingle()
+
+  if (existing) {
+    console.log(`  Tenant B already exists (${existing.id})`)
+    return existing.id
+  }
+
+  const { data, error } = await supabase
+    .from('tenants')
+    .insert({ name: TENANT_B_NAME, company_code: 'E2E_TEST_B' })
+    .select('id')
+    .single()
+  if (error) throw error
+  console.log(`  Created tenant B (${data.id})`)
+  return data.id
+}
+
+async function seedTenantBHomeowners(tenantId: string): Promise<{ daveId: string }> {
+  const { data, error } = await supabase
+    .from('users')
+    .insert([
+      {
+        tenant_id: tenantId,
+        first_name: 'E2E Dave',
+        phone_number: '+15550000004',
+        city: 'Atlanta',
+        state: 'GA',
+        onboarding_complete: true,
+        onboarding_status: null,
+        opted_out: false,
+      },
+    ])
+    .select('id, first_name')
+
+  if (error) throw error
+  console.log(`  Created tenant B homeowner: ${data[0].first_name}`)
+  return { daveId: data[0].id }
+}
+
 /**
  * Verify that the RLS policies from supabase/migrations/ have been applied to
  * the test database. Uses the anon key + the E2E user's JWT (authenticated role)
@@ -287,10 +355,28 @@ async function main() {
   console.log('7. Reminders')
   await seedReminders(aliceId)
 
-  const stateFile = path.join(__dirname, '.seed-state.json')
-  fs.writeFileSync(stateFile, JSON.stringify({ tenantId, aliceId }, null, 2))
+  let daveId: string | null = null
+  if (E2E_EMAIL_B && E2E_PASSWORD_B) {
+    console.log('\n--- Tenant B (multi-tenant isolation) ---')
+    console.log('8a. Tenant B auth user')
+    const authUserBId = await ensureSecondAuthUser()
+    console.log('8b. Tenant B')
+    const tenantBId = await ensureSecondTenant()
+    console.log('8c. Tenant B membership')
+    await linkUserToTenant(authUserBId, tenantBId)
+    console.log('8d. Clearing tenant B homeowner data')
+    await clearTenantData(tenantBId)
+    console.log('8e. Tenant B homeowners')
+    const result = await seedTenantBHomeowners(tenantBId)
+    daveId = result.daveId
+  } else {
+    console.log('\n  (skipping tenant B setup — E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B not set)')
+  }
 
-  console.log('\n8. RLS policy verification')
+  const stateFile = path.join(__dirname, '.seed-state.json')
+  fs.writeFileSync(stateFile, JSON.stringify({ tenantId, aliceId, daveId }, null, 2))
+
+  console.log('\n9. RLS policy verification')
   await verifyRLSPolicies()
 
   console.log('\nSeed complete.')

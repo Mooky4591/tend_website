@@ -16,6 +16,8 @@ Pre-test data setup for the E2E suite. Connects to the test Supabase project usi
 - Delete existing reminders, conversations, and users for the tenant, then re-insert known seed rows.
 - Insert 3 homeowners (E2E Alice — complete, E2E Bob — queued, E2E Carol — opted out).
 - Insert 4 conversation messages and 2 reminders for E2E Alice.
+- When E2E_TEST_EMAIL_B and E2E_TEST_PASSWORD_B are set: create a second auth user, create "E2E Tenant B", link the second user, clear and re-seed one homeowner (E2E Dave) for tenant B.
+- Write { tenantId, aliceId, daveId } to e2e/.seed-state.json (daveId is null when tenant B is not set up).
 - Verify that the RLS policies from supabase/migrations/ are applied (sign in as the E2E user with the anon key and query tenant_users); exit with code 1 and clear instructions if they are missing.
 
 ## Not Allowed
@@ -33,3 +35,5 @@ Pre-test data setup for the E2E suite. Connects to the test Supabase project usi
 - SUPABASE_TEST_ANON_KEY
 - E2E_TEST_EMAIL
 - E2E_TEST_PASSWORD
+- E2E_TEST_EMAIL_B (optional — tenant B setup skipped when absent)
+- E2E_TEST_PASSWORD_B (optional — tenant B setup skipped when absent)
