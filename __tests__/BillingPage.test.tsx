@@ -68,6 +68,7 @@ describe('BillingPage', () => {
 
     render(await BillingPage())
 
+    expect(screen.getByText('Month')).toBeInTheDocument()
     expect(screen.getByText('Active users')).toBeInTheDocument()
     expect(screen.getByText('New users')).toBeInTheDocument()
     expect(screen.getByText('Reminders sent')).toBeInTheDocument()
