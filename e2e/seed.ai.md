@@ -13,9 +13,10 @@ Pre-test data setup for the E2E suite. Connects to the test Supabase project usi
 - Create the E2E test auth user if they do not exist (supabase.auth.admin.createUser).
 - Create the "E2E Test Tenant" tenant if it does not exist.
 - Upsert the auth user into tenant_users with role=admin.
-- Delete existing reminders, conversations, and users for the tenant, then re-insert known seed rows.
+- Delete existing reminders, conversations, users, and billing snapshots for the tenant, then re-insert known seed rows.
 - Insert 3 homeowners (E2E Alice — complete, E2E Bob — queued, E2E Carol — opted out).
 - Insert 4 conversation messages and 2 reminders for E2E Alice.
+- Insert 3 months of billing snapshots (Feb–Apr 2026) for the test tenant.
 - When E2E_TEST_EMAIL_B and E2E_TEST_PASSWORD_B are set: create a second auth user, create "E2E Tenant B", link the second user, clear and re-seed one homeowner (E2E Dave) for tenant B.
 - Write { tenantId, aliceId, daveId } to e2e/.seed-state.json (daveId is null when tenant B is not set up).
 - Verify that the RLS policies from supabase/migrations/ are applied (sign in as the E2E user with the anon key and query tenant_users); exit with code 1 and clear instructions if they are missing.
@@ -23,7 +24,7 @@ Pre-test data setup for the E2E suite. Connects to the test Supabase project usi
 ## Not Allowed
 - Do not touch the production Supabase project — only reads SUPABASE_TEST_URL.
 - Do not delete the tenant or auth user (idempotent upsert only).
-- Do not insert warranty_documents or billing snapshots (not needed for E2E flows).
+- Do not insert warranty_documents.
 - Do not call any Next.js API routes — all inserts go directly through the service role client.
 
 ## Public Interfaces
