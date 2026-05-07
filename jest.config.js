@@ -12,7 +12,7 @@ const config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/tend_website/'],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/tend_website/', '<rootDir>/e2e/'],
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
