@@ -37,6 +37,11 @@ if (!url || !key) {
   process.exit(1)
 }
 
+if (!TENANT_ID) {
+  console.error('e2e/.seed-state.json exists but is missing tenantId — run npm run seed:e2e first')
+  process.exit(1)
+}
+
 const supabase = createClient(url, key, { auth: { persistSession: false } })
 
 // ── Data pools ──────────────────────────────────────────────────────────────
