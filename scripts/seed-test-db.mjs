@@ -20,7 +20,8 @@ function loadEnv() {
     if (!trimmed || trimmed.startsWith('#')) continue
     const eq = trimmed.indexOf('=')
     if (eq === -1) continue
-    env[trimmed.slice(0, eq).trim()] = trimmed.slice(eq + 1).trim()
+    const val = trimmed.slice(eq + 1).trim()
+    env[trimmed.slice(0, eq).trim()] = val.replace(/^(['"])(.*)\1$/, '$2')
   }
   return env
 }
@@ -185,10 +186,11 @@ async function main() {
 
   // Replace billing snapshots
   console.log(`Replacing billing snapshots (${SNAPSHOTS.length} months)...`)
-  await supabase
+  const { error: snapDelErr } = await supabase
     .from('monthly_billing_snapshots')
     .delete()
     .eq('tenant_id', TENANT_ID)
+  if (snapDelErr) { console.error('Delete snapshots failed:', snapDelErr); process.exit(1) }
   const { error: snapErr } = await supabase.from('monthly_billing_snapshots').insert(SNAPSHOTS)
   if (snapErr) { console.error('Insert snapshots failed:', snapErr); process.exit(1) }
 
