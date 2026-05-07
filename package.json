@@ -18,7 +18,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "seed:e2e": "tsx --env-file=.env.local e2e/seed.ts"
+    "seed:e2e": "tsx --env-file=.env.local e2e/seed.ts",
+    "seed:test": "node scripts/seed-test-db.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.0",
