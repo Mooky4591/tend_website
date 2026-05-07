@@ -1,7 +1,7 @@
 # AI Contract: app/dashboard/billing/page.tsx
 
 ## Purpose
-Server Component page (`BillingPage`) that displays a read-only table of monthly billing snapshots from `monthly_billing_snapshots` for the authenticated user's tenant, plus a support contact blurb.
+Server Component page (`BillingPage`) that displays a read-only table of monthly billing snapshots from `monthly_billing_snapshots` for the authenticated user's tenant, including a calculated "Amount due" column, plus a support contact blurb.
 
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
@@ -9,6 +9,7 @@ Server Component page (`BillingPage`) that displays a read-only table of monthly
 - Query `monthly_billing_snapshots` for `billing_month`, `active_users`, `new_users`, `reminders_sent`, and `conversations`, ordered newest-first.
 - Render the snapshot table and empty-state row.
 - Format `billing_month` strings via the local `formatMonth` helper.
+- Calculate and display "Amount due" as `active_users * PRICE_PER_USER` (currently $7 per active user).
 
 ## Not Allowed
 - Do not allow mutations; this page is read-only.
@@ -24,7 +25,8 @@ Server Component page (`BillingPage`) that displays a read-only table of monthly
 - Auth check and redirect before any database queries.
 - Resolve `tenant_id` via `getTenantId(supabase, user.id)` from `@/lib/auth`; use `tenantId ?? ''` when querying snapshots.
 - `toLocaleString()` for all numeric values in the table cells.
-- Empty-state row spanning all 5 columns when `snapshots` is empty.
+- Amount due formatted as `$${(active_users * PRICE_PER_USER).toLocaleString()}` using the `PRICE_PER_USER` constant (7).
+- Empty-state row spanning all 6 columns when `snapshots` is empty.
 
 ## Tests Required
 - Unauthenticated user is redirected to `/login`.
@@ -32,6 +34,8 @@ Server Component page (`BillingPage`) that displays a read-only table of monthly
 - Numeric columns render with `toLocaleString` formatting.
 - Empty-state cell is shown when there are no snapshots.
 - `formatMonth` converts `'2026-05'` to `'May 2026'` (locale-formatted).
+- "Amount due" column header is present.
+- Amount due cell shows `active_users * 7` formatted as a dollar value (e.g., 42 active users → `$294`).
 
 ## Notes for AI Agents
 - Billing snapshot rows are written by an external process; this page never writes to `monthly_billing_snapshots`.

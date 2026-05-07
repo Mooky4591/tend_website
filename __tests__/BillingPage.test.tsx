@@ -61,7 +61,7 @@ describe('BillingPage', () => {
     expect(screen.getByText('130')).toBeInTheDocument()
   })
 
-  it('renders all five columns (month, active, new, reminders, conversations)', async () => {
+  it('renders all six columns (month, active, new, reminders, conversations, amount due)', async () => {
     mockSnapshotsEq.mockResolvedValueOnce({
       data: [{ billing_month: '2026-04-01', active_users: 10, new_users: 2, reminders_sent: 5, conversations: 20 }],
     })
@@ -72,6 +72,17 @@ describe('BillingPage', () => {
     expect(screen.getByText('New users')).toBeInTheDocument()
     expect(screen.getByText('Reminders sent')).toBeInTheDocument()
     expect(screen.getByText('Conversations')).toBeInTheDocument()
+    expect(screen.getByText('Amount due')).toBeInTheDocument()
+  })
+
+  it('shows amount due as active_users * 7 formatted as currency', async () => {
+    mockSnapshotsEq.mockResolvedValueOnce({
+      data: [{ billing_month: '2026-04-01', active_users: 42, new_users: 5, reminders_sent: 18, conversations: 130 }],
+    })
+
+    render(await BillingPage())
+
+    expect(screen.getByText('$294')).toBeInTheDocument()
   })
 
   it('shows the support contact CTA', async () => {
