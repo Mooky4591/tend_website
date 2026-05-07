@@ -164,12 +164,20 @@ async function main() {
 
   // Remove previously seeded users (safe: only touches +15552 phone prefix)
   console.log('Removing previous seed users...')
-  const { error: delErr } = await supabase
+  const { data: prevUsers, error: prevErr } = await supabase
     .from('users')
-    .delete()
+    .select('id')
     .eq('tenant_id', TENANT_ID)
     .like('phone_number', '+15552%')
-  if (delErr) { console.error('Delete users failed:', delErr); process.exit(1) }
+  if (prevErr) { console.error('Lookup previous seed users failed:', prevErr); process.exit(1) }
+
+  if (prevUsers?.length) {
+    const ids = prevUsers.map(u => u.id)
+    const { error: remDelErr } = await supabase.from('reminders').delete().in('user_id', ids)
+    if (remDelErr) { console.error('Delete previous reminders failed:', remDelErr); process.exit(1) }
+    const { error: delErr } = await supabase.from('users').delete().in('id', ids)
+    if (delErr) { console.error('Delete users failed:', delErr); process.exit(1) }
+  }
 
   // Insert homeowners
   console.log(`Inserting ${USERS.length} homeowners...`)
