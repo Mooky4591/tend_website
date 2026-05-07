@@ -226,7 +226,7 @@ async function seedBillingSnapshots(tenantId: string): Promise<void> {
     { tenant_id: tenantId, billing_month: '2026-03-01', active_users: 38, new_users: 3,  reminders_sent: 12, conversations:  95 },
     { tenant_id: tenantId, billing_month: '2026-02-01', active_users: 35, new_users: 8,  reminders_sent: 20, conversations: 110 },
   ])
-  if (error) throw error
+  if (error) throw new Error(`Failed to insert billing snapshots: ${error.message}`)
   console.log('  Created 3 billing snapshots (Feb–Apr 2026)')
 }
 
@@ -392,6 +392,7 @@ async function main() {
     await linkUserToTenant(authUserBId, tenantBId)
     console.log('9d. Clearing tenant B homeowner data')
     await clearTenantData(tenantBId)
+    await clearBillingSnapshots(tenantBId)
     console.log('9e. Tenant B homeowners')
     const result = await seedTenantBHomeowners(tenantBId)
     daveId = result.daveId
