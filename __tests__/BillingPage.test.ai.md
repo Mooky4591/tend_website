@@ -25,7 +25,8 @@ Integration tests for `app/dashboard/billing/page.tsx`. Verifies auth redirect, 
 - Redirects to `/login` when unauthenticated.
 - Shows empty state when there are no snapshots.
 - Renders a row for each billing snapshot with correct values.
-- Renders all five column headers (month, active, new, reminders, conversations).
+- Renders all six column headers (month, active, new, reminders, conversations, amount due).
 - Shows the support contact CTA link.
 - Shows empty state when user has no tenant membership.
 - Handles null snapshots response without crashing.
+- Amount due cell shows `active_users * 7` formatted as a dollar value (e.g., 42 → `$294`).
