@@ -9,6 +9,7 @@ config({ path: path.resolve(__dirname, '.env.local') })
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000'
 
 export default defineConfig({
+  globalSetup: './e2e/global.setup.ts',
   testDir: './e2e',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
