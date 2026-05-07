@@ -211,6 +211,25 @@ async function seedReminders(aliceId: string): Promise<void> {
   console.log('  Created 2 reminders for E2E Alice')
 }
 
+async function clearBillingSnapshots(tenantId: string): Promise<void> {
+  const { error } = await supabase
+    .from('monthly_billing_snapshots')
+    .delete()
+    .eq('tenant_id', tenantId)
+  if (error) throw new Error(`Failed to delete billing snapshots: ${error.message}`)
+  console.log('  Cleared existing billing snapshots')
+}
+
+async function seedBillingSnapshots(tenantId: string): Promise<void> {
+  const { error } = await supabase.from('monthly_billing_snapshots').insert([
+    { tenant_id: tenantId, billing_month: '2026-04-01', active_users: 42, new_users: 5,  reminders_sent: 18, conversations: 130 },
+    { tenant_id: tenantId, billing_month: '2026-03-01', active_users: 38, new_users: 3,  reminders_sent: 12, conversations:  95 },
+    { tenant_id: tenantId, billing_month: '2026-02-01', active_users: 35, new_users: 8,  reminders_sent: 20, conversations: 110 },
+  ])
+  if (error) throw error
+  console.log('  Created 3 billing snapshots (Feb–Apr 2026)')
+}
+
 async function ensureSecondAuthUser(): Promise<string> {
   const { data: { users }, error } = await supabase.auth.admin.listUsers({ perPage: 1000 })
   if (error) throw error
@@ -346,8 +365,9 @@ async function main() {
   console.log('3. Tenant membership')
   await linkUserToTenant(authUserId, tenantId)
 
-  console.log('4. Clearing existing homeowner data')
+  console.log('4. Clearing existing tenant data')
   await clearTenantData(tenantId)
+  await clearBillingSnapshots(tenantId)
 
   console.log('5. Homeowners')
   const { aliceId } = await seedHomeowners(tenantId)
@@ -358,18 +378,21 @@ async function main() {
   console.log('7. Reminders')
   await seedReminders(aliceId)
 
+  console.log('8. Billing snapshots')
+  await seedBillingSnapshots(tenantId)
+
   let daveId: string | null = null
   if (E2E_EMAIL_B && E2E_PASSWORD_B) {
     console.log('\n--- Tenant B (multi-tenant isolation) ---')
-    console.log('8a. Tenant B auth user')
+    console.log('9a. Tenant B auth user')
     const authUserBId = await ensureSecondAuthUser()
-    console.log('8b. Tenant B')
+    console.log('9b. Tenant B')
     const tenantBId = await ensureSecondTenant()
-    console.log('8c. Tenant B membership')
+    console.log('9c. Tenant B membership')
     await linkUserToTenant(authUserBId, tenantBId)
-    console.log('8d. Clearing tenant B homeowner data')
+    console.log('9d. Clearing tenant B homeowner data')
     await clearTenantData(tenantBId)
-    console.log('8e. Tenant B homeowners')
+    console.log('9e. Tenant B homeowners')
     const result = await seedTenantBHomeowners(tenantBId)
     daveId = result.daveId
   } else {
@@ -379,7 +402,7 @@ async function main() {
   const stateFile = path.join(__dirname, '.seed-state.json')
   fs.writeFileSync(stateFile, JSON.stringify({ tenantId, aliceId, daveId }, null, 2))
 
-  console.log('\n9. RLS policy verification')
+  console.log('\n10. RLS policy verification')
   await verifyRLSPolicies()
 
   console.log('\nSeed complete.')
