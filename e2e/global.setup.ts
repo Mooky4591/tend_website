@@ -8,5 +8,6 @@ export default async function globalSetup() {
     stdio: 'inherit',
     env: process.env,
   })
+  if (result.error) throw result.error
   if (result.status !== 0) throw new Error('E2E seed script failed — see output above')
 }
