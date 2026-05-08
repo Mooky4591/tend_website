@@ -23,6 +23,28 @@ describe('PhoneNumberEditor', () => {
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
   })
 
+
+
+  it('cancel reverts to initial phone value', () => {
+    render(<PhoneNumberEditor userId="u1" phoneNumber="+15550001111" />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.change(screen.getByPlaceholderText('+15551234567'), { target: { value: '+15553333333' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.getByText('+15550001111')).toBeInTheDocument()
+  })
+
+  it('shows API error on failure', async () => {
+    mockUpdate.mockResolvedValue({ ok: false, json: async () => ({ error: 'Invalid phone number' }) })
+    render(<PhoneNumberEditor userId="u1" phoneNumber="+15550001111" />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByText('Invalid phone number')).toBeInTheDocument()
+  })
+
   it('saves and refreshes on success', async () => {
     mockUpdate.mockResolvedValue({ ok: true, json: async () => ({}) })
     render(<PhoneNumberEditor userId="u1" phoneNumber="+15550001111" />)

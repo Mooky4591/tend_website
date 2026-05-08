@@ -4,7 +4,7 @@
 Authenticated API route to update one homeowner's `phone_number` field from the dashboard.
 
 ## Allowed Responsibilities
-- Verify authenticated user via Supabase auth.
+- Verify authenticated user via Supabase auth and ensure the caller has an admin tenant_users membership.
 - Validate non-empty `phoneNumber` input.
 - Update `users.phone_number` by `params.id`.
 - Return JSON API responses using `lib/api-response` helpers.
@@ -19,6 +19,7 @@ Authenticated API route to update one homeowner's `phone_number` field from the 
 
 ## Required Patterns
 - Return 401 when unauthenticated.
+- Return 403 when authenticated but not an admin tenant member.
 - Return 400 for empty phone values.
 - Map `PGRST116` to 404.
 
