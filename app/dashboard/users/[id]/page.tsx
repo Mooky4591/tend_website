@@ -49,14 +49,16 @@ export default async function UserDetailPage({ params }: { params: { id: string 
       <div className="mb-6">
         <div className="bg-white rounded-2xl border border-slate-200 p-4 lg:max-w-2xl">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">{homeowner.first_name ?? 'Homeowner'}</h1>
-          <div className="flex gap-2 mb-4">
-            {homeowner.onboarding_complete && (
-              <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700">Onboarding complete</span>
-            )}
-            {homeowner.opted_out && (
-              <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Opted out</span>
-            )}
-          </div>
+          {(homeowner.onboarding_complete || homeowner.opted_out) && (
+            <div className="flex gap-2 mb-4">
+              {homeowner.onboarding_complete && (
+                <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700">Onboarding complete</span>
+              )}
+              {homeowner.opted_out && (
+                <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Opted out</span>
+              )}
+            </div>
+          )}
           <h2 className="text-sm font-semibold text-slate-700 mb-3">Homeowner Information</h2>
           <PhoneNumberEditor userId={params.id} phoneNumber={homeowner.phone_number} />
           {location && <p className="text-slate-500 text-sm mt-2">{location}</p>}
