@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import ConversationPanel from './ConversationPanel'
 import MessageForm from './MessageForm'
 import RemindersPanel from './RemindersPanel'
+import PhoneNumberEditor from './PhoneNumberEditor'
 
 export default async function UserDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -45,17 +46,23 @@ export default async function UserDetailPage({ params }: { params: { id: string 
         </Link>
       </div>
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">{homeowner.first_name ?? 'Homeowner'}</h1>
-        <p className="text-slate-500 text-sm mt-1 font-mono">{homeowner.phone_number}</p>
-        {location && <p className="text-slate-500 text-sm">{location}</p>}
-        <div className="flex gap-2 mt-2">
-          {homeowner.onboarding_complete && (
-            <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700">Onboarding complete</span>
-          )}
-          {homeowner.opted_out && (
-            <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Opted out</span>
-          )}
+      <div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <h1 className="text-2xl font-bold text-slate-900">{homeowner.first_name ?? 'Homeowner'}</h1>
+          <div className="flex gap-2 mt-2">
+            {homeowner.onboarding_complete && (
+              <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700">Onboarding complete</span>
+            )}
+            {homeowner.opted_out && (
+              <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700">Opted out</span>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-700 mb-3">Homeowner Information</h2>
+          <PhoneNumberEditor userId={params.id} phoneNumber={homeowner.phone_number} />
+          {location && <p className="text-slate-500 text-sm mt-2">{location}</p>}
         </div>
       </div>
 
