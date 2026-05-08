@@ -47,3 +47,11 @@ export async function submitSmsEnrollment(body: object): Promise<Response> {
     body: JSON.stringify(body),
   })
 }
+
+export async function updateHomeownerPhone(userId: string, phoneNumber: string): Promise<Response> {
+  return fetch(`/api/users/${userId}/phone`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phoneNumber }),
+  })
+}

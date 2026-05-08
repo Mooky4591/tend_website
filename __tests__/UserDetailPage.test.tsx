@@ -55,6 +55,12 @@ jest.mock('@/app/dashboard/users/[id]/RemindersPanel', () => {
   return RemindersPanel
 })
 
+
+jest.mock('@/app/dashboard/users/[id]/PhoneNumberEditor', () => {
+  const PhoneNumberEditor = ({ phoneNumber }: { phoneNumber: string }) => <div data-testid="phone-editor">{phoneNumber}</div>
+  PhoneNumberEditor.displayName = 'PhoneNumberEditor'
+  return PhoneNumberEditor
+})
 const HOMEOWNER = {
   id: 'u1',
   first_name: 'Alice',
@@ -90,7 +96,7 @@ describe('UserDetailPage', () => {
   it('renders the homeowner name and phone number', async () => {
     render(await UserDetailPage({ params: { id: 'u1' } }))
     expect(screen.getByText('Alice')).toBeInTheDocument()
-    expect(screen.getByText('+15551234567')).toBeInTheDocument()
+    expect(screen.getByTestId('phone-editor')).toHaveTextContent('+15551234567')
   })
 
   it('renders the full address when all location fields are present', async () => {
@@ -134,6 +140,7 @@ describe('UserDetailPage', () => {
     expect(screen.getByTestId('conversation-panel')).toBeInTheDocument()
     expect(screen.getByTestId('message-form')).toBeInTheDocument()
     expect(screen.getByTestId('reminders-panel')).toBeInTheDocument()
+    expect(screen.getByTestId('phone-editor')).toBeInTheDocument()
   })
 
   it('handles null conversations and reminders responses without crashing', async () => {
@@ -142,5 +149,6 @@ describe('UserDetailPage', () => {
     render(await UserDetailPage({ params: { id: 'u1' } }))
     expect(screen.getByTestId('conversation-panel')).toBeInTheDocument()
     expect(screen.getByTestId('reminders-panel')).toBeInTheDocument()
+    expect(screen.getByTestId('phone-editor')).toBeInTheDocument()
   })
 })
