@@ -23,8 +23,6 @@ describe('PhoneNumberEditor', () => {
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
   })
 
-
-
   it('cancel reverts to initial phone value', () => {
     render(<PhoneNumberEditor userId="u1" phoneNumber="+15550001111" />)
 

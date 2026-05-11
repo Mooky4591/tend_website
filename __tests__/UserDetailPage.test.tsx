@@ -61,6 +61,7 @@ jest.mock('@/app/dashboard/users/[id]/PhoneNumberEditor', () => {
   PhoneNumberEditor.displayName = 'PhoneNumberEditor'
   return PhoneNumberEditor
 })
+
 const HOMEOWNER = {
   id: 'u1',
   first_name: 'Alice',
@@ -135,7 +136,12 @@ describe('UserDetailPage', () => {
     expect(screen.getByRole('heading', { name: 'Homeowner' })).toBeInTheDocument()
   })
 
-  it('renders ConversationPanel, MessageForm, and RemindersPanel', async () => {
+  it('passes the homeowner phone number to PhoneNumberEditor', async () => {
+    render(await UserDetailPage({ params: { id: 'u1' } }))
+    expect(screen.getByTestId('phone-editor')).toHaveTextContent('+15551234567')
+  })
+
+  it('renders ConversationPanel, MessageForm, RemindersPanel, and PhoneNumberEditor', async () => {
     render(await UserDetailPage({ params: { id: 'u1' } }))
     expect(screen.getByTestId('conversation-panel')).toBeInTheDocument()
     expect(screen.getByTestId('message-form')).toBeInTheDocument()

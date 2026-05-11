@@ -13,11 +13,11 @@ Integration tests for `app/dashboard/users/[id]/page.tsx`. Verifies auth redirec
 - Mock `@/lib/supabase/server` to control `getUser`, `users`, `conversations`, and `reminders` queries.
 - Mock `next/navigation` to intercept `redirect` and `notFound`.
 - Mock `next/link` to render anchor tags.
-- Stub `ConversationPanel`, `MessageForm`, and `RemindersPanel` child components.
+- Stub `ConversationPanel`, `MessageForm`, `RemindersPanel`, and `PhoneNumberEditor` child components.
 - Assert on rendered text, addresses, badges, and stub presence.
 
 ## Not Allowed
-- Do not test ConversationPanel, MessageForm, or RemindersPanel internals — they are stubbed.
+- Do not test ConversationPanel, MessageForm, RemindersPanel, or PhoneNumberEditor internals — they are stubbed.
 - Do not make real network requests.
 
 ## Public Interfaces
@@ -33,5 +33,6 @@ Integration tests for `app/dashboard/users/[id]/page.tsx`. Verifies auth redirec
 - Does not show the "Onboarding complete" badge when false.
 - Shows the "Opted out" badge when applicable.
 - Falls back to "Homeowner" heading when `first_name` is null.
-- Renders ConversationPanel, MessageForm, and RemindersPanel.
+- Renders ConversationPanel, MessageForm, RemindersPanel, and PhoneNumberEditor.
+- Passes the homeowner's phone number to PhoneNumberEditor.
 - Handles null conversations and reminders responses without crashing.

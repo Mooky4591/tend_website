@@ -13,3 +13,9 @@ Unit tests for `PhoneNumberEditor` covering inline phone display and successful 
 
 ## Required Patterns
 - Use Testing Library user interactions.
+
+## Tests Required
+- Renders current phone number and Edit button.
+- Cancel reverts the input to the initial phone value.
+- Shows the API error message on failure.
+- Saves and calls router refresh on success.

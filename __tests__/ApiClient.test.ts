@@ -5,6 +5,7 @@ import {
   deleteReminder,
   uploadWarrantyDoc,
   submitSmsEnrollment,
+  updateHomeownerPhone,
 } from '@/lib/api/client'
 
 const mockFetch = jest.fn()
@@ -88,5 +89,19 @@ describe('submitSmsEnrollment', () => {
     await submitSmsEnrollment(body)
     expect(mockFetch).toHaveBeenCalledWith('/api/sms-enrollment', expect.objectContaining({ method: 'POST' }))
     expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual(body)
+  })
+})
+
+describe('updateHomeownerPhone', () => {
+  it('PATCHes /api/users/:id/phone with phoneNumber JSON body', async () => {
+    await updateHomeownerPhone('u1', '+15559999999')
+    expect(mockFetch).toHaveBeenCalledWith('/api/users/u1/phone', expect.objectContaining({ method: 'PATCH' }))
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ phoneNumber: '+15559999999' })
+  })
+
+  it('returns the raw Response without throwing on non-2xx', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403 })
+    const res = await updateHomeownerPhone('u1', '+15559999999')
+    expect(res).toMatchObject({ ok: false, status: 403 })
   })
 })

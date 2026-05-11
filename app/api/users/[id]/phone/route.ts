@@ -9,7 +9,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
   const { data: member, error: memberError } = await supabase
     .from('tenant_users')
-    .select('role')
+    .select('role, tenant_id')
     .eq('auth_user_id', user.id)
     .eq('role', 'admin')
     .maybeSingle()
@@ -25,6 +25,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     .from('users')
     .update({ phone_number: phoneNumber })
     .eq('id', params.id)
+    .eq('tenant_id', member.tenant_id)
     .select('id, phone_number')
     .single()
 
