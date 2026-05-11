@@ -29,6 +29,7 @@ Integration tests for `app/dashboard/users/page.tsx`. Verifies auth redirect, ho
 - Renders a row for each homeowner with name and phone, and shows correct total count.
 - Links each homeowner name to their detail page (`/dashboard/users/:id`).
 - Shows correct status badge for each onboarding status (opted out, complete, queued, failed).
+- Renders tooltip text in the DOM for each status so CSS-only hover tooltips are verifiable without interaction.
 - Shows "—" when `first_name` is null.
 - Handles null homeowners response without crashing.
 - Shows empty state when user has no tenant membership.
