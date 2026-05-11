@@ -7,11 +7,11 @@ type: project
 # AI Contract: e2e/users.spec.ts
 
 ## Purpose
-End-to-end tests for /dashboard/users and /dashboard/users/[id]. Uses real Supabase data where possible; mocks POST /api/send-message to avoid sending real SMS. Reminder create/delete hit real Supabase; edit is mocked to avoid side effects.
+End-to-end tests for /dashboard/homeowners and /dashboard/homeowners/[id]. Uses real Supabase data where possible; mocks POST /api/send-message to avoid sending real SMS. Reminder create/delete hit real Supabase; edit is mocked to avoid side effects.
 
 ## Allowed Responsibilities
 - Use storageState: 'e2e/.auth/user.json' for all tests.
-- Navigate to /dashboard/users and assert table columns.
+- Navigate to /dashboard/homeowners and assert table columns.
 - Conditionally navigate to the first user's detail page (skip tests if no users exist).
 - Assert detail page shows Conversation section, MessageForm textarea, and RemindersPanel.
 - Mock POST /api/send-message to test send success (textarea clears) and send failure (error shown).
@@ -33,7 +33,7 @@ End-to-end tests for /dashboard/users and /dashboard/users/[id]. Uses real Supab
 - Users list: Homeowners heading and total count visible.
 - Users list: Name, Phone, Location, Status table headers.
 - Users list: user link or empty state.
-- Users list: clicking user name navigates to /dashboard/users/:id.
+- Users list: clicking user name navigates to /dashboard/homeowners/:id.
 - User detail: Conversation heading, MessageForm textarea, Scheduled Reminders heading.
 - User detail: Back to homeowners link.
 - User detail: phone number in monospace font.

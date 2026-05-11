@@ -15,7 +15,7 @@ function getSeedState(): { aliceId: string } | null {
 
 test.describe('users list page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/dashboard/users')
+    await page.goto('/dashboard/homeowners')
   })
 
   test('renders Homeowners heading with user count', async ({ page }) => {
@@ -31,7 +31,7 @@ test.describe('users list page', () => {
   })
 
   test('shows either user rows with links or "No homeowners yet" empty state', async ({ page }) => {
-    const userLinks = page.locator('table tbody a[href^="/dashboard/users/"]')
+    const userLinks = page.locator('table tbody a[href^="/dashboard/homeowners/"]')
     const linkCount = await userLinks.count()
     if (linkCount > 0) {
       await expect(userLinks.first()).toBeVisible()
@@ -46,8 +46,8 @@ test.describe('users list page', () => {
       test.skip()
       return
     }
-    await page.locator(`table tbody a[href="/dashboard/users/${userId}"]`).click()
-    await expect(page).toHaveURL(/\/dashboard\/users\/.+/)
+    await page.locator(`table tbody a[href="/dashboard/homeowners/${userId}"]`).click()
+    await expect(page).toHaveURL(/\/dashboard\/homeowners\/.+/)
   })
 })
 
@@ -58,7 +58,7 @@ test.describe('user detail page', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`)
+    await page.goto(`/dashboard/homeowners/${userId}`)
     await expect(page.locator('h2', { hasText: 'Conversation' })).toBeVisible()
     await expect(page.locator('textarea[placeholder*="Type a message"]')).toBeVisible()
     await expect(page.locator('h2', { hasText: 'Scheduled Reminders' })).toBeVisible()
@@ -70,8 +70,8 @@ test.describe('user detail page', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`)
-    await expect(page.locator('a[href="/dashboard/users"]', { hasText: 'Back to homeowners' })).toBeVisible()
+    await page.goto(`/dashboard/homeowners/${userId}`)
+    await expect(page.locator('a[href="/dashboard/homeowners"]', { hasText: 'Back to homeowners' })).toBeVisible()
   })
 
   test('shows homeowner phone number', async ({ page }) => {
@@ -80,7 +80,7 @@ test.describe('user detail page', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`)
+    await page.goto(`/dashboard/homeowners/${userId}`)
     // Phone number rendered in monospace font
     const phoneEl = page.locator('p.font-mono')
     await expect(phoneEl).toBeVisible()
@@ -94,7 +94,7 @@ test.describe('message form', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await expect(page.locator('button', { hasText: 'Send' })).toBeDisabled()
   })
 
@@ -104,7 +104,7 @@ test.describe('message form', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await page.fill('textarea[placeholder*="Type a message"]', 'Hello from E2E test')
     await expect(page.locator('button', { hasText: 'Send' })).toBeEnabled()
   })
@@ -115,7 +115,7 @@ test.describe('message form', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await page.route('/api/send-message', route =>
       route.fulfill({ status: 200, contentType: 'application/json', body: '{}' })
     )
@@ -134,7 +134,7 @@ test.describe('message form', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await page.route('/api/send-message', route =>
       route.fulfill({
         status: 500,
@@ -157,7 +157,7 @@ test.describe('reminders panel', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await expect(page.locator('button', { hasText: '+ Add' })).toBeVisible()
   })
 
@@ -169,7 +169,7 @@ test.describe('reminders panel', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await page.locator('button', { hasText: '+ Add' }).click()
     await expect(page.locator('select').last()).toBeVisible()
     await expect(page.locator('input[type="date"]').last()).toBeVisible()
@@ -183,7 +183,7 @@ test.describe('reminders panel', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await page.locator('button', { hasText: '+ Add' }).click()
     await page.locator('button', { hasText: 'Cancel' }).click()
     // The add form's Add button should no longer be visible
@@ -196,7 +196,7 @@ test.describe('reminders panel', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
     await page.locator('button', { hasText: '+ Add' }).click()
     await page.locator('button', { hasText: /^Add$/ }).click()
     await expect(page.locator('text=Due date is required')).toBeVisible()
@@ -208,7 +208,7 @@ test.describe('reminders panel', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
 
     // Count all reminder cards BEFORE opening the form (form container shares these classes)
     const allCards = page.locator('.bg-white.border.border-slate-200.rounded-xl')
@@ -250,7 +250,7 @@ test.describe('reminders panel', () => {
       test.skip()
       return
     }
-    await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
 
     // Scope to the reminders panel container to avoid matching the PhoneNumberEditor's
     // Edit button, which appears earlier in the DOM and shows an <input>, not a <select>.

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import ConversationPanel from '@/app/dashboard/users/[id]/ConversationPanel'
+import ConversationPanel from '@/app/dashboard/homeowners/[id]/ConversationPanel'
 
 beforeEach(() => {
   window.HTMLElement.prototype.scrollIntoView = jest.fn()

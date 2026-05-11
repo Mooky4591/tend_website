@@ -27,7 +27,7 @@ function getSeedState(): SeedState | null {
 
 test.describe('failed status badge tooltips', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/dashboard/users')
+    await page.goto('/dashboard/homeowners')
   })
 
   test('invalid_number badge shows update phone number tooltip on hover', async ({ page }) => {

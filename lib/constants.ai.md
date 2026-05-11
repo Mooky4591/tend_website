@@ -25,6 +25,6 @@ Single source of truth for application-wide enumerated constants. Currently hold
 - `ReminderType` is narrower than `string` (verified at the TypeScript level, not at runtime).
 
 ## Notes for AI Agents
-- `app/dashboard/users/[id]/RemindersPanel.tsx` consumes this to render reminder type selects.
+- `app/dashboard/homeowners/[id]/RemindersPanel.tsx` consumes this to render reminder type selects.
 - Adding a new reminder type here is the only code change required to make it available throughout the app (assuming the database `reminder_type` column accepts any string value).
 - The values stored in the `reminders` table are the raw strings from this array.

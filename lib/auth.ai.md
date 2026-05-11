@@ -26,6 +26,6 @@ Shared server-side authentication helper that extracts the current staff user's 
 - The calling route returns 403 when `getTenantId` returns `null`.
 
 ## Notes for AI Agents
-- Used in: `app/api/warranty-upload/route.ts`, `app/api/warranty-docs/[planName]/route.ts`, `app/dashboard/billing/page.tsx`, `app/dashboard/users/page.tsx`, `app/dashboard/docs/page.tsx` (server action).
+- Used in: `app/api/warranty-upload/route.ts`, `app/api/warranty-docs/[planName]/route.ts`, `app/dashboard/billing/page.tsx`, `app/dashboard/homeowners/page.tsx`, `app/dashboard/docs/page.tsx` (server action).
 - `app/dashboard/page.tsx` does NOT use this helper because it joins `tenants(name)` in the same query — a separate `getTenantId` call would be wasteful.
 - The `supabase` parameter must be the server client returned by `lib/supabase/server.createClient()`, not the browser client.

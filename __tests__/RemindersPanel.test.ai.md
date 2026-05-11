@@ -1,13 +1,13 @@
 ---
 name: RemindersPanel.test
-description: Tests for app/dashboard/users/[id]/RemindersPanel — list render, edit/save/cancel/delete/add CRUD flows, loading guards
+description: Tests for app/dashboard/homeowners/[id]/RemindersPanel — list render, edit/save/cancel/delete/add CRUD flows, loading guards
 type: project
 ---
 
 # AI Contract: __tests__/RemindersPanel.test.tsx
 
 ## Purpose
-Unit tests for `app/dashboard/users/[id]/RemindersPanel.tsx`. Verifies reminder list rendering, empty state, inline edit form pre-fill, Save (PATCH), Cancel, Delete, Add (POST), due-date validation, in-flight double-click guards for all three operations, and `router.refresh` after mutations.
+Unit tests for `app/dashboard/homeowners/[id]/RemindersPanel.tsx`. Verifies reminder list rendering, empty state, inline edit form pre-fill, Save (PATCH), Cancel, Delete, Add (POST), due-date validation, in-flight double-click guards for all three operations, and `router.refresh` after mutations.
 
 ## Allowed Responsibilities
 - Stub `global.fetch` to control PATCH/DELETE/POST outcomes.

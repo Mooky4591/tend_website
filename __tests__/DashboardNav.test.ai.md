@@ -21,10 +21,10 @@ Unit tests for `app/dashboard/DashboardNav.tsx`. Verifies all four tabs render, 
 - No exports — test file only.
 
 ## Tests Required
-- Renders all four tabs (Overview, Users, Billing, Warranty Docs).
+- Renders all four tabs (Overview, Homeowners, Billing, Warranty Docs).
 - Marks Overview as active when pathname is exactly `/dashboard`.
-- Does not mark Overview as active on `/dashboard/users`.
-- Marks Users as active when pathname starts with `/dashboard/users`.
+- Does not mark Overview as active on `/dashboard/homeowners`.
+- Marks Homeowners as active when pathname starts with `/dashboard/homeowners`.
 - Marks Billing as active when pathname starts with `/dashboard/billing`.
 - Marks Warranty Docs as active when pathname starts with `/dashboard/docs`.
 - Applies inactive (`border-transparent`) styles to non-active tabs.

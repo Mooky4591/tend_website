@@ -6,8 +6,8 @@ test.describe('auth guard', () => {
     await expect(page).toHaveURL('/login')
   })
 
-  test('unauthenticated visit to /dashboard/users redirects to /login', async ({ page }) => {
-    await page.goto('/dashboard/users')
+  test('unauthenticated visit to /dashboard/homeowners redirects to /login', async ({ page }) => {
+    await page.goto('/dashboard/homeowners')
     await expect(page).toHaveURL('/login')
   })
 

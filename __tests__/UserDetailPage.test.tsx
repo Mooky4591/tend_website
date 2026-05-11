@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import UserDetailPage from '@/app/dashboard/users/[id]/page'
+import UserDetailPage from '@/app/dashboard/homeowners/[id]/page'
 
 const mockRedirect = jest.fn()
 const mockNotFound = jest.fn()
@@ -37,26 +37,26 @@ jest.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
-jest.mock('@/app/dashboard/users/[id]/ConversationPanel', () => {
+jest.mock('@/app/dashboard/homeowners/[id]/ConversationPanel', () => {
   const ConversationPanel = () => <div data-testid="conversation-panel" />
   ConversationPanel.displayName = 'ConversationPanel'
   return ConversationPanel
 })
 
-jest.mock('@/app/dashboard/users/[id]/MessageForm', () => {
+jest.mock('@/app/dashboard/homeowners/[id]/MessageForm', () => {
   const MessageForm = () => <div data-testid="message-form" />
   MessageForm.displayName = 'MessageForm'
   return MessageForm
 })
 
-jest.mock('@/app/dashboard/users/[id]/RemindersPanel', () => {
+jest.mock('@/app/dashboard/homeowners/[id]/RemindersPanel', () => {
   const RemindersPanel = () => <div data-testid="reminders-panel" />
   RemindersPanel.displayName = 'RemindersPanel'
   return RemindersPanel
 })
 
 
-jest.mock('@/app/dashboard/users/[id]/PhoneNumberEditor', () => {
+jest.mock('@/app/dashboard/homeowners/[id]/PhoneNumberEditor', () => {
   const PhoneNumberEditor = ({ phoneNumber }: { phoneNumber: string }) => <div data-testid="phone-editor">{phoneNumber}</div>
   PhoneNumberEditor.displayName = 'PhoneNumberEditor'
   return PhoneNumberEditor

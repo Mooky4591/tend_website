@@ -12,7 +12,7 @@ End-to-end tests for onboarding failure tracking. Verifies that failed status ba
 ## Allowed Responsibilities
 - Use storageState: 'e2e/.auth/user.json' for all tests.
 - Read e2e/.seed-state.json (via getSeedState) for seeded user IDs; skip tests when the file is absent or an ID is missing.
-- Navigate to /dashboard/users and hover over failed-status badge spans.
+- Navigate to /dashboard/homeowners and hover over failed-status badge spans.
 - Assert tooltip text becomes visible after hover (CSS group-hover).
 - Use the `request` fixture (no cookies) for the unauthenticated 401 test.
 - Use `page.request` (shares browser session cookies) for authenticated API tests.

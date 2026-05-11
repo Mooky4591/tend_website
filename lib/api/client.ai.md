@@ -35,6 +35,6 @@ Typed browser-side fetch wrappers for all internal API endpoints. Centralizes ha
 - Non-2xx responses are returned to the caller without throwing.
 
 ## Notes for AI Agents
-- Consumed by: `app/dashboard/users/[id]/MessageForm.tsx`, `app/dashboard/users/[id]/RemindersPanel.tsx`, `app/dashboard/users/[id]/PhoneNumberEditor.tsx`, `app/dashboard/docs/UploadForm.tsx`, `app/sms-enrollment/SmsEnrollmentForm.tsx`.
+- Consumed by: `app/dashboard/homeowners/[id]/MessageForm.tsx`, `app/dashboard/homeowners/[id]/RemindersPanel.tsx`, `app/dashboard/homeowners/[id]/PhoneNumberEditor.tsx`, `app/dashboard/docs/UploadForm.tsx`, `app/sms-enrollment/SmsEnrollmentForm.tsx`.
 - Tests for those components mock `global.fetch` directly; since this module calls `fetch` internally, the mocks intercept correctly without any changes to test setup.
 - If an API endpoint URL changes, update only this file.

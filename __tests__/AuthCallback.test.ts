@@ -38,9 +38,9 @@ describe('GET /auth/callback', () => {
   })
 
   it('redirects to a custom next param when it is a valid relative path', async () => {
-    const res = await GET(makeRequest({ code: 'valid-code', next: '/dashboard/users' }))
+    const res = await GET(makeRequest({ code: 'valid-code', next: '/dashboard/homeowners' }))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toBe('http://localhost/dashboard/users')
+    expect(res.headers.get('location')).toBe('http://localhost/dashboard/homeowners')
   })
 
   it('ignores next param starting with // to prevent open redirect', async () => {
