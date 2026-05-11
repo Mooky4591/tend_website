@@ -29,7 +29,11 @@ Integration tests for `app/dashboard/users/page.tsx`. Verifies auth redirect, ho
 - Renders a row for each homeowner with name and phone, and shows correct total count.
 - Links each homeowner name to their detail page (`/dashboard/users/:id`).
 - Shows correct status badge for each onboarding status (opted out, complete, queued, failed).
-- Renders tooltip text in the DOM for each status so CSS-only hover tooltips are verifiable without interaction.
+- Renders tooltip text in the DOM for non-failed statuses (opted_out, complete, queued, pending).
+- Failed badge with `failure_reason = 'invalid_number' | 'landline' | 'disconnected'` shows "update their phone number" tooltip.
+- Failed badge with `failure_reason = 'delivery_timeout' | 'network_error'` shows "retry option will be available" tooltip.
+- Failed badge with `failure_reason = 'carrier_blocked' | 'account_error'` shows "support@trytendr.org" tooltip.
+- Failed badge with `failure_reason = null` shows default "support@trytendr.org" tooltip.
 - Shows "—" when `first_name` is null.
 - Handles null homeowners response without crashing.
 - Shows empty state when user has no tenant membership.

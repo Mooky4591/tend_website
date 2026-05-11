@@ -85,10 +85,10 @@ describe('UsersPage', () => {
   it('shows correct status badge for each onboarding status', async () => {
     mockUsersOrder.mockResolvedValueOnce({
       data: [
-        { id: 'u1', first_name: 'Dana', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: 'pending', opted_out: true, created_at: '2026-01-01' },
-        { id: 'u2', first_name: 'Eva', phone_number: '+2', city: null, state: null, onboarding_complete: true, onboarding_status: 'complete', opted_out: false, created_at: '2026-01-02' },
-        { id: 'u3', first_name: 'Frank', phone_number: '+3', city: null, state: null, onboarding_complete: false, onboarding_status: 'queued', opted_out: false, created_at: '2026-01-03' },
-        { id: 'u4', first_name: 'Grace', phone_number: '+4', city: null, state: null, onboarding_complete: false, onboarding_status: 'failed', opted_out: false, created_at: '2026-01-04' },
+        { id: 'u1', first_name: 'Dana', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: 'pending', opted_out: true, failure_reason: null, created_at: '2026-01-01' },
+        { id: 'u2', first_name: 'Eva', phone_number: '+2', city: null, state: null, onboarding_complete: true, onboarding_status: 'complete', opted_out: false, failure_reason: null, created_at: '2026-01-02' },
+        { id: 'u3', first_name: 'Frank', phone_number: '+3', city: null, state: null, onboarding_complete: false, onboarding_status: 'queued', opted_out: false, failure_reason: null, created_at: '2026-01-03' },
+        { id: 'u4', first_name: 'Grace', phone_number: '+4', city: null, state: null, onboarding_complete: false, onboarding_status: 'failed', opted_out: false, failure_reason: null, created_at: '2026-01-04' },
       ],
     })
 
@@ -100,14 +100,13 @@ describe('UsersPage', () => {
     expect(screen.getByText('Failed')).toBeInTheDocument()
   })
 
-  it('renders tooltip text in the DOM for each status', async () => {
+  it('renders tooltip text in the DOM for each non-failed status', async () => {
     mockUsersOrder.mockResolvedValueOnce({
       data: [
-        { id: 'u1', first_name: 'Dana', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: true, created_at: '2026-01-01' },
-        { id: 'u2', first_name: 'Eva', phone_number: '+2', city: null, state: null, onboarding_complete: true, onboarding_status: null, opted_out: false, created_at: '2026-01-02' },
-        { id: 'u3', first_name: 'Frank', phone_number: '+3', city: null, state: null, onboarding_complete: false, onboarding_status: 'queued', opted_out: false, created_at: '2026-01-03' },
-        { id: 'u4', first_name: 'Grace', phone_number: '+4', city: null, state: null, onboarding_complete: false, onboarding_status: 'failed', opted_out: false, created_at: '2026-01-04' },
-        { id: 'u5', first_name: 'Hank', phone_number: '+5', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, created_at: '2026-01-05' },
+        { id: 'u1', first_name: 'Dana', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: true, failure_reason: null, created_at: '2026-01-01' },
+        { id: 'u2', first_name: 'Eva', phone_number: '+2', city: null, state: null, onboarding_complete: true, onboarding_status: null, opted_out: false, failure_reason: null, created_at: '2026-01-02' },
+        { id: 'u3', first_name: 'Frank', phone_number: '+3', city: null, state: null, onboarding_complete: false, onboarding_status: 'queued', opted_out: false, failure_reason: null, created_at: '2026-01-03' },
+        { id: 'u5', first_name: 'Hank', phone_number: '+5', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, failure_reason: null, created_at: '2026-01-05' },
       ],
     })
 
@@ -116,8 +115,31 @@ describe('UsersPage', () => {
     expect(screen.getByText(/opted out of SMS messages/i)).toBeInTheDocument()
     expect(screen.getByText(/onboarding is complete/i)).toBeInTheDocument()
     expect(screen.getByText(/queued for onboarding/i)).toBeInTheDocument()
-    expect(screen.getByText(/onboarding failed/i)).toBeInTheDocument()
     expect(screen.getByText(/hasn't started yet/i)).toBeInTheDocument()
+  })
+
+  it.each([
+    ['invalid_number', /update their phone number/i],
+    ['landline', /update their phone number/i],
+    ['disconnected', /update their phone number/i],
+    ['delivery_timeout', /retry option will be available/i],
+    ['network_error', /retry option will be available/i],
+    ['carrier_blocked', /support@trytendr\.org/i],
+    ['account_error', /support@trytendr\.org/i],
+  ])('failed badge with failure_reason %s shows correct tooltip', async (failureReason, pattern) => {
+    mockUsersOrder.mockResolvedValueOnce({
+      data: [{ id: 'u1', first_name: 'Alice', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: 'failed', opted_out: false, failure_reason: failureReason, created_at: '2026-01-01' }],
+    })
+    render(await UsersPage())
+    expect(screen.getByText(pattern)).toBeInTheDocument()
+  })
+
+  it('failed badge with null failure_reason shows default contact support tooltip', async () => {
+    mockUsersOrder.mockResolvedValueOnce({
+      data: [{ id: 'u1', first_name: 'Alice', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: 'failed', opted_out: false, failure_reason: null, created_at: '2026-01-01' }],
+    })
+    render(await UsersPage())
+    expect(screen.getByText(/support@trytendr\.org/i)).toBeInTheDocument()
   })
 
   it('shows — when first_name is null', async () => {
