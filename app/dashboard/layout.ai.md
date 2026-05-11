@@ -6,7 +6,7 @@ Server Component layout (`DashboardLayout`) that wraps all `/dashboard` routes. 
 ## Allowed Responsibilities
 - Authenticate the user via `createClient()` from `@/lib/supabase/server`.
 - Redirect to `/login` if no authenticated user.
-- Render the fixed header with `/logo.png` and `SignOutButton`.
+- Render the fixed header with `/logo.png`, `SettingsMenu`, and `SignOutButton`.
 - Render `DashboardNav` below the header.
 - Render `{children}` inside a `<main>` element.
 
@@ -21,12 +21,13 @@ Server Component layout (`DashboardLayout`) that wraps all `/dashboard` routes. 
 ## Required Patterns
 - Auth check and redirect must happen before any JSX is returned.
 - Logo is rendered with `<Image src="/logo.png" alt="Tendr" width={102} height={34} priority />`.
+- `SettingsMenu` and `SignOutButton` are rendered together in a flex container in the header.
 - `<main>{children}</main>` is the slot for page content.
 - Background is `bg-slate-50`; header is `bg-white border-b border-slate-200`.
 
 ## Tests Required
 - Unauthenticated users are redirected to `/login`.
-- Authenticated users see the logo, SignOutButton, and DashboardNav.
+- Authenticated users see the logo, SettingsMenu, SignOutButton, and DashboardNav.
 - `children` are rendered inside `<main>`.
 
 ## Notes for AI Agents
