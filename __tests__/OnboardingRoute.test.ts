@@ -50,6 +50,13 @@ describe('POST /api/users/[id]/onboarding', () => {
     expect(res.status).toBe(403)
   })
 
+  it('returns 400 when request body is not valid JSON', async () => {
+    const { POST } = await import('@/app/api/users/[id]/onboarding/route')
+    const badReq = { json: async () => { throw new SyntaxError('Unexpected token') } } as never
+    const res = await POST(badReq, PARAMS)
+    expect(res.status).toBe(400)
+  })
+
   it('returns 400 when message is missing', async () => {
     const { POST } = await import('@/app/api/users/[id]/onboarding/route')
     const res = await POST(makeRequest({}), PARAMS)

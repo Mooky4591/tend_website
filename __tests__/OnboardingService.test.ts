@@ -56,9 +56,21 @@ describe('triggerOnboarding', () => {
   it('sets onboarding_status to queued and clears failure_reason on success', async () => {
     await triggerOnboarding(makeSupabase() as never, 'user-1', 'Welcome!')
     expect(mockUsersUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ onboarding_status: 'queued', failure_reason: null }),
+      expect.objectContaining({ onboarding_status: 'queued', failure_reason: null, last_onboarding_attempt: expect.any(String) }),
       'id', 'user-1'
     )
+  })
+
+  it('returns 500 when conversations insert fails', async () => {
+    mockConversationsInsert.mockResolvedValueOnce({ error: { message: 'DB write error' } })
+    const result = await triggerOnboarding(makeSupabase() as never, 'user-1', 'Welcome!')
+    expect(result?.status).toBe(500)
+  })
+
+  it('returns 500 when users update fails on success path', async () => {
+    mockUsersUpdate.mockResolvedValueOnce({ error: { message: 'DB write error' } })
+    const result = await triggerOnboarding(makeSupabase() as never, 'user-1', 'Welcome!')
+    expect(result?.status).toBe(500)
   })
 
   it('returns status 502 when SMS fails', async () => {

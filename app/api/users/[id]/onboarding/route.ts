@@ -10,7 +10,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
   const { data: member, error: memberError } = await supabase
     .from('tenant_users')
-    .select('role, tenant_id')
+    .select('role')
     .eq('auth_user_id', user.id)
     .eq('role', 'admin')
     .maybeSingle()
@@ -18,7 +18,12 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   if (memberError) return serverError(memberError.message)
   if (!member) return forbidden('Admin access required')
 
-  const body = await request.json() as { message?: string }
+  let body: { message?: string }
+  try {
+    body = await request.json() as { message?: string }
+  } catch {
+    return badRequest('Invalid request body')
+  }
   const message = body.message?.trim()
   if (!message) return badRequest('message is required')
 

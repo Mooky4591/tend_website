@@ -29,8 +29,10 @@ Business-logic service for triggering the initial onboarding SMS for a homeowner
 - On SMS failure, update user status before returning the error (best-effort — do not fail the request if the DB update fails).
 
 ## Tests Required
-- Returns `null` and sets `onboarding_status = 'queued'`, `failure_reason = null`, updates `last_onboarding_attempt` on SMS success.
+- Returns `null` and sets `onboarding_status = 'queued'`, `failure_reason = null`, `last_onboarding_attempt = <ISO string>` on SMS success.
 - Inserts a conversation row with `role: 'staff'` on SMS success.
+- Returns `{ status: 500 }` when `conversations.insert` fails on the success path.
+- Returns `{ status: 500 }` when `users.update` fails on the success path.
 - Returns `{ status: 502 }` on SMS failure.
 - Sets `onboarding_status = 'failed'` and correct `failure_reason` on SMS failure (tested for at least two distinct Twilio codes).
 - Returns `{ status: 404 }` when the homeowner is not found.

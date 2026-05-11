@@ -19,13 +19,14 @@ Route handler for triggering the onboarding SMS for a homeowner. Authenticates t
 - `export async function POST(request, { params }): Promise<NextResponse>`
 
 ## Required Patterns
-- Tenant isolation is enforced by querying `tenant_users` with `auth_user_id = user.id` and `role = 'admin'`.
-  The `users` table RLS further prevents cross-tenant access.
+- Tenant isolation is enforced by querying `tenant_users` with `auth_user_id = user.id` and `role = 'admin'`. Select only `role` — no other columns needed. The `users` table RLS further prevents cross-tenant access.
+- Wrap `request.json()` in a try/catch; return `badRequest('Invalid request body')` on `SyntaxError`.
 - Body shape: `{ message: string }` — trim before passing to service.
 - Error mapping: 404 → `notFound`, 502 → `badGateway`, all others → `serverError`.
 
 ## Tests Required
 - Returns 401 when unauthenticated.
+- Returns 400 when request body is not valid JSON (SyntaxError from `request.json()`).
 - Returns 400 when `message` is missing or blank.
 - Returns 403 when caller is not an admin.
 - Returns 404 when the homeowner does not exist (service returns 404).

@@ -51,14 +51,15 @@ export async function triggerOnboarding(
     return { error: 'SMS delivery failed', status: 502 }
   }
 
-  await supabase.from('conversations').insert({
+  const { error: insertError } = await supabase.from('conversations').insert({
     user_id: userId,
     tenant_id: homeowner.tenant_id,
     role: 'staff',
     content: message,
   })
+  if (insertError) return { error: insertError.message, status: 500 }
 
-  await supabase
+  const { error: updateError } = await supabase
     .from('users')
     .update({
       onboarding_status: 'queued',
@@ -66,6 +67,7 @@ export async function triggerOnboarding(
       last_onboarding_attempt: now,
     })
     .eq('id', userId)
+  if (updateError) return { error: updateError.message, status: 500 }
 
   return null
 }
