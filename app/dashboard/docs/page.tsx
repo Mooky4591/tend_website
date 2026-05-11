@@ -39,26 +39,26 @@ export default async function DocsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Warranty Documents</h1>
-        <p className="text-slate-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Warranty Documents</h1>
+        <p className="text-muted-foreground/60 text-sm mt-1">
           Documents are chunked and embedded so the AI can reference them during homeowner conversations.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <h2 className="text-sm font-semibold text-slate-700 mb-3">Uploaded documents</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground mb-3">Uploaded documents</h2>
           {docs.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-sm text-slate-400">
+            <div className="bg-white rounded-2xl border border-border/20 p-8 text-center text-sm text-muted-foreground/50">
               No documents uploaded yet
             </div>
           ) : (
             <div className="space-y-2">
               {docs.map(d => (
-                <div key={d.plan_name} className="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between">
+                <div key={d.plan_name} className="bg-white rounded-2xl border border-border/20 p-4 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-900">{d.plan_name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-sm font-medium text-foreground">{d.plan_name}</p>
+                    <p className="text-xs text-muted-foreground/50 mt-0.5">
                       {d.chunk_count} chunks · uploaded {formatDate(d.uploaded_at)}
                     </p>
                   </div>

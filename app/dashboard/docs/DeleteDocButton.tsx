@@ -14,7 +14,7 @@ export default function DeleteDocButton({
 
   return (
     <div>
-      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-xs text-error mt-1">{error}</p>}
       <button
         type="button"
         disabled={busy}
@@ -30,7 +30,7 @@ export default function DeleteDocButton({
             setBusy(false)
           }
         }}
-        className="text-xs text-red-500 hover:text-red-700 transition-colors disabled:opacity-40"
+        className="text-xs text-error/80 hover:text-error transition-colors disabled:opacity-40"
       >
         {busy ? 'Deleting…' : 'Delete'}
       </button>

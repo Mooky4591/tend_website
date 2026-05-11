@@ -50,34 +50,34 @@ export default function UploadForm() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-      <h2 className="text-sm font-semibold text-slate-700 mb-4">Upload warranty document</h2>
+    <div className="bg-white rounded-2xl border border-border/20 p-6">
+      <h2 className="text-sm font-semibold text-muted-foreground mb-4">Upload warranty document</h2>
 
       {status && (
-        <div className={`mb-4 text-sm px-3 py-2 rounded-lg ${status.type === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+        <div className={`mb-4 text-sm px-3 py-2 rounded-lg ${status.type === 'error' ? 'bg-error/5 text-error' : 'bg-success/10 text-success'}`}>
           {status.message}
         </div>
       )}
 
       <div className="flex flex-col gap-3">
         <div>
-          <label htmlFor="upload-plan-name" className="block text-xs font-medium text-slate-600 mb-1">Plan name</label>
+          <label htmlFor="upload-plan-name" className="block text-xs font-medium text-muted-foreground/80 mb-1">Plan name</label>
           <input
             id="upload-plan-name"
             type="text"
             value={planName}
             onChange={e => setPlanName(e.target.value)}
             placeholder="e.g. Premium Home Warranty"
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+            className="w-full border border-border/20 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/30"
             disabled={busy}
           />
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground/50 mt-1">
             Uploading with an existing plan name replaces that document.
           </p>
         </div>
 
         <div>
-          <label htmlFor="upload-pdf-file" className="block text-xs font-medium text-slate-600 mb-1">PDF file (max 10 MB)</label>
+          <label htmlFor="upload-pdf-file" className="block text-xs font-medium text-muted-foreground/80 mb-1">PDF file (max 10 MB)</label>
           <input
             id="upload-pdf-file"
             ref={fileRef}
@@ -85,7 +85,7 @@ export default function UploadForm() {
             accept="application/pdf"
             onChange={e => setFile(e.target.files?.[0] ?? null)}
             disabled={busy}
-            className="w-full text-sm text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
+            className="w-full text-sm text-muted-foreground/80 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-muted file:text-muted-foreground hover:file:bg-muted/70"
           />
         </div>
 

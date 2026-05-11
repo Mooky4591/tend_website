@@ -3,16 +3,48 @@
 @tailwind utilities;
 
 :root {
-  --brand-primary: #21B6A8;
-  --brand-primary-dark: #178C84;
-  --brand-light: #DDF7F3;
-  --navy: #0B1F3A;
-  --deep-slate: #243241;
+  /* Palette — raw RGB channels so Tailwind opacity modifiers work */
+  --p-navy:       11 31 58;
+  --p-deep-slate: 36 50 65;
+  --p-teal:       33 182 168;
+  --p-mint:       221 247 243;
+  --p-sand:       247 243 234;
+  --p-gold:       245 185 66;
+  --p-success:    59 170 102;
+  --p-error:      214 90 74;
+  --p-white:      255 255 255;
+
+  /* Brand scale */
+  --p-brand-50:  221 247 243;
+  --p-brand-100: 184 237 232;
+  --p-brand-200: 125 217 209;
+  --p-brand-300: 76 196 187;
+  --p-brand-400: 50 186 177;
+  --p-brand-500: 33 182 168;
+  --p-brand-600: 28 163 153;
+  --p-brand-700: 23 140 132;
+  --p-brand-800: 18 110 103;
+  --p-brand-900: 13 82 77;
+
+  /* Semantic role tokens — reference palette vars */
+  --background:         var(--p-sand);
+  --foreground:         var(--p-navy);
+  --card:               var(--p-white);
+  --card-foreground:    var(--p-navy);
+  --muted:              var(--p-sand);
+  --muted-foreground:   var(--p-deep-slate);
+  --border:             var(--p-deep-slate);
+  --ring:               var(--p-teal);
+  --primary:            var(--p-teal);
+  --primary-foreground: var(--p-white);
+  --destructive:        var(--p-error);
+  --overlay:            var(--p-navy);
+  --overlay-foreground: var(--p-white);
 }
 
 @layer base {
   body {
-    @apply text-slate-900 antialiased;
+    @apply bg-background text-foreground antialiased;
   }
 }
 

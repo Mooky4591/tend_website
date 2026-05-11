@@ -32,12 +32,12 @@ export default function SignOutButton() {
       <button
         onClick={handleSignOut}
         disabled={loading}
-        className="text-sm text-slate-500 hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="text-sm text-muted-foreground/60 hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? 'Signing out…' : 'Sign out'}
       </button>
       {error && (
-        <p role="alert" className="text-xs text-red-500">{error}</p>
+        <p role="alert" className="text-xs text-error">{error}</p>
       )}
     </div>
   )

@@ -43,7 +43,7 @@ export default function PhoneNumberEditor({ userId, phoneNumber }: { userId: str
           <input
             value={value}
             onChange={e => setValue(e.target.value)}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-slate-300"
+            className="w-full border border-border/20 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring/30"
             placeholder="+15551234567"
             disabled={busy}
           />
@@ -56,7 +56,7 @@ export default function PhoneNumberEditor({ userId, phoneNumber }: { userId: str
                 setError(null)
               }}
               disabled={busy}
-              className="text-xs px-3 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              className="text-xs px-3 py-1 border border-border/20 rounded-lg hover:bg-muted transition-colors"
             >
               Cancel
             </button>
@@ -64,11 +64,11 @@ export default function PhoneNumberEditor({ userId, phoneNumber }: { userId: str
         </div>
       ) : (
         <div className="flex items-center gap-2">
-          <p className="text-slate-500 text-sm font-mono">{phoneNumber ?? 'No phone number'}</p>
-          <button onClick={() => setEditing(true)} className="text-xs text-slate-500 hover:text-slate-800 transition-colors">Edit</button>
+          <p className="text-muted-foreground/60 text-sm font-mono">{phoneNumber ?? 'No phone number'}</p>
+          <button onClick={() => setEditing(true)} className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors">Edit</button>
         </div>
       )}
-      {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
+      {error && <p className="text-xs text-error mt-2">{error}</p>}
     </div>
   )
 }

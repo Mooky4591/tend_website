@@ -5,10 +5,10 @@ type StatCardProps = { label: string; value: number; sub?: string }
 
 function StatCard({ label, value, sub }: StatCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="text-3xl font-bold text-slate-900 mt-1">{value.toLocaleString()}</p>
-      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+    <div className="bg-white rounded-2xl border border-border/20 p-6">
+      <p className="text-sm text-muted-foreground/60">{label}</p>
+      <p className="text-3xl font-bold text-foreground mt-1">{value.toLocaleString()}</p>
+      {sub && <p className="text-xs text-muted-foreground/50 mt-1">{sub}</p>}
     </div>
   )
 }
@@ -39,8 +39,8 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">{tenantName}</h1>
-        <p className="text-slate-500 text-sm mt-1">Usage overview</p>
+        <h1 className="text-2xl font-bold text-foreground">{tenantName}</h1>
+        <p className="text-muted-foreground/60 text-sm mt-1">Usage overview</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">

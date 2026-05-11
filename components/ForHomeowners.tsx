@@ -47,7 +47,7 @@ const exampleMessages = [
 export default function ForHomeowners() {
   return (
     <section
-      className="bg-slate-50 py-20 lg:py-28"
+      className="bg-muted py-20 lg:py-28"
       aria-labelledby="homeowners-heading"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -58,11 +58,11 @@ export default function ForHomeowners() {
           </p>
           <h2
             id="homeowners-heading"
-            className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight text-balance"
+            className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight text-balance"
           >
             A home assistant experience they&apos;ll actually use
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg text-muted-foreground/80">
             Homeowners don&apos;t need to download anything, create an account, or remember a password.
             Tendr lives in the texting app they already use every day.
           </p>
@@ -74,14 +74,14 @@ export default function ForHomeowners() {
             {homeownerBenefits.map((benefit) => (
               <div
                 key={benefit.title}
-                className="flex gap-4 bg-white rounded-xl p-5 border border-slate-200"
+                className="flex gap-4 bg-white rounded-xl p-5 border border-border/20"
               >
                 <span className="text-2xl shrink-0" aria-hidden="true">
                   {benefit.emoji}
                 </span>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm mb-1">{benefit.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{benefit.description}</p>
+                  <h3 className="font-bold text-foreground text-sm mb-1">{benefit.title}</h3>
+                  <p className="text-sm text-muted-foreground/80 leading-relaxed">{benefit.description}</p>
                 </div>
               </div>
             ))}
@@ -89,20 +89,20 @@ export default function ForHomeowners() {
 
           {/* Right: example Q&A exchanges */}
           <div className="space-y-6">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider">
               Example conversations
             </p>
             {exampleMessages.map((ex) => (
               <div
                 key={ex.question}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm"
+                className="bg-white rounded-2xl border border-border/20 overflow-hidden shadow-sm"
               >
                 {/* Header */}
-                <div className="bg-slate-800 px-4 py-2.5 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-red-400" aria-hidden="true" />
-                  <div className="w-2 h-2 rounded-full bg-yellow-400" aria-hidden="true" />
-                  <div className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />
-                  <span className="ml-2 text-xs text-slate-400">Armadillo Home Warranty</span>
+                <div className="bg-deep-slate px-4 py-2.5 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-error" aria-hidden="true" />
+                  <div className="w-2 h-2 rounded-full bg-gold" aria-hidden="true" />
+                  <div className="w-2 h-2 rounded-full bg-success" aria-hidden="true" />
+                  <span className="ml-2 text-xs text-white/50">Armadillo Home Warranty</span>
                 </div>
 
                 {/* Conversation */}
@@ -115,7 +115,7 @@ export default function ForHomeowners() {
                   </div>
                   {/* Tendr response */}
                   <div className="flex justify-start">
-                    <div className="max-w-[80%] bg-slate-100 text-slate-800 text-sm px-3.5 py-2.5 rounded-2xl rounded-tl-sm leading-relaxed">
+                    <div className="max-w-[80%] bg-sand text-deep-slate text-sm px-3.5 py-2.5 rounded-2xl rounded-tl-sm leading-relaxed">
                       {ex.answer}
                     </div>
                   </div>

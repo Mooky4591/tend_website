@@ -20,7 +20,7 @@ const legalLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-navy text-slate-400" role="contentinfo">
+    <footer className="bg-navy text-white/50" role="contentinfo">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 lg:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
           {/* Brand column */}
@@ -107,12 +107,12 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-500">
+        <div className="pt-8 border-t border-deep-slate flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-white/40">
             {/* PLACEHOLDER: Update company name if different from "Tendr" */}
             &copy; {new Date().getFullYear()} Tendr. All rights reserved.
           </p>
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-white/30">
             support@trytendr.org
           </p>
         </div>

@@ -5,11 +5,11 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="bg-slate-50 text-slate-900">
+    <main className="bg-background text-foreground">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Privacy Policy</h1>
-        <p className="mt-3 text-sm text-slate-600">Tendr</p>
-        <p className="text-sm text-slate-600">Last updated May 8, 2026</p>
+        <p className="mt-3 text-sm text-muted-foreground/80">Tendr</p>
+        <p className="text-sm text-muted-foreground/80">Last updated May 8, 2026</p>
 
         <section className="mt-8 space-y-4 leading-7">
           <h2 className="text-xl font-semibold">Overview</h2>
@@ -330,12 +330,12 @@ export default function PrivacyPolicyPage() {
           </p>
           <p className="font-semibold">Categories of Personal Information We May Collect</p>
           <div className="overflow-x-auto">
-            <table className="min-w-full border border-slate-300 text-sm">
-              <thead className="bg-slate-100">
+            <table className="min-w-full border border-border/30 text-sm">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="border border-slate-300 px-3 py-2 text-left">Category</th>
-                  <th className="border border-slate-300 px-3 py-2 text-left">Examples</th>
-                  <th className="border border-slate-300 px-3 py-2 text-left">Collected</th>
+                  <th className="border border-border/30 px-3 py-2 text-left">Category</th>
+                  <th className="border border-border/30 px-3 py-2 text-left">Examples</th>
+                  <th className="border border-border/30 px-3 py-2 text-left">Collected</th>
                 </tr>
               </thead>
               <tbody>
