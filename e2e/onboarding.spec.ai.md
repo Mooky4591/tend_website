@@ -36,11 +36,11 @@ End-to-end tests for onboarding failure tracking. Verifies that failed status ba
 - Hovering Eva's badge does not show Grace's support tooltip (tooltips are row-scoped).
 
 ### API contract
-- No session → 401.
 - Missing message → 400.
 - Blank message → 400.
 - Non-existent user ID → 404.
 - Valid auth + valid message + no Twilio number (E2E environment) → 500 with error matching /Twilio/i.
+- Note: 401 (unauthenticated) is not tested E2E — the dev server's Supabase session leaks into fresh Playwright API contexts via the shared cookie jar. It is covered by OnboardingRoute.test.ts instead.
 
 ## Seed State Dependencies
 - evaId   — failed user with failure_reason = 'invalid_number'
