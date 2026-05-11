@@ -47,7 +47,7 @@ test.describe('users list page', () => {
       return
     }
     await page.locator(`table tbody a[href="/dashboard/homeowners/${userId}"]`).click()
-    await expect(page).toHaveURL(/\/dashboard\/users\/.+/)
+    await expect(page).toHaveURL(/\/dashboard\/homeowners\/.+/)
   })
 })
 
