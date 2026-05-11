@@ -43,21 +43,21 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
-          <p className="mt-2 text-slate-400 text-sm">Set your new password</p>
+          <p className="mt-2 text-white/50 text-sm">Set your new password</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-deep-slate rounded-2xl p-8 border border-slate-800 space-y-5"
+          className="bg-deep-slate rounded-2xl p-8 border border-deep-slate space-y-5"
         >
           {error && (
-            <div role="alert" className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
+            <div role="alert" className="bg-error/10 border border-error/20 rounded-lg px-4 py-3 text-sm text-error/80">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-white/70 mb-1.5">
               New password
             </label>
             <input
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
               autoComplete="new-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+              className="w-full bg-navy border border-deep-slate/50 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -83,7 +83,7 @@ export default function ResetPasswordPage() {
         </form>
 
         <p className="mt-6 text-center text-sm">
-          <Link href="/login" className="text-slate-400 hover:text-white transition-colors">
+          <Link href="/login" className="text-white/50 hover:text-white transition-colors">
             Back to sign in
           </Link>
         </p>

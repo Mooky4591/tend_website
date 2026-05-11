@@ -13,13 +13,13 @@ export default function SmsEnrollmentPage() {
   return (
     <>
       <Navigation />
-      <main className="bg-slate-50 pt-24 pb-20 min-h-screen" id="main-content">
+      <main className="bg-background pt-24 pb-20 min-h-screen" id="main-content">
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
           <header className="mb-8">
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
               Enroll in Tendr SMS Home Warranty Assistance
             </h1>
-            <div className="mt-4 space-y-3 text-base text-slate-600 leading-relaxed">
+            <div className="mt-4 space-y-3 text-base text-muted-foreground/80 leading-relaxed">
               <p>
                 Tendr helps homeowners receive SMS support for home warranty assistance, claim support, claim status
                 updates, home maintenance reminders, and related product recommendations.
@@ -31,7 +31,7 @@ export default function SmsEnrollmentPage() {
             </div>
           </header>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-2xl border border-border/20 bg-white p-6 shadow-sm sm:p-8">
             <SmsEnrollmentForm />
           </div>
         </div>

@@ -24,19 +24,19 @@ describe('ConversationPanel', () => {
     expect(screen.getByText('Staff chiming in')).toBeInTheDocument()
   })
 
-  it('applies slate bubble style to user messages', () => {
+  it('applies sand bubble style to user messages', () => {
     render(<ConversationPanel messages={[MESSAGES[0]]} />)
-    expect(screen.getByText('Hello there').className).toContain('bg-slate-100')
+    expect(screen.getByText('Hello there').className).toContain('bg-sand')
   })
 
-  it('applies emerald bubble style to assistant messages', () => {
+  it('applies brand bubble style to assistant messages', () => {
     render(<ConversationPanel messages={[MESSAGES[1]]} />)
-    expect(screen.getByText('Hi! How can I help?').className).toContain('bg-emerald-600')
+    expect(screen.getByText('Hi! How can I help?').className).toContain('bg-brand-600')
   })
 
-  it('applies blue bubble style to staff messages and shows Staff label', () => {
+  it('applies deep-slate bubble style to staff messages and shows Staff label', () => {
     render(<ConversationPanel messages={[MESSAGES[2]]} />)
-    expect(screen.getByText('Staff chiming in').className).toContain('bg-blue-600')
+    expect(screen.getByText('Staff chiming in').className).toContain('bg-deep-slate')
     expect(screen.getByText('Staff')).toBeInTheDocument()
   })
 

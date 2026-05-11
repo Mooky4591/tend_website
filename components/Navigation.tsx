@@ -78,7 +78,7 @@ export default function Navigation() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm transition-shadow duration-200 ${
-        scrolled ? 'shadow-sm border-b border-slate-200' : ''
+        scrolled ? 'shadow-sm border-b border-border/20' : ''
       }`}
       role="banner"
     >
@@ -96,7 +96,7 @@ export default function Navigation() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                className="text-sm font-medium text-muted-foreground/80 hover:text-foreground transition-colors"
               >
                 {link.label}
               </a>
@@ -108,7 +108,7 @@ export default function Navigation() {
         <div className="hidden md:flex items-center gap-3">
           <a
             href="/login"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            className="text-sm font-medium text-muted-foreground/80 hover:text-foreground transition-colors"
           >
             Sign in
           </a>
@@ -123,7 +123,7 @@ export default function Navigation() {
         {/* Mobile hamburger */}
         <button
           ref={hamburgerRef}
-          className="md:hidden p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+          className="md:hidden p-2 rounded-md text-muted-foreground/80 hover:text-foreground hover:bg-muted transition-colors"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-menu"
@@ -146,7 +146,7 @@ export default function Navigation() {
         <nav
           id="mobile-menu"
           ref={mobileMenuRef}
-          className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 flex flex-col gap-1"
+          className="md:hidden border-t border-border/20 bg-white px-4 pt-2 pb-4 flex flex-col gap-1"
           onKeyDown={handleMenuKeyDown}
           aria-label="Navigation menu"
         >
@@ -154,7 +154,7 @@ export default function Navigation() {
             <a
               key={link.href}
               href={link.href}
-              className="py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+              className="py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               onClick={closeMobileMenu}
             >
               {link.label}
@@ -162,7 +162,7 @@ export default function Navigation() {
           ))}
           <a
             href="/login"
-            className="py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+            className="py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             onClick={closeMobileMenu}
           >
             Sign in

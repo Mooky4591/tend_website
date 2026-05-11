@@ -37,11 +37,11 @@ export default function MessageForm({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="border-t border-slate-200 p-4">
-      {error && <p className="text-xs text-red-600 mb-2">{error}</p>}
+    <div className="border-t border-border/20 p-4">
+      {error && <p className="text-xs text-error mb-2">{error}</p>}
       <div className="flex gap-2">
         <textarea
-          className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-slate-300"
+          className="flex-1 border border-border/20 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring/30"
           rows={2}
           placeholder="Type a message to send via SMS…"
           value={message}
@@ -62,7 +62,7 @@ export default function MessageForm({ userId }: { userId: string }) {
           {busy ? 'Sending…' : 'Send'}
         </button>
       </div>
-      <p className="text-xs text-slate-400 mt-1">Sends via SMS and appears in the conversation thread.</p>
+      <p className="text-xs text-muted-foreground/50 mt-1">Sends via SMS and appears in the conversation thread.</p>
     </div>
   )
 }

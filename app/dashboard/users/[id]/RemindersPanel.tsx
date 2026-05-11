@@ -81,7 +81,7 @@ export default function RemindersPanel({
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold text-slate-700">Scheduled Reminders</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground">Scheduled Reminders</h2>
         <button
           onClick={() => setAdding(true)}
           className="text-xs px-3 py-1.5 bg-navy text-white rounded-lg hover:bg-deep-slate transition-colors"
@@ -91,17 +91,17 @@ export default function RemindersPanel({
         </button>
       </div>
 
-      {error && <p className="text-xs text-red-600 mb-2">{error}</p>}
+      {error && <p className="text-xs text-error mb-2">{error}</p>}
 
       <div className="space-y-2">
         {reminders.map(r => (
-          <div key={r.id} className="bg-white border border-slate-200 rounded-xl p-3">
+          <div key={r.id} className="bg-white border border-border/20 rounded-xl p-3">
             {editingId === r.id ? (
               <div className="flex flex-col gap-2">
                 <select
                   value={editValues.reminderType}
                   onChange={e => setEditValues(v => ({ ...v, reminderType: e.target.value }))}
-                  className="border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  className="border border-border/20 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring/30"
                 >
                   {REMINDER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
@@ -109,7 +109,7 @@ export default function RemindersPanel({
                   type="date"
                   value={editValues.dueDate}
                   onChange={e => setEditValues(v => ({ ...v, dueDate: e.target.value }))}
-                  className="border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  className="border border-border/20 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring/30"
                 />
                 <div className="flex gap-2">
                   <button
@@ -122,7 +122,7 @@ export default function RemindersPanel({
                   <button
                     onClick={() => setEditingId(null)}
                     disabled={busy}
-                    className="text-xs px-3 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                    className="text-xs px-3 py-1 border border-border/20 rounded-lg hover:bg-muted transition-colors"
                   >
                     Cancel
                   </button>
@@ -131,9 +131,9 @@ export default function RemindersPanel({
             ) : (
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-800">{r.reminder_type}</p>
-                  <p className="text-xs text-slate-500">{formatDate(r.due_date)}</p>
-                  {r.sent && <span className="text-xs text-emerald-600">Sent</span>}
+                  <p className="text-sm font-medium text-foreground">{r.reminder_type}</p>
+                  <p className="text-xs text-muted-foreground/60">{formatDate(r.due_date)}</p>
+                  {r.sent && <span className="text-xs text-success">Sent</span>}
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -142,14 +142,14 @@ export default function RemindersPanel({
                       setEditValues({ reminderType: r.reminder_type, dueDate: r.due_date })
                     }}
                     disabled={busy}
-                    className="text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                    className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(r.id)}
                     disabled={busy}
-                    className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                    className="text-xs text-error/80 hover:text-error transition-colors"
                   >
                     Delete
                   </button>
@@ -160,15 +160,15 @@ export default function RemindersPanel({
         ))}
 
         {reminders.length === 0 && !adding && (
-          <p className="text-xs text-slate-400 py-4 text-center">No reminders scheduled</p>
+          <p className="text-xs text-muted-foreground/50 py-4 text-center">No reminders scheduled</p>
         )}
 
         {adding && (
-          <div className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
+          <div className="bg-white border border-border/20 rounded-xl p-3 flex flex-col gap-2">
             <select
               value={newValues.reminderType}
               onChange={e => setNewValues(v => ({ ...v, reminderType: e.target.value }))}
-              className="border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+              className="border border-border/20 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring/30"
             >
               {REMINDER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
@@ -176,7 +176,7 @@ export default function RemindersPanel({
               type="date"
               value={newValues.dueDate}
               onChange={e => setNewValues(v => ({ ...v, dueDate: e.target.value }))}
-              className="border border-slate-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+              className="border border-border/20 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring/30"
             />
             <div className="flex gap-2">
               <button
@@ -189,7 +189,7 @@ export default function RemindersPanel({
               <button
                 onClick={() => { setAdding(false); setError(null) }}
                 disabled={busy}
-                className="text-xs px-3 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                className="text-xs px-3 py-1 border border-border/20 rounded-lg hover:bg-muted transition-colors"
               >
                 Cancel
               </button>

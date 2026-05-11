@@ -52,21 +52,21 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
-          <p className="mt-2 text-slate-400 text-sm">Sign in to your account</p>
+          <p className="mt-2 text-white/50 text-sm">Sign in to your account</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-deep-slate rounded-2xl p-8 border border-slate-800 space-y-5"
+          className="bg-deep-slate rounded-2xl p-8 border border-deep-slate space-y-5"
         >
           {error && (
-            <div role="alert" className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
+            <div role="alert" className="bg-error/10 border border-error/20 rounded-lg px-4 py-3 text-sm text-error/80">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">
+            <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-1.5">
               Email
             </label>
             <input
@@ -76,13 +76,13 @@ function LoginForm() {
               autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+              className="w-full bg-navy border border-deep-slate/50 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               placeholder="you@company.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-white/70 mb-1.5">
               Password
             </label>
             <input
@@ -92,7 +92,7 @@ function LoginForm() {
               autoComplete="current-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+              className="w-full bg-navy border border-deep-slate/50 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -107,17 +107,17 @@ function LoginForm() {
 
           <Link
             href="/forgot-password"
-            className="block text-center text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            className="block text-center text-xs text-white/40 hover:text-white/70 transition-colors"
           >
             Forgot password?
           </Link>
         </form>
 
-        <p className="mt-6 text-center text-xs text-slate-600">
+        <p className="mt-6 text-center text-xs text-white/30">
           Need access?{' '}
           <a
             href="mailto:support@trytendr.org"
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-white/50 hover:text-white transition-colors"
           >
             Contact support
           </a>

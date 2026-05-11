@@ -40,7 +40,7 @@ export default function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="bg-slate-50 py-20 lg:py-28"
+      className="bg-muted py-20 lg:py-28"
       aria-labelledby="how-it-works-heading"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -51,11 +51,11 @@ export default function HowItWorks() {
           </p>
           <h2
             id="how-it-works-heading"
-            className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight text-balance"
+            className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight text-balance"
           >
             From sign-up to fully automated in three steps
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg text-muted-foreground/80">
             Tendr integrates with your existing platform and takes over the ongoing homeowner
             relationship — so your team doesn&apos;t have to.
           </p>
@@ -79,12 +79,12 @@ export default function HowItWorks() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-4">{step.description}</p>
-                  <div className="flex items-start gap-2 pt-3 border-t border-slate-100">
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-border/10">
+                  <h3 className="text-lg font-bold text-foreground mb-2">{step.title}</h3>
+                  <p className="text-muted-foreground/80 text-sm leading-relaxed mb-4">{step.description}</p>
+                  <div className="flex items-start gap-2 pt-3 border-t border-border/10">
                     <CheckIcon />
-                    <p className="text-xs text-slate-500 leading-relaxed">{step.detail}</p>
+                    <p className="text-xs text-muted-foreground/60 leading-relaxed">{step.detail}</p>
                   </div>
                 </div>
               </div>

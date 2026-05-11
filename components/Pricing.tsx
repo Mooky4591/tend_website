@@ -32,7 +32,7 @@ export default function Pricing() {
   return (
     <section
       id="pricing"
-      className="bg-slate-50 py-20 lg:py-28"
+      className="bg-muted py-20 lg:py-28"
       aria-labelledby="pricing-heading"
     >
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -43,11 +43,11 @@ export default function Pricing() {
           </p>
           <h2
             id="pricing-heading"
-            className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight text-balance"
+            className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight text-balance"
           >
             You only pay for users who are actually using it
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg text-muted-foreground/80">
             Tendr is priced per active user, per month. If a homeowner completes onboarding and
             is actively engaged, they count. Inactive or unresponsive users don&apos;t.
           </p>
@@ -58,13 +58,13 @@ export default function Pricing() {
           {highlights.map((item) => (
             <div
               key={item.title}
-              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center"
+              className="bg-white rounded-2xl p-6 border border-border/20 shadow-sm text-center"
             >
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 text-brand-600 mb-4">
                 {item.icon}
               </div>
-              <h3 className="text-sm font-bold text-slate-900 mb-2">{item.title}</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
+              <h3 className="text-sm font-bold text-foreground mb-2">{item.title}</h3>
+              <p className="text-sm text-muted-foreground/80 leading-relaxed">{item.description}</p>
             </div>
           ))}
         </div>

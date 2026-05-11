@@ -43,7 +43,7 @@ const faqs = [
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg
-      className={`w-5 h-5 text-slate-400 transition-transform duration-200 shrink-0 ${open ? 'rotate-180' : ''}`}
+      className={`w-5 h-5 text-muted-foreground/50 transition-transform duration-200 shrink-0 ${open ? 'rotate-180' : ''}`}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -60,10 +60,10 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
   const panelId = `faq-answer-${index}`
 
   return (
-    <div className="border-b border-slate-200 last:border-b-0">
+    <div className="border-b border-border/20 last:border-b-0">
       <button
         id={buttonId}
-        className="w-full flex items-center justify-between gap-4 py-5 text-left text-sm font-semibold text-slate-900 hover:text-brand-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 rounded-sm"
+        className="w-full flex items-center justify-between gap-4 py-5 text-left text-sm font-semibold text-foreground hover:text-brand-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 rounded-sm"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-controls={panelId}
@@ -77,7 +77,7 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
         role="region"
         aria-labelledby={buttonId}
         hidden={!open}
-        className="pb-5 text-sm text-slate-600 leading-relaxed"
+        className="pb-5 text-sm text-muted-foreground/80 leading-relaxed"
       >
         {answer}
       </div>
@@ -98,11 +98,11 @@ export default function FAQ() {
           <p className="text-sm font-semibold text-brand-600 uppercase tracking-wider mb-3">FAQ</p>
           <h2
             id="faq-heading"
-            className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight text-balance"
+            className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight text-balance"
           >
             Common questions
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg text-muted-foreground/80">
             Can&apos;t find what you&apos;re looking for?{' '}
             <a href="#contact" className="text-brand-600 hover:underline font-medium">
               Ask us directly.
@@ -111,7 +111,7 @@ export default function FAQ() {
         </div>
 
         {/* Accordion */}
-        <div className="border border-slate-200 rounded-2xl px-6 divide-y divide-slate-200 overflow-hidden">
+        <div className="border border-border/20 rounded-2xl px-6 divide-y divide-border/20 overflow-hidden">
           {faqs.map((faq, i) => (
             <FAQItem key={faq.question} question={faq.question} answer={faq.answer} index={i} />
           ))}

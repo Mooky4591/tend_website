@@ -106,11 +106,11 @@ export default function Features() {
           </p>
           <h2
             id="features-heading"
-            className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight text-balance"
+            className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight text-balance"
           >
             Everything your homeowners need. Nothing they don&apos;t.
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg text-muted-foreground/80">
             Tendr handles the full homeowner lifecycle — from first text to ongoing care —
             so your team can focus on what matters.
           </p>
@@ -121,15 +121,15 @@ export default function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group relative bg-white rounded-2xl p-6 border border-slate-200 hover:border-brand-200 hover:shadow-md transition-all duration-200"
+              className="group relative bg-white rounded-2xl p-6 border border-border/20 hover:border-brand-200 hover:shadow-md transition-all duration-200"
             >
               {/* Icon */}
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 text-brand-600 mb-4 group-hover:bg-brand-100 transition-colors">
                 {feature.icon}
               </div>
 
-              <h3 className="text-base font-bold text-slate-900 mb-2">{feature.title}</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+              <h3 className="text-base font-bold text-foreground mb-2">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground/80 leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>

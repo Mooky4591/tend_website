@@ -11,8 +11,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!user) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200">
+    <div className="min-h-screen bg-background">
+      <header className="bg-white border-b border-border/20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Image src="/logo.png" alt="Tendr" width={102} height={34} priority />
           <SignOutButton />

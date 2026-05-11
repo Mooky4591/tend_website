@@ -38,13 +38,13 @@ export default function ForgotPasswordPage() {
       <div className="min-h-screen bg-navy flex items-center justify-center px-4">
         <div className="w-full max-w-sm text-center">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
-          <div className="mt-8 bg-deep-slate rounded-2xl p-8 border border-slate-800">
-            <p className="text-slate-300 text-sm">
+          <div className="mt-8 bg-deep-slate rounded-2xl p-8 border border-deep-slate">
+            <p className="text-white/70 text-sm">
               If that email is registered, you&apos;ll receive a password reset link shortly.
             </p>
             <Link
               href="/login"
-              className="mt-4 inline-block text-sm text-slate-400 hover:text-white transition-colors"
+              className="mt-4 inline-block text-sm text-white/50 hover:text-white transition-colors"
             >
               Back to sign in
             </Link>
@@ -59,15 +59,15 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-white tracking-tight">Tendr</span>
-          <p className="mt-2 text-slate-400 text-sm">Reset your password</p>
+          <p className="mt-2 text-white/50 text-sm">Reset your password</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-deep-slate rounded-2xl p-8 border border-slate-800 space-y-5"
+          className="bg-deep-slate rounded-2xl p-8 border border-deep-slate space-y-5"
         >
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">
+            <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-1.5">
               Email
             </label>
             <input
@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
               autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+              className="w-full bg-navy border border-deep-slate/50 rounded-lg px-3.5 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               placeholder="you@company.com"
             />
           </div>
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
         </form>
 
         <p className="mt-6 text-center text-sm">
-          <Link href="/login" className="text-slate-400 hover:text-white transition-colors">
+          <Link href="/login" className="text-white/50 hover:text-white transition-colors">
             Back to sign in
           </Link>
         </p>
