@@ -55,6 +55,7 @@ jest.mock('@/app/dashboard/users/[id]/RemindersPanel', () => {
   return RemindersPanel
 })
 
+
 jest.mock('@/app/dashboard/users/[id]/PhoneNumberEditor', () => {
   const PhoneNumberEditor = ({ phoneNumber }: { phoneNumber: string }) => <div data-testid="phone-editor">{phoneNumber}</div>
   PhoneNumberEditor.displayName = 'PhoneNumberEditor'

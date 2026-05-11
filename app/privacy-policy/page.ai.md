@@ -21,7 +21,7 @@ Static Server Component page (`PrivacyPolicyPage`) that renders the full Tendr P
 
 ## Required Patterns
 - `<main>` as the root element with `bg-slate-50 text-slate-900` classes.
-- "Last updated May 2, 2026" date displayed below the heading.
+- "Last updated May 8, 2026" date displayed below the heading.
 - The SMS mobile data section (Section 2) must explicitly state that mobile numbers and SMS consent are not sold or shared for marketing purposes — required for A2P 10DLC compliance.
 
 ## Tests Required

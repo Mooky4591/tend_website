@@ -21,6 +21,8 @@ export default async function BillingPage() {
     .eq('tenant_id', tenantId ?? '')
     .order('billing_month', { ascending: false })
 
+  const PRICE_PER_USER = 7
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-6">
@@ -37,6 +39,7 @@ export default async function BillingPage() {
               <th className="text-right px-4 py-3 font-medium text-slate-600">New users</th>
               <th className="text-right px-4 py-3 font-medium text-slate-600">Reminders sent</th>
               <th className="text-right px-4 py-3 font-medium text-slate-600">Conversations</th>
+              <th className="text-right px-4 py-3 font-medium text-slate-600">Amount due</th>
             </tr>
           </thead>
           <tbody>
@@ -47,11 +50,12 @@ export default async function BillingPage() {
                 <td className="px-4 py-3 text-right text-slate-700">{s.new_users.toLocaleString()}</td>
                 <td className="px-4 py-3 text-right text-slate-700">{s.reminders_sent.toLocaleString()}</td>
                 <td className="px-4 py-3 text-right text-slate-700">{s.conversations.toLocaleString()}</td>
+                <td className="px-4 py-3 text-right text-slate-700">${(s.active_users * PRICE_PER_USER).toLocaleString()}</td>
               </tr>
             ))}
             {(snapshots ?? []).length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-slate-400 text-sm">No billing data yet</td>
+                <td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-sm">No billing data yet</td>
               </tr>
             )}
           </tbody>
