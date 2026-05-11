@@ -4,7 +4,7 @@
 Typed browser-side fetch wrappers for all internal API endpoints. Centralizes hardcoded URL strings and request shapes so client components make API calls through a single module rather than scattering `fetch('/api/...')` calls inline.
 
 ## Allowed Responsibilities
-- Export one function per API operation: `sendMessage`, `createReminder`, `updateReminder`, `deleteReminder`, `uploadWarrantyDoc`, `submitSmsEnrollment`.
+- Export one function per API operation: `sendMessage`, `createReminder`, `updateReminder`, `deleteReminder`, `uploadWarrantyDoc`, `submitSmsEnrollment`, `updateHomeownerPhone`.
 - Each function constructs the correct `fetch` call (URL, method, headers, body) and returns the raw `Response`.
 - For multipart uploads (`uploadWarrantyDoc`), build the `FormData` internally.
 
@@ -21,6 +21,7 @@ Typed browser-side fetch wrappers for all internal API endpoints. Centralizes ha
 - `export async function deleteReminder(id: string): Promise<Response>`
 - `export async function uploadWarrantyDoc(planName: string, file: File): Promise<Response>`
 - `export async function submitSmsEnrollment(body: object): Promise<Response>`
+- `export async function updateHomeownerPhone(userId: string, phoneNumber: string): Promise<Response>`
 
 ## Required Patterns
 - JSON endpoints must set `Content-Type: application/json` and stringify the body.
@@ -34,6 +35,6 @@ Typed browser-side fetch wrappers for all internal API endpoints. Centralizes ha
 - Non-2xx responses are returned to the caller without throwing.
 
 ## Notes for AI Agents
-- Consumed by: `app/dashboard/users/[id]/MessageForm.tsx`, `app/dashboard/users/[id]/RemindersPanel.tsx`, `app/dashboard/docs/UploadForm.tsx`, `app/sms-enrollment/SmsEnrollmentForm.tsx`.
+- Consumed by: `app/dashboard/users/[id]/MessageForm.tsx`, `app/dashboard/users/[id]/RemindersPanel.tsx`, `app/dashboard/users/[id]/PhoneNumberEditor.tsx`, `app/dashboard/docs/UploadForm.tsx`, `app/sms-enrollment/SmsEnrollmentForm.tsx`.
 - Tests for those components mock `global.fetch` directly; since this module calls `fetch` internally, the mocks intercept correctly without any changes to test setup.
 - If an API endpoint URL changes, update only this file.

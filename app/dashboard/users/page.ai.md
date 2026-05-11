@@ -8,7 +8,7 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 - Resolve `tenant_id` via `getTenantId` from `@/lib/auth`.
 - Query the `users` table for the tenant's homeowners, ordered by `created_at` descending.
 - Render a table with columns: Name, Phone, Location, Status.
-- Apply `statusBadge` to determine the correct badge color and label per row.
+- Apply `statusBadge` to determine the correct badge color, label, and hover tooltip per row.
 
 ## Not Allowed
 - Do not allow mutations from this page (no delete, edit, or bulk actions).
@@ -18,9 +18,12 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 ## Public Interfaces
 - `export default async function UsersPage(): Promise<JSX.Element>`
 - `function statusBadge(u: { onboarding_complete: boolean; onboarding_status: string | null; opted_out: boolean }): JSX.Element` — local, not exported.
+- `function StatusTooltipBadge({ label, colorClass, tooltip }): JSX.Element` — local, not exported. Renders a badge with a CSS-only hover tooltip using Tailwind `group`/`group-hover`.
 
 ## Required Patterns
 - `statusBadge` priority order: opted_out → onboarding_complete → queued → failed → pending (Pending is the default).
+- Each status badge is wrapped in `StatusTooltipBadge` which shows a `w-56` dark tooltip above the badge on hover via Tailwind `group`/`group-hover` (no client-side JS).
+- Tooltip copy lives in the `STATUS_TOOLTIPS` constant keyed by status name.
 - Each name cell is a `<Link>` to `/dashboard/users/${h.id}`.
 - Phone numbers rendered with `font-mono text-xs`.
 - Total count displayed below the heading: `{homeowners?.length ?? 0} total`.
@@ -32,6 +35,7 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 - `statusBadge` returns "Opted out" badge when `opted_out === true` (even if `onboarding_complete === true`).
 - `statusBadge` returns "Complete" badge when `onboarding_complete === true` and not opted out.
 - `statusBadge` returns "Queued"/"Failed"/"Pending" based on `onboarding_status`.
+- Each status renders its corresponding tooltip text in the DOM.
 - Name links navigate to `/dashboard/users/${id}`.
 - Empty state renders when no homeowners exist.
 

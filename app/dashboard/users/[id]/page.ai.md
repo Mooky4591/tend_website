@@ -9,7 +9,8 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 - Call `notFound()` if the homeowner is not found.
 - Derive `location` string from address fields.
 - Render status badges for `onboarding_complete` and `opted_out`.
-- Compose `ConversationPanel`, `MessageForm`, and `RemindersPanel` with fetched data.
+- Compose `ConversationPanel`, `MessageForm`, `RemindersPanel`, and `PhoneNumberEditor` with fetched data.
+- Render a "Homeowner Information" card with `PhoneNumberEditor` and location.
 
 ## Not Allowed
 - Do not make mutations on this page; all mutations go through client components and API routes.
@@ -29,7 +30,8 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 ## Tests Required
 - Unauthenticated user is redirected to `/login`.
 - `notFound()` is called when the homeowner row does not exist.
-- Homeowner name, phone, and location are rendered.
+- Homeowner name and location are rendered.
+- `PhoneNumberEditor` is rendered with the homeowner's phone number.
 - "Onboarding complete" badge renders when `onboarding_complete === true`.
 - "Opted out" badge renders when `opted_out === true`.
 - `ConversationPanel` receives messages sorted ascending.

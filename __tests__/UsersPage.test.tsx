@@ -100,6 +100,26 @@ describe('UsersPage', () => {
     expect(screen.getByText('Failed')).toBeInTheDocument()
   })
 
+  it('renders tooltip text in the DOM for each status', async () => {
+    mockUsersOrder.mockResolvedValueOnce({
+      data: [
+        { id: 'u1', first_name: 'Dana', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: true, created_at: '2026-01-01' },
+        { id: 'u2', first_name: 'Eva', phone_number: '+2', city: null, state: null, onboarding_complete: true, onboarding_status: null, opted_out: false, created_at: '2026-01-02' },
+        { id: 'u3', first_name: 'Frank', phone_number: '+3', city: null, state: null, onboarding_complete: false, onboarding_status: 'queued', opted_out: false, created_at: '2026-01-03' },
+        { id: 'u4', first_name: 'Grace', phone_number: '+4', city: null, state: null, onboarding_complete: false, onboarding_status: 'failed', opted_out: false, created_at: '2026-01-04' },
+        { id: 'u5', first_name: 'Hank', phone_number: '+5', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, created_at: '2026-01-05' },
+      ],
+    })
+
+    render(await UsersPage())
+
+    expect(screen.getByText(/opted out of SMS messages/i)).toBeInTheDocument()
+    expect(screen.getByText(/onboarding is complete/i)).toBeInTheDocument()
+    expect(screen.getByText(/queued for onboarding/i)).toBeInTheDocument()
+    expect(screen.getByText(/onboarding failed/i)).toBeInTheDocument()
+    expect(screen.getByText(/hasn't started yet/i)).toBeInTheDocument()
+  })
+
   it('shows — when first_name is null', async () => {
     mockUsersOrder.mockResolvedValueOnce({
       data: [{ id: 'u1', first_name: null, phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, created_at: '2026-01-01' }],
