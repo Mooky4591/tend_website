@@ -32,7 +32,7 @@ test.describe('multi-tenant isolation', () => {
     const seed = getSeedState()
     if (!seed) { test.skip(); return }
 
-    await page.goto('/dashboard/users')
+    await page.goto('/dashboard/homeowners')
     await expect(page.locator('text=E2E Alice')).not.toBeVisible()
     await expect(page.locator('text=E2E Bob')).not.toBeVisible()
     await expect(page.locator('text=E2E Carol')).not.toBeVisible()
@@ -42,7 +42,7 @@ test.describe('multi-tenant isolation', () => {
     const seed = getSeedState()
     if (!seed?.aliceId) { test.skip(); return }
 
-    await page.goto(`/dashboard/users/${seed.aliceId}`)
+    await page.goto(`/dashboard/homeowners/${seed.aliceId}`)
     // notFound() renders the 404 page — Alice's name must not appear
     await expect(page.locator('text=E2E Alice')).not.toBeVisible({ timeout: 5_000 })
     await expect(page.locator('p.font-mono')).not.toBeVisible({ timeout: 5_000 })
@@ -52,7 +52,7 @@ test.describe('multi-tenant isolation', () => {
     const seed = getSeedState()
     if (!seed?.daveId) { test.skip(); return }
 
-    await page.goto('/dashboard/users')
+    await page.goto('/dashboard/homeowners')
     await expect(page.locator('text=E2E Dave')).toBeVisible()
     // Tenant A homeowners must still not be visible
     await expect(page.locator('text=E2E Alice')).not.toBeVisible()

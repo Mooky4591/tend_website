@@ -1,7 +1,7 @@
 # AI Contract: app/dashboard/DashboardNav.tsx
 
 ## Purpose
-Client Component (`DashboardNav`) that renders the four-tab horizontal navigation bar inside the dashboard: Overview, Users, Billing, and Warranty Docs. Uses `usePathname` to determine the active tab.
+Client Component (`DashboardNav`) that renders the four-tab horizontal navigation bar inside the dashboard: Overview, Homeowners, Billing, and Warranty Docs. Uses `usePathname` to determine the active tab.
 
 ## Allowed Responsibilities
 - Render a `<nav>` element containing the four dashboard tabs defined in the `tabs` constant.
@@ -24,9 +24,9 @@ Client Component (`DashboardNav`) that renders the four-tab horizontal navigatio
 - Active styles: `border-navy text-navy`; inactive: `border-transparent text-muted-foreground/60 hover:text-muted-foreground hover:border-border/30`.
 
 ## Tests Required
-- Renders all four tab labels: Overview, Users, Billing, Warranty Docs.
+- Renders all four tab labels: Overview, Homeowners, Billing, Warranty Docs.
 - Applies `border-navy` to Overview only when `pathname === '/dashboard'` exactly.
-- Applies `border-navy` to Users when `pathname === '/dashboard/users/some-id'`.
+- Applies `border-navy` to Homeowners when `pathname === '/dashboard/homeowners/some-id'`.
 - Inactive tabs do not receive `border-navy` (use `border-transparent`).
 
 ## Notes for AI Agents

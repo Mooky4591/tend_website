@@ -24,7 +24,7 @@ End-to-end tests for the authentication flows that do not require a stored auth 
 - No exports — test file only.
 
 ## Tests Required
-- Auth guard: unauthenticated visit to /dashboard, /dashboard/users, /dashboard/docs, /dashboard/billing each redirect to /login.
+- Auth guard: unauthenticated visit to /dashboard, /dashboard/homeowners, /dashboard/docs, /dashboard/billing each redirect to /login.
 - Login page: email field, password field, Sign in button, Forgot password link visible.
 - Login: wrong password shows role=alert error.
 - Login: ?error=auth_callback_failed shows expired/invalid message.

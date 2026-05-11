@@ -14,7 +14,7 @@ End-to-end tests for the authenticated /dashboard overview page. Validates that 
 - Assert the three stat cards (Total homeowners, Fully provisioned, Opted out) are visible.
 - Assert each stat card shows a numeric value.
 - Assert the tenant name heading is present.
-- Assert nav tab links navigate to /dashboard/users, /dashboard/billing, /dashboard/docs.
+- Assert nav tab links navigate to /dashboard/homeowners, /dashboard/billing, /dashboard/docs.
 
 ## Not Allowed
 - Do not include sign-out tests here (lives in z_signout.spec.ts).
@@ -28,7 +28,7 @@ End-to-end tests for the authenticated /dashboard overview page. Validates that 
 - Total homeowners, Fully provisioned, Opted out stat cards visible.
 - Each stat value matches /^\d[\d,]*$/.
 - Tenant name heading visible.
-- Nav shows Overview, Users, Billing, Warranty Docs tabs.
-- Clicking Users tab reaches /dashboard/users.
+- Nav shows Overview, Homeowners, Billing, Warranty Docs tabs.
+- Clicking Homeowners tab reaches /dashboard/homeowners.
 - Clicking Billing tab reaches /dashboard/billing.
 - Clicking Warranty Docs tab reaches /dashboard/docs.

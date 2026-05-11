@@ -1,13 +1,13 @@
 ---
 name: ConversationPanel.test
-description: Tests for app/dashboard/users/[id]/ConversationPanel — message rendering, bubble styles, staff label, scrollIntoView
+description: Tests for app/dashboard/homeowners/[id]/ConversationPanel — message rendering, bubble styles, staff label, scrollIntoView
 type: project
 ---
 
 # AI Contract: __tests__/ConversationPanel.test.tsx
 
 ## Purpose
-Unit tests for `app/dashboard/users/[id]/ConversationPanel.tsx`. Verifies empty state, message content rendering, bubble color styles per role (user/assistant/staff), Staff label visibility, and `scrollIntoView` on mount.
+Unit tests for `app/dashboard/homeowners/[id]/ConversationPanel.tsx`. Verifies empty state, message content rendering, bubble color styles per role (user/assistant/staff), Staff label visibility, and `scrollIntoView` on mount.
 
 ## Allowed Responsibilities
 - Render `ConversationPanel` with synthetic message arrays.

@@ -1,4 +1,4 @@
-# AI Contract: app/dashboard/users/[id]/page.tsx
+# AI Contract: app/dashboard/homeowners/[id]/page.tsx
 
 ## Purpose
 Server Component page (`UserDetailPage`) that fetches and displays a single homeowner's profile, conversation thread, and reminders in a dashboard layout. Calls `notFound()` if the homeowner row does not exist.
@@ -25,7 +25,7 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 - `notFound()` called when `homeowner` is null (triggers the Next.js 404 page).
 - Conversations ordered ascending; reminders ordered ascending by due date.
 - `ConversationPanel` messages cast via `as Parameters<typeof ConversationPanel>[0]['messages']`.
-- Back link to `/dashboard/users` rendered above the heading.
+- Back link to `/dashboard/homeowners` rendered above the heading.
 - Pass `params.id` and `homeowner.phone_number` into `PhoneNumberEditor`.
 
 ## Tests Required

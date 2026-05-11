@@ -14,9 +14,9 @@ Security regression tests for row-level security. Confirms that the RLS policies
 - Sign in as tenant B user (E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B) in beforeEach.
 - Skip all tests when E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B env vars are absent.
 - Skip individual tests when the required seed-state entry is absent.
-- Assert tenant A homeowners (E2E Alice, E2E Bob, E2E Carol) are not visible on /dashboard/users for tenant B.
+- Assert tenant A homeowners (E2E Alice, E2E Bob, E2E Carol) are not visible on /dashboard/homeowners for tenant B.
 - Assert direct URL access to tenant A's homeowner detail page does not expose Alice's data.
-- Assert tenant B's own homeowner (E2E Dave) is visible on /dashboard/users when signed in as tenant B.
+- Assert tenant B's own homeowner (E2E Dave) is visible on /dashboard/homeowners when signed in as tenant B.
 
 ## Not Allowed
 - Do not use the tenant A storageState (e2e/.auth/user.json).

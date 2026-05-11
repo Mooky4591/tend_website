@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import PhoneNumberEditor from '@/app/dashboard/users/[id]/PhoneNumberEditor'
+import PhoneNumberEditor from '@/app/dashboard/homeowners/[id]/PhoneNumberEditor'
 
 const mockRefresh = jest.fn()
 const mockUpdate = jest.fn()
