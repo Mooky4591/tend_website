@@ -136,6 +136,11 @@ describe('UserDetailPage', () => {
     expect(screen.getByRole('heading', { name: 'Homeowner' })).toBeInTheDocument()
   })
 
+  it('passes the homeowner phone number to PhoneNumberEditor', async () => {
+    render(await UserDetailPage({ params: { id: 'u1' } }))
+    expect(screen.getByTestId('phone-editor')).toHaveTextContent('+15551234567')
+  })
+
   it('renders ConversationPanel, MessageForm, RemindersPanel, and PhoneNumberEditor', async () => {
     render(await UserDetailPage({ params: { id: 'u1' } }))
     expect(screen.getByTestId('conversation-panel')).toBeInTheDocument()
