@@ -7,8 +7,28 @@ const STATUS_TOOLTIPS: Record<string, string> = {
   opted_out: 'This homeowner has opted out of SMS messages. No further messages will be sent to them.',
   complete: 'Onboarding is complete. This homeowner has finished the setup process.',
   queued: 'This homeowner is queued for onboarding. Messages will begin sending soon.',
-  failed: 'Onboarding failed. Review their profile to retry or investigate the issue.',
   pending: "Onboarding hasn't started yet. No messages have been sent to this homeowner.",
+}
+
+function getFailedTooltip(failureReason: string | null): string {
+  switch (failureReason) {
+    case 'invalid_number':
+      return 'The phone number on file is invalid or does not exist. Review the customer profile and update their phone number.'
+    case 'landline':
+      return 'The phone number on file is a landline and cannot receive SMS. Review the customer profile and update their phone number.'
+    case 'disconnected':
+      return 'The phone number on file appears to be disconnected. Review the customer profile and update their phone number.'
+    case 'delivery_timeout':
+      return 'SMS delivery failed because the handset was temporarily unreachable. A retry option will be available here.'
+    case 'network_error':
+      return 'SMS delivery failed due to a temporary network error. A retry option will be available here.'
+    case 'carrier_blocked':
+      return 'The message was blocked by the carrier. Contact support at support@trytendr.org for assistance.'
+    case 'account_error':
+      return 'There is an issue with the SMS account configuration. Contact support at support@trytendr.org for assistance.'
+    default:
+      return 'Onboarding failed. Contact support at support@trytendr.org if the issue persists.'
+  }
 }
 
 function StatusTooltipBadge({ label, colorClass, tooltip }: { label: string; colorClass: string; tooltip: string }) {
@@ -23,11 +43,11 @@ function StatusTooltipBadge({ label, colorClass, tooltip }: { label: string; col
   )
 }
 
-function statusBadge(u: { onboarding_complete: boolean; onboarding_status: string | null; opted_out: boolean }) {
+function statusBadge(u: { onboarding_complete: boolean; onboarding_status: string | null; opted_out: boolean; failure_reason: string | null }) {
   if (u.opted_out) return <StatusTooltipBadge label="Opted out" colorClass="bg-red-100 text-red-700" tooltip={STATUS_TOOLTIPS.opted_out} />
   if (u.onboarding_complete) return <StatusTooltipBadge label="Complete" colorClass="bg-green-100 text-green-700" tooltip={STATUS_TOOLTIPS.complete} />
   if (u.onboarding_status === 'queued') return <StatusTooltipBadge label="Queued" colorClass="bg-yellow-100 text-yellow-700" tooltip={STATUS_TOOLTIPS.queued} />
-  if (u.onboarding_status === 'failed') return <StatusTooltipBadge label="Failed" colorClass="bg-red-100 text-red-700" tooltip={STATUS_TOOLTIPS.failed} />
+  if (u.onboarding_status === 'failed') return <StatusTooltipBadge label="Failed" colorClass="bg-red-100 text-red-700" tooltip={getFailedTooltip(u.failure_reason)} />
   return <StatusTooltipBadge label="Pending" colorClass="bg-slate-100 text-slate-600" tooltip={STATUS_TOOLTIPS.pending} />
 }
 
@@ -40,7 +60,7 @@ export default async function UsersPage() {
 
   const { data: homeowners } = await supabase
     .from('users')
-    .select('id, first_name, phone_number, city, state, onboarding_complete, onboarding_status, opted_out, created_at')
+    .select('id, first_name, phone_number, city, state, onboarding_complete, onboarding_status, opted_out, failure_reason, created_at')
     .eq('tenant_id', tenantId ?? '')
     .order('created_at', { ascending: false })
 

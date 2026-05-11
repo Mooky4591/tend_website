@@ -252,7 +252,10 @@ test.describe('reminders panel', () => {
     }
     await page.goto(`/dashboard/users/${userId}`, { waitUntil: 'networkidle' })
 
-    const editBtn = page.locator('button', { hasText: 'Edit' }).first()
+    // Scope to the reminders panel container to avoid matching the PhoneNumberEditor's
+    // Edit button, which appears earlier in the DOM and shows an <input>, not a <select>.
+    const remindersSection = page.locator('.bg-slate-50.rounded-2xl')
+    const editBtn = remindersSection.locator('button', { hasText: 'Edit' }).first()
     if (await editBtn.count() === 0) {
       // No reminders to edit — skip
       test.skip()
