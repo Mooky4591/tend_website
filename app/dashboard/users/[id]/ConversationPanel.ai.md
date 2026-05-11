@@ -22,9 +22,10 @@ Client Component (`ConversationPanel`) that renders a scrollable list of convers
 
 ## Required Patterns
 - `'use client'` directive required.
-- `bubble(role)` helper maps role to Tailwind classes: user → `bg-slate-100 text-slate-800`, assistant → `bg-emerald-600 text-white`, staff → `bg-blue-600 text-white`.
+- `bubble(role)` helper maps role to Tailwind classes: user → `bg-sand text-deep-slate`, assistant → `bg-brand-600 text-white`, staff → `bg-deep-slate text-white`.
 - `useEffect` dependency is `[messages.length]`, not `[messages]`.
 - `bottomRef.current?.scrollIntoView({ behavior: 'auto' })` (not `'smooth'`).
+- Staff label uses `text-brand-500`; timestamps use `text-muted-foreground/40`.
 
 ## Tests Required
 - Renders "No messages yet" when `messages` is empty.

@@ -24,8 +24,8 @@ Unit tests for `app/dashboard/users/[id]/ConversationPanel.tsx`. Verifies empty 
 ## Tests Required
 - Shows empty state when there are no messages.
 - Renders all message contents.
-- Applies slate (`bg-slate-100`) bubble style to user messages.
-- Applies emerald (`bg-emerald-600`) bubble style to assistant messages.
-- Applies blue (`bg-blue-600`) bubble style to staff messages and shows "Staff" label.
+- Applies sand (`bg-sand`) bubble style to user messages.
+- Applies brand (`bg-brand-600`) bubble style to assistant messages.
+- Applies deep-slate (`bg-deep-slate`) bubble style to staff messages and shows "Staff" label.
 - Does not show "Staff" label for user or assistant messages.
 - Calls `scrollIntoView` on mount.

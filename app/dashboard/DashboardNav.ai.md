@@ -21,13 +21,13 @@ Client Component (`DashboardNav`) that renders the four-tab horizontal navigatio
 ## Required Patterns
 - `'use client'` directive is required (uses `usePathname`).
 - Active detection for `/dashboard` must be an exact match (`pathname === '/dashboard'`), not `startsWith`, to avoid marking it active on sub-routes.
-- Active styles: `border-slate-900 text-slate-900`; inactive: `border-transparent text-slate-500`.
+- Active styles: `border-navy text-navy`; inactive: `border-transparent text-muted-foreground/60 hover:text-muted-foreground hover:border-border/30`.
 
 ## Tests Required
 - Renders all four tab labels: Overview, Users, Billing, Warranty Docs.
-- Applies active styles to Overview only when `pathname === '/dashboard'` exactly.
-- Applies active styles to Users when `pathname === '/dashboard/users/some-id'`.
-- Inactive tabs do not receive the active border class.
+- Applies `border-navy` to Overview only when `pathname === '/dashboard'` exactly.
+- Applies `border-navy` to Users when `pathname === '/dashboard/users/some-id'`.
+- Inactive tabs do not receive `border-navy` (use `border-transparent`).
 
 ## Notes for AI Agents
 - This component is rendered by `app/dashboard/layout.tsx`, not by individual pages. Do not import it in page files.
