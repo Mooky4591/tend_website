@@ -1,6 +1,6 @@
 ---
 name: ApiClient.test
-description: Unit tests for lib/api/client.ts — fetch URL, method, body, and FormData for all 6 functions
+description: Unit tests for lib/api/client.ts — fetch URL, method, body, and FormData for all 7 functions
 type: project
 ---
 
@@ -29,6 +29,8 @@ Unit tests for `lib/api/client.ts`. Verifies that each exported function calls `
 - `uploadWarrantyDoc` POSTs to `/api/warranty-upload` with `FormData` containing `plan_name` and `file`.
 - `uploadWarrantyDoc` does not set an explicit `Content-Type` header.
 - `submitSmsEnrollment` POSTs to `/api/sms-enrollment` with correct JSON body.
+- `updateHomeownerPhone` PATCHes `/api/users/:id/phone` with `{ phoneNumber }` JSON body.
+- `updateHomeownerPhone` returns the raw Response without throwing on non-2xx.
 - Non-2xx responses are returned to the caller without throwing.
 
 ## Notes for AI Agents

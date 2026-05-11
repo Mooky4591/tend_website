@@ -12,7 +12,7 @@ jest.mock('@/lib/supabase/server', () => ({
         return { select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: mockMemberMaybeSingle }) }) }) }
       }
       if (table === 'users') {
-        return { update: () => ({ eq: () => ({ select: () => ({ single: mockUserSingle }) }) }) }
+        return { update: () => ({ eq: () => ({ eq: () => ({ select: () => ({ single: mockUserSingle }) }) }) }) }
       }
       throw new Error(`Unexpected table ${table}`)
     },
@@ -23,7 +23,7 @@ describe('PATCH /api/users/[id]/phone', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetUser.mockResolvedValue({ data: { user: { id: 'staff-1' } } })
-    mockMemberMaybeSingle.mockResolvedValue({ data: { role: 'admin' }, error: null })
+    mockMemberMaybeSingle.mockResolvedValue({ data: { role: 'admin', tenant_id: 'tenant-1' }, error: null })
   })
 
   it('returns 401 when unauthenticated', async () => {
