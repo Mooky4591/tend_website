@@ -19,7 +19,7 @@ Pre-test data setup for the E2E suite. Connects to the test Supabase project usi
 - Insert 3 months of billing snapshots (Feb–Apr 2026) for the test tenant.
 - When E2E_TEST_EMAIL_B and E2E_TEST_PASSWORD_B are set: create a second auth user, create "E2E Tenant B", link the second user, clear and re-seed one homeowner (E2E Dave) for tenant B.
 - Write { tenantId, aliceId, daveId } to e2e/.seed-state.json (daveId is null when tenant B is not set up).
-- Verify that the RLS policies from supabase/migrations/ are applied (sign in as the E2E user with the anon key and query tenant_users); exit with code 1 and clear instructions if they are missing.
+- Verify that the RLS policies from supabase/migrations/ are applied: sign in as the E2E user with the anon key, query tenant_users to confirm SELECT access (20260428000000 + 20260429000001), then attempt to update Alice's phone_number to confirm UPDATE access (20260508090000); exit with code 1 and clear migration instructions if either check fails.
 
 ## Not Allowed
 - Do not touch the production Supabase project — only reads SUPABASE_TEST_URL.

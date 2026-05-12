@@ -304,7 +304,7 @@ async function seedTenantBHomeowners(tenantId: string): Promise<{ daveId: string
  * tenant_users row, which causes every dashboard query to return empty results
  * and makes detail-page tests time out with 404s.
  */
-async function verifyRLSPolicies(): Promise<void> {
+async function verifyRLSPolicies(aliceId: string): Promise<void> {
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
     email: E2E_EMAIL!,
     password: E2E_PASSWORD!,
@@ -326,6 +326,7 @@ async function verifyRLSPolicies(): Promise<void> {
     global: { headers: { Authorization: `Bearer ${signInData.session.access_token}` } },
   })
 
+  // Verify SELECT policy (20260428000000 + 20260429000001)
   const { data: rows } = await userClient.from('tenant_users').select('id').limit(1)
 
   if (!rows || rows.length === 0) {
@@ -344,8 +345,86 @@ async function verifyRLSPolicies(): Promise<void> {
 
   2. Paste and run:  supabase/migrations/20260428000000_tenant_users.sql
   3. Paste and run:  supabase/migrations/20260429000001_portal_rls_policies.sql
+  4. Paste and run:  supabase/migrations/20260508090000_users_update_policy.sql
 
-  4. Re-run this script: npm run seed:e2e
+  5. Re-run this script: npm run seed:e2e
+`)
+    process.exit(1)
+  }
+
+  // Verify SELECT policy on users table (20260429000001) separately from tenant_users,
+  // so that a missing users SELECT policy produces a targeted error rather than being
+  // conflated with a missing UPDATE policy below.
+  const { data: aliceRow, error: aliceSelectErr } = await userClient
+    .from('users')
+    .select('id')
+    .eq('id', aliceId)
+    .maybeSingle()
+
+  if (aliceSelectErr || !aliceRow) {
+    const projectRef = new URL(SUPABASE_URL!).hostname.split('.')[0]
+    console.error(`
+  ❌  The SELECT RLS policy for the users table is missing or Alice's row is not visible.
+
+  Fix (one-time setup):
+
+  1. Open the Supabase SQL Editor:
+     https://supabase.com/dashboard/project/${projectRef}/sql/new
+
+  2. Paste and run:  supabase/migrations/20260429000001_portal_rls_policies.sql
+
+  3. Re-run this script: npm run seed:e2e
+`)
+    process.exit(1)
+  }
+
+  // Verify UPDATE policy (20260508090000). Use .select() without .single() so that
+  // an empty result unambiguously means the UPDATE was blocked — not that a chained
+  // .single() fired because the SELECT-back returned zero rows due to a missing SELECT
+  // policy (which we already ruled out above).
+  const { data: updated, error: updateErr } = await userClient
+    .from('users')
+    .update({ phone_number: '+15550000001' })
+    .eq('id', aliceId)
+    .select('id')
+
+  if (updateErr) {
+    const projectRef = new URL(SUPABASE_URL!).hostname.split('.')[0]
+    console.error(`
+  ❌  UPDATE policy verification failed with a database error.
+
+  Code:    ${updateErr.code ?? 'unknown'}
+  Message: ${updateErr.message}
+
+  This is likely a schema mismatch (e.g. a missing column, wrong type, or
+  constraint violation) rather than a missing RLS policy. Check the users
+  table schema in the Supabase dashboard:
+  https://supabase.com/dashboard/project/${projectRef}/editor
+`)
+    process.exit(1)
+  }
+
+  if (!updated || updated.length === 0) {
+    const projectRef = new URL(SUPABASE_URL!).hostname.split('.')[0]
+    console.error(`
+  ❌  The UPDATE RLS policy for the users table is missing.
+
+  The E2E user can read homeowners but cannot update them. Without this policy,
+  the phone number editor returns "Homeowner not found" for every save attempt.
+
+  This migration must be applied to every Supabase environment
+  (test, development, and production).
+
+  Fix for this test project (one-time setup):
+
+  1. Open the Supabase SQL Editor:
+     https://supabase.com/dashboard/project/${projectRef}/sql/new
+
+  2. Paste and run:  supabase/migrations/20260508090000_users_update_policy.sql
+
+  3. Re-run this script: npm run seed:e2e
+
+  Remember to apply the same migration to your dev and production projects.
 `)
     process.exit(1)
   }
@@ -404,7 +483,7 @@ async function main() {
   fs.writeFileSync(stateFile, JSON.stringify({ tenantId, aliceId, daveId }, null, 2))
 
   console.log('\n10. RLS policy verification')
-  await verifyRLSPolicies()
+  await verifyRLSPolicies(aliceId)
 
   console.log('\nSeed complete.')
   console.log(`  Tenant ID : ${tenantId}`)
