@@ -1,6 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { sendSms } from '@/lib/twilio'
-import { mapTwilioCodeToFailureReason, type FailureReason } from '@/lib/onboarding-failure'
 
 type ServiceError = { error: string; status: number }
 
@@ -28,26 +27,11 @@ export async function triggerOnboarding(
     return { error: 'Tenant has no Twilio number configured', status: 500 }
   }
 
-  let twilioErrorCode: number | undefined
   const smsError = await sendSms(tenant.twilio_phone_number, homeowner.phone_number, message)
     .then(() => null)
-    .catch((err: unknown) => {
-      twilioErrorCode = (err as { code?: number }).code
-      return err
-    })
-
-  const now = new Date().toISOString()
+    .catch((err: unknown) => err)
 
   if (smsError) {
-    const failureReason: FailureReason = mapTwilioCodeToFailureReason(twilioErrorCode)
-    await supabase
-      .from('users')
-      .update({
-        onboarding_status: 'failed',
-        failure_reason: failureReason,
-        last_onboarding_attempt: now,
-      })
-      .eq('id', userId)
     return { error: 'SMS delivery failed', status: 502 }
   }
 
@@ -64,7 +48,7 @@ export async function triggerOnboarding(
     .update({
       onboarding_status: 'queued',
       failure_reason: null,
-      last_onboarding_attempt: now,
+      last_onboarding_attempt: new Date().toISOString(),
     })
     .eq('id', userId)
   if (updateError) return { error: updateError.message, status: 500 }

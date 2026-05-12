@@ -79,31 +79,10 @@ describe('triggerOnboarding', () => {
     expect(result?.status).toBe(502)
   })
 
-  it('sets onboarding_status to failed with correct failure_reason for landline error', async () => {
+  it('does not update user status on SMS failure', async () => {
     mockSendSms.mockRejectedValue({ code: 21614 })
     await triggerOnboarding(makeSupabase() as never, 'user-1', 'Welcome!')
-    expect(mockUsersUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ onboarding_status: 'failed', failure_reason: 'landline' }),
-      'id', 'user-1'
-    )
-  })
-
-  it('sets failure_reason to carrier_blocked for code 30007', async () => {
-    mockSendSms.mockRejectedValue({ code: 30007 })
-    await triggerOnboarding(makeSupabase() as never, 'user-1', 'Welcome!')
-    expect(mockUsersUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ failure_reason: 'carrier_blocked' }),
-      'id', 'user-1'
-    )
-  })
-
-  it('sets failure_reason to network_error for unknown Twilio code', async () => {
-    mockSendSms.mockRejectedValue({ code: 99999 })
-    await triggerOnboarding(makeSupabase() as never, 'user-1', 'Welcome!')
-    expect(mockUsersUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ failure_reason: 'network_error' }),
-      'id', 'user-1'
-    )
+    expect(mockUsersUpdate).not.toHaveBeenCalled()
   })
 
   it('does not insert a conversation row when SMS fails', async () => {
