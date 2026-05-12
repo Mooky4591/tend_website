@@ -36,7 +36,6 @@ export default function RemindersPanel({
   }
 
   async function handleDelete(id: string) {
-    if (busy) return
     setError(null)
     setIsSubmitting(true)
     try {
@@ -49,7 +48,6 @@ export default function RemindersPanel({
   }
 
   async function handleSaveEdit(id: string) {
-    if (busy) return
     setError(null)
     setIsSubmitting(true)
     try {
@@ -64,7 +62,6 @@ export default function RemindersPanel({
 
   async function handleAdd() {
     if (!newValues.dueDate) { setError('Due date is required'); return }
-    if (busy) return
     setError(null)
     setIsSubmitting(true)
     try {

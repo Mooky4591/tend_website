@@ -163,4 +163,30 @@ describe('SmsEnrollmentForm', () => {
     expect(screen.getByRole('button', { name: /submitting/i })).toBeDisabled()
     resolve!({ ok: true, json: async () => ({ ok: true }) })
   })
+
+  it('shows network error message when fetch throws', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('Network failure'))
+    render(<SmsEnrollmentForm />)
+    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
+    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
+    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
+    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+
+    await waitFor(() => screen.getByRole('alert'))
+    expect(screen.getByText(/Network error/i)).toBeInTheDocument()
+  })
+
+  it('shows "Submission failed" fallback when API error response has no error field', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, json: async () => ({}) })
+    render(<SmsEnrollmentForm />)
+    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
+    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
+    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
+    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+
+    await waitFor(() => screen.getByRole('alert'))
+    expect(screen.getByText('Submission failed. Please try again.')).toBeInTheDocument()
+  })
 })

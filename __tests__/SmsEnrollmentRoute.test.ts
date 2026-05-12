@@ -8,6 +8,12 @@ import { CONSENT_LANGUAGE, CONSENT_LANGUAGE_VERSION, TERMS_URL, PRIVACY_POLICY_U
 
 const mockInsert = jest.fn()
 
+const defaultHeaderValues: Record<string, string | null> = {
+  'x-forwarded-for': '1.2.3.4',
+  'user-agent': 'TestAgent/1.0',
+}
+const mockHeaderGet = jest.fn((key: string) => defaultHeaderValues[key] ?? null)
+
 jest.mock('@/lib/supabase/server', () => ({
   createClient: () => ({
     from: () => ({ insert: mockInsert }),
@@ -15,13 +21,7 @@ jest.mock('@/lib/supabase/server', () => ({
 }))
 
 jest.mock('next/headers', () => ({
-  headers: () => ({
-    get: (key: string) => {
-      if (key === 'x-forwarded-for') return '1.2.3.4'
-      if (key === 'user-agent') return 'TestAgent/1.0'
-      return null
-    },
-  }),
+  headers: () => ({ get: (key: string) => mockHeaderGet(key) }),
 }))
 
 const validBody = {
@@ -45,6 +45,7 @@ function makeRequest(body: object) {
 beforeEach(() => {
   jest.clearAllMocks()
   mockInsert.mockResolvedValue({ error: null })
+  mockHeaderGet.mockImplementation((key: string) => defaultHeaderValues[key] ?? null)
 })
 
 describe('POST /api/sms-enrollment', () => {
@@ -185,5 +186,24 @@ describe('POST /api/sms-enrollment', () => {
     mockInsert.mockResolvedValueOnce({ error: { message: 'constraint violation' } })
     const res = await POST(makeRequest(validBody))
     expect(res.status).toBe(500)
+  })
+
+  it('falls back to x-real-ip when x-forwarded-for is absent', async () => {
+    mockHeaderGet.mockImplementation((key: string) => {
+      if (key === 'x-real-ip') return '9.8.7.6'
+      if (key === 'user-agent') return 'TestAgent/1.0'
+      return null // x-forwarded-for returns null
+    })
+    await POST(makeRequest(validBody))
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ ip_address: '9.8.7.6' }))
+  })
+
+  it('stores null for ip_address when both x-forwarded-for and x-real-ip are absent', async () => {
+    mockHeaderGet.mockImplementation((key: string) => {
+      if (key === 'user-agent') return 'TestAgent/1.0'
+      return null
+    })
+    await POST(makeRequest(validBody))
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ ip_address: null }))
   })
 })

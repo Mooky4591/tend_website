@@ -6,7 +6,7 @@ Marketing `<footer>` component (`Footer`) that renders three navigation link gro
 ## Allowed Responsibilities
 - Define `productLinks`, `companyLinks`, and `legalLinks` arrays.
 - Render four columns: brand, Product nav, Company nav, Legal nav.
-- Apply `target="_blank" rel="noopener noreferrer"` for external links (detected by `href.startsWith('http')`).
+- All links are internal; no external link handling is needed.
 - Render copyright year via `new Date().getFullYear()`.
 
 ## Not Allowed
@@ -27,7 +27,7 @@ Marketing `<footer>` component (`Footer`) that renders three navigation link gro
 - `<footer>` has `role="contentinfo"`.
 - Privacy Policy link has `href="/privacy-policy"`.
 - Terms of Use link has `href="/terms"`.
-- External links (`href.startsWith('http')`) have `target="_blank"` and `rel="noopener noreferrer"`.
+- No links use `target="_blank"` or `rel="noopener noreferrer"`; all links are internal.
 - Copyright year matches the current year.
 
 ## Notes for AI Agents

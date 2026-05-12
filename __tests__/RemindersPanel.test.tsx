@@ -190,4 +190,41 @@ describe('RemindersPanel', () => {
 
     resolveFetch!({ ok: true, json: async () => ({ id: 'new' }) } as Response)
   })
+
+  it('shows error and does not refresh when Delete request fails', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+
+    await user.click(screen.getAllByRole('button', { name: 'Delete' })[0])
+
+    expect(await screen.findByText('Failed to delete')).toBeInTheDocument()
+    expect(mockRefresh).not.toHaveBeenCalled()
+  })
+
+  it('shows error and does not refresh when Save request fails', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+
+    await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByText('Failed to save')).toBeInTheDocument()
+    expect(mockRefresh).not.toHaveBeenCalled()
+  })
+
+  it('shows error and does not refresh when Add request fails', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
+    const user = userEvent.setup()
+    const { container } = render(<RemindersPanel reminders={[]} userId="u1" />)
+
+    await user.click(screen.getByRole('button', { name: '+ Add' }))
+    const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement
+    await user.type(dateInput, '2026-08-01')
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+
+    expect(await screen.findByText('Failed to add reminder')).toBeInTheDocument()
+    expect(mockRefresh).not.toHaveBeenCalled()
+  })
 })

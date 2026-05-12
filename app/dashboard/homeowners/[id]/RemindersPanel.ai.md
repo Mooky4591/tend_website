@@ -14,7 +14,7 @@ Client Component (`RemindersPanel`) that manages the full CRUD lifecycle for a h
 ## Not Allowed
 - Do not call Supabase directly.
 - Do not accept or send `sent` as an editable field; `sent` is display-only.
-- Do not allow multiple simultaneous in-flight requests (`busy` guard).
+- Do not allow multiple simultaneous in-flight requests; buttons are disabled via `busy` while a request is in flight.
 - Do not own reminder data fetching; the parent page (`UserDetailPage`) passes `reminders` as a prop.
 
 ## Public Interfaces
@@ -27,7 +27,7 @@ Client Component (`RemindersPanel`) that manages the full CRUD lifecycle for a h
 - `busy = isSubmitting || isPending` pattern.
 - `refresh()` helper wraps `startTransition(() => router.refresh())`.
 - `formatDate` appends `T00:00:00` before parsing to avoid timezone off-by-one on date strings.
-- `handleAdd` must validate that `dueDate` is non-empty before the `busy` check.
+- `handleAdd` must validate that `dueDate` is non-empty before the API call.
 
 ## Tests Required
 - Renders all reminders with type and formatted date.

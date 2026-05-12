@@ -54,4 +54,33 @@ describe('PhoneNumberEditor', () => {
     await waitFor(() => expect(mockUpdate).toHaveBeenCalledWith('u1', '+15559999999'))
     await waitFor(() => expect(mockRefresh).toHaveBeenCalled())
   })
+
+  it('shows validation error and does not call API when phone is blank', () => {
+    render(<PhoneNumberEditor userId="u1" phoneNumber="+15550001111" />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.change(screen.getByPlaceholderText('+15551234567'), { target: { value: '   ' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(screen.getByText('Phone number is required')).toBeInTheDocument()
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it('shows "No phone number" and initializes input to empty string when phoneNumber is null', () => {
+    render(<PhoneNumberEditor userId="u1" phoneNumber={null} />)
+    expect(screen.getByText('No phone number')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    expect(screen.getByPlaceholderText('+15551234567')).toHaveValue('')
+  })
+
+  it('shows "Failed to update phone number" when API error response has no error field', async () => {
+    mockUpdate.mockResolvedValue({ ok: false, json: async () => ({}) })
+    render(<PhoneNumberEditor userId="u1" phoneNumber="+15550001111" />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(await screen.findByText('Failed to update phone number')).toBeInTheDocument()
+  })
 })
