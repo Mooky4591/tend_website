@@ -389,7 +389,18 @@ async function verifyRLSPolicies(aliceId: string): Promise<void> {
     .select('id')
 
   if (updateErr) {
-    console.error(`  ❌  UPDATE policy verification failed: ${updateErr.message}`)
+    const projectRef = new URL(SUPABASE_URL!).hostname.split('.')[0]
+    console.error(`
+  ❌  UPDATE policy verification failed with a database error.
+
+  Code:    ${updateErr.code ?? 'unknown'}
+  Message: ${updateErr.message}
+
+  This is likely a schema mismatch (e.g. a missing column, wrong type, or
+  constraint violation) rather than a missing RLS policy. Check the users
+  table schema in the Supabase dashboard:
+  https://supabase.com/dashboard/project/${projectRef}/editor
+`)
     process.exit(1)
   }
 
