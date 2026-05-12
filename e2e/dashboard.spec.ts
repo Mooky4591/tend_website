@@ -35,16 +35,16 @@ test.describe('dashboard navigation', () => {
     await page.goto('/dashboard')
   })
 
-  test('nav shows Overview, Users, Billing, Warranty Docs tabs', async ({ page }) => {
+  test('nav shows Overview, Homeowners, Billing, Warranty Docs tabs', async ({ page }) => {
     await expect(page.locator('nav a[href="/dashboard"]')).toContainText('Overview')
-    await expect(page.locator('nav a[href="/dashboard/users"]')).toContainText('Users')
+    await expect(page.locator('nav a[href="/dashboard/homeowners"]')).toContainText('Homeowners')
     await expect(page.locator('nav a[href="/dashboard/billing"]')).toContainText('Billing')
     await expect(page.locator('nav a[href="/dashboard/docs"]')).toContainText('Warranty Docs')
   })
 
-  test('clicking Users tab navigates to /dashboard/users', async ({ page }) => {
-    await page.click('nav a[href="/dashboard/users"]')
-    await expect(page).toHaveURL('/dashboard/users')
+  test('clicking Homeowners tab navigates to /dashboard/homeowners', async ({ page }) => {
+    await page.click('nav a[href="/dashboard/homeowners"]')
+    await expect(page).toHaveURL('/dashboard/homeowners')
     await expect(page.locator('h1')).toContainText('Homeowners')
   })
 

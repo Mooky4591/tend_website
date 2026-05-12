@@ -22,3 +22,5 @@ Integration tests for `app/auth/callback/route.ts` (GET handler). Verifies code 
 - Ignores a `next` param starting with `//` (open-redirect guard).
 - Redirects to `/login?error=auth_callback_failed` when no code is present.
 - Redirects to `/login?error=auth_callback_failed` when code exchange fails.
+- `getAll` callback delegates to `cookieStore.getAll()` and returns its result.
+- `setAll` callback writes each cookie entry to the cookie store via `cookieStore.set`.

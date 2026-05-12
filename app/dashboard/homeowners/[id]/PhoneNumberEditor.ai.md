@@ -1,4 +1,4 @@
-# AI Contract: app/dashboard/users/[id]/PhoneNumberEditor.tsx
+# AI Contract: app/dashboard/homeowners/[id]/PhoneNumberEditor.tsx
 
 ## Purpose
 Client Component that allows staff to edit and save a homeowner phone number inline on the user detail page.

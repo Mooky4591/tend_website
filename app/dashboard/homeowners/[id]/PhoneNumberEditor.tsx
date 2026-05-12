@@ -19,7 +19,6 @@ export default function PhoneNumberEditor({ userId, phoneNumber }: { userId: str
       return
     }
 
-    if (busy) return
     setError(null)
     setIsSubmitting(true)
     try {

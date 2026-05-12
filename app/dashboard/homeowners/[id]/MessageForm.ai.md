@@ -1,4 +1,4 @@
-# AI Contract: app/dashboard/users/[id]/MessageForm.tsx
+# AI Contract: app/dashboard/homeowners/[id]/MessageForm.tsx
 
 ## Purpose
 Client Component (`MessageForm`) that lets dashboard staff send an SMS to a homeowner by posting to `/api/send-message`. Uses `useTransition` to trigger a `router.refresh()` after the message is sent so the conversation panel updates.
@@ -14,7 +14,7 @@ Client Component (`MessageForm`) that lets dashboard staff send an SMS to a home
 - Do not call Supabase directly; all persistence and SMS delivery is owned by the API route.
 - Do not call `fetch` directly; use `sendMessage` from `@/lib/api/client`.
 - Do not allow sending an empty or whitespace-only message (`trimmed` check).
-- Do not send while `busy === true`.
+- Do not send while `busy === true`; enforce via `disabled` on the button and textarea rather than a handler guard.
 - Do not handle opt-out status here; the API route and RLS handle that.
 
 ## Public Interfaces

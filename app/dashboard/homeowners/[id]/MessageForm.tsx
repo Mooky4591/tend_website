@@ -16,7 +16,7 @@ export default function MessageForm({ userId }: { userId: string }) {
 
   async function handleSend() {
     const trimmed = message.trim()
-    if (!trimmed || busy) return
+    if (!trimmed) return
     setError(null)
     setIsSending(true)
 

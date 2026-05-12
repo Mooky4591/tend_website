@@ -59,4 +59,18 @@ describe('PATCH /api/users/[id]/phone', () => {
     const res = await PATCH({ json: async () => ({ phoneNumber: '+1555000' }) } as any, { params: { id: 'u1' } })
     expect(res.status).toBe(200)
   })
+
+  it('returns 500 when membership query returns an error', async () => {
+    mockMemberMaybeSingle.mockResolvedValueOnce({ data: null, error: { message: 'DB connection error' } })
+    const { PATCH } = await import('@/app/api/users/[id]/phone/route')
+    const res = await PATCH({ json: async () => ({ phoneNumber: '+1555000' }) } as any, { params: { id: 'u1' } })
+    expect(res.status).toBe(500)
+  })
+
+  it('returns 500 when update query fails with a non-PGRST116 error', async () => {
+    mockUserSingle.mockResolvedValueOnce({ data: null, error: { code: 'CONSTRAINT_VIOLATION', message: 'duplicate key' } })
+    const { PATCH } = await import('@/app/api/users/[id]/phone/route')
+    const res = await PATCH({ json: async () => ({ phoneNumber: '+1555000' }) } as any, { params: { id: 'u1' } })
+    expect(res.status).toBe(500)
+  })
 })

@@ -85,7 +85,7 @@ export default async function UsersPage() {
             {(homeowners ?? []).map(h => (
               <tr key={h.id} className="border-b border-border/10 hover:bg-muted transition-colors">
                 <td className="px-4 py-3">
-                  <Link href={`/dashboard/users/${h.id}`} className="font-medium text-foreground hover:underline">
+                  <Link href={`/dashboard/homeowners/${h.id}`} className="font-medium text-foreground hover:underline">
                     {h.first_name ?? '—'}
                   </Link>
                 </td>

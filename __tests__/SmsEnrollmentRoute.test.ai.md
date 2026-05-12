@@ -30,3 +30,5 @@ Integration tests for `app/api/sms-enrollment/route.ts` (POST handler). Verifies
 - Stores `sms_consent: true/false` correctly, including when field is omitted.
 - Stores `null` for optional fields when omitted.
 - Returns 500 when DB insert fails.
+- Falls back to `x-real-ip` header for IP when `x-forwarded-for` is absent.
+- Stores `null` for `ip_address` when both `x-forwarded-for` and `x-real-ip` are absent.

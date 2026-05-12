@@ -1,4 +1,4 @@
-# AI Contract: app/dashboard/users/[id]/ConversationPanel.tsx
+# AI Contract: app/dashboard/homeowners/[id]/ConversationPanel.tsx
 
 ## Purpose
 Client Component (`ConversationPanel`) that renders a scrollable list of conversation messages for a single homeowner. Automatically scrolls to the bottom when `messages.length` changes and applies role-based bubble styling.
@@ -35,5 +35,5 @@ Client Component (`ConversationPanel`) that renders a scrollable list of convers
 - Timestamps are rendered for each message.
 
 ## Notes for AI Agents
-- Message data is fetched in `app/dashboard/users/[id]/page.tsx` and passed down. Do not add a data-fetch hook here.
+- Message data is fetched in `app/dashboard/homeowners/[id]/page.tsx` and passed down. Do not add a data-fetch hook here.
 - The three role values (`user`, `assistant`, `staff`) are the only valid values; do not add new roles without updating the `bubble` function.

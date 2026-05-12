@@ -1,13 +1,13 @@
 ---
 name: MessageForm.test
-description: Tests for app/dashboard/users/[id]/MessageForm — send button state, fetch call, trim, clear, error, loading, double-click guard, Enter key
+description: Tests for app/dashboard/homeowners/[id]/MessageForm — send button state, fetch call, trim, clear, error, loading, double-click guard, Enter key
 type: project
 ---
 
 # AI Contract: __tests__/MessageForm.test.tsx
 
 ## Purpose
-Unit tests for `app/dashboard/users/[id]/MessageForm.tsx`. Verifies disabled-until-content send button, correct fetch call arguments, whitespace trimming, textarea clear on success, router refresh, error display, loading state, in-flight double-click guard, and Enter/Shift+Enter keyboard behavior.
+Unit tests for `app/dashboard/homeowners/[id]/MessageForm.tsx`. Verifies disabled-until-content send button, correct fetch call arguments, whitespace trimming, textarea clear on success, router refresh, error display, loading state, in-flight double-click guard, and Enter/Shift+Enter keyboard behavior.
 
 ## Allowed Responsibilities
 - Stub `global.fetch` to control API outcomes.
@@ -32,3 +32,4 @@ Unit tests for `app/dashboard/users/[id]/MessageForm.tsx`. Verifies disabled-unt
 - Disables the button and shows "Sending…" for the full fetch round-trip.
 - Ignores a second click while a send is already in flight.
 - Submits on Enter and does not submit on Shift+Enter.
+- Shows "Failed to send" fallback when API error response has no `error` field.

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import MessageForm from '@/app/dashboard/users/[id]/MessageForm'
+import MessageForm from '@/app/dashboard/homeowners/[id]/MessageForm'
 
 const mockRefresh = jest.fn()
 
@@ -136,5 +136,19 @@ describe('MessageForm', () => {
     ;(global.fetch as jest.Mock).mockClear()
     await user.type(textarea, 'Line1{Shift>}{Enter}{/Shift}still typing')
     expect(global.fetch).not.toHaveBeenCalled()
+  })
+
+  it('shows "Failed to send" fallback when API error response has no error field', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      json: async () => ({}),
+    })
+    const user = userEvent.setup()
+    render(<MessageForm userId="u1" />)
+
+    await user.type(screen.getByPlaceholderText(/Type a message/), 'Hello')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+
+    expect(await screen.findByText('Failed to send')).toBeInTheDocument()
   })
 })

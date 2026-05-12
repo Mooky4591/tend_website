@@ -125,7 +125,7 @@ async function clearTenantData(tenantId: string): Promise<void> {
   }
 }
 
-async function seedHomeowners(tenantId: string): Promise<{ aliceId: string; evaId: string; frankId: string; graceId: string }> {
+async function seedHomeowners(tenantId: string): Promise<{ aliceId: string }> {
   const { data, error } = await supabase
     .from('users')
     .insert([
@@ -161,39 +161,6 @@ async function seedHomeowners(tenantId: string): Promise<{ aliceId: string; evaI
         onboarding_status: null,
         opted_out: true,
       },
-      {
-        tenant_id: tenantId,
-        first_name: 'E2E Eva',
-        phone_number: '+15550000005',
-        city: 'Atlanta',
-        state: 'GA',
-        onboarding_complete: false,
-        onboarding_status: 'failed',
-        failure_reason: 'invalid_number',
-        opted_out: false,
-      },
-      {
-        tenant_id: tenantId,
-        first_name: 'E2E Frank',
-        phone_number: '+15550000006',
-        city: 'Atlanta',
-        state: 'GA',
-        onboarding_complete: false,
-        onboarding_status: 'failed',
-        failure_reason: 'delivery_timeout',
-        opted_out: false,
-      },
-      {
-        tenant_id: tenantId,
-        first_name: 'E2E Grace',
-        phone_number: '+15550000007',
-        city: 'Atlanta',
-        state: 'GA',
-        onboarding_complete: false,
-        onboarding_status: 'failed',
-        failure_reason: 'carrier_blocked',
-        opted_out: false,
-      },
     ])
     .select('id, first_name')
 
@@ -201,10 +168,7 @@ async function seedHomeowners(tenantId: string): Promise<{ aliceId: string; evaI
   console.log(`  Created homeowners: ${data.map(h => h.first_name).join(', ')}`)
 
   const alice = data.find(h => h.first_name === 'E2E Alice')!
-  const eva   = data.find(h => h.first_name === 'E2E Eva')!
-  const frank = data.find(h => h.first_name === 'E2E Frank')!
-  const grace = data.find(h => h.first_name === 'E2E Grace')!
-  return { aliceId: alice.id, evaId: eva.id, frankId: frank.id, graceId: grace.id }
+  return { aliceId: alice.id }
 }
 
 async function seedConversations(aliceId: string, tenantId: string): Promise<void> {
@@ -406,7 +370,7 @@ async function main() {
   await clearBillingSnapshots(tenantId)
 
   console.log('5. Homeowners')
-  const { aliceId, evaId, frankId, graceId } = await seedHomeowners(tenantId)
+  const { aliceId } = await seedHomeowners(tenantId)
 
   console.log('6. Conversations')
   await seedConversations(aliceId, tenantId)
@@ -437,7 +401,7 @@ async function main() {
   }
 
   const stateFile = path.join(__dirname, '.seed-state.json')
-  fs.writeFileSync(stateFile, JSON.stringify({ tenantId, aliceId, daveId, evaId, frankId, graceId }, null, 2))
+  fs.writeFileSync(stateFile, JSON.stringify({ tenantId, aliceId, daveId }, null, 2))
 
   console.log('\n10. RLS policy verification')
   await verifyRLSPolicies()
