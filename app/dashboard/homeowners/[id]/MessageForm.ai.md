@@ -1,4 +1,4 @@
-# AI Contract: app/dashboard/users/[id]/MessageForm.tsx
+# AI Contract: app/dashboard/homeowners/[id]/MessageForm.tsx
 
 ## Purpose
 Client Component (`MessageForm`) that lets dashboard staff send an SMS to a homeowner by posting to `/api/send-message`. Uses `useTransition` to trigger a `router.refresh()` after the message is sent so the conversation panel updates.

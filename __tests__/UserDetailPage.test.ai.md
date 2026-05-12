@@ -1,13 +1,13 @@
 ---
 name: UserDetailPage.test
-description: Tests for app/dashboard/users/[id]/page — server component rendering, auth redirect, notFound, homeowner details, sub-components
+description: Tests for app/dashboard/homeowners/[id]/page — server component rendering, auth redirect, notFound, homeowner details, sub-components
 type: project
 ---
 
 # AI Contract: __tests__/UserDetailPage.test.tsx
 
 ## Purpose
-Integration tests for `app/dashboard/users/[id]/page.tsx`. Verifies auth redirect, `notFound` call for missing homeowners, homeowner detail display, address/badge rendering, `first_name` fallback, and sub-component presence.
+Integration tests for `app/dashboard/homeowners/[id]/page.tsx`. Verifies auth redirect, `notFound` call for missing homeowners, homeowner detail display, address/badge rendering, `first_name` fallback, and sub-component presence.
 
 ## Allowed Responsibilities
 - Mock `@/lib/supabase/server` to control `getUser`, `users`, `conversations`, and `reminders` queries.

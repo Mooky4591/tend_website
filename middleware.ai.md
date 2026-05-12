@@ -27,7 +27,7 @@ Next.js middleware that enforces two auth redirect rules: (1) unauthenticated us
 
 ## Tests Required
 - Unauthenticated request to `/dashboard` redirects to `/login`.
-- Unauthenticated request to `/dashboard/users/123` redirects to `/login`.
+- Unauthenticated request to `/dashboard/homeowners/123` redirects to `/login`.
 - Authenticated request to `/login` redirects to `/dashboard`.
 - Authenticated request to `/forgot-password` redirects to `/dashboard`.
 - Authenticated request to `/dashboard` passes through.

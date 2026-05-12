@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import RemindersPanel from '@/app/dashboard/users/[id]/RemindersPanel'
+import RemindersPanel from '@/app/dashboard/homeowners/[id]/RemindersPanel'
 
 const mockRefresh = jest.fn()
 

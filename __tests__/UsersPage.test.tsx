@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import UsersPage from '@/app/dashboard/users/page'
+import UsersPage from '@/app/dashboard/homeowners/page'
 
 const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
@@ -79,7 +79,7 @@ describe('UsersPage', () => {
     render(await UsersPage())
 
     const link = screen.getByRole('link', { name: 'Alice' })
-    expect(link).toHaveAttribute('href', '/dashboard/users/user-abc')
+    expect(link).toHaveAttribute('href', '/dashboard/homeowners/user-abc')
   })
 
   it('shows correct status badge for each onboarding status', async () => {

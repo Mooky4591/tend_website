@@ -27,6 +27,6 @@ Central repository for shared domain types used across both server and client mo
 - No runtime tests needed. TypeScript compilation (`tsc --noEmit`) enforces correctness.
 
 ## Notes for AI Agents
-- `Reminder` is consumed by `app/dashboard/users/[id]/RemindersPanel.tsx`.
-- `Message` is consumed by `app/dashboard/users/[id]/ConversationPanel.tsx`.
+- `Reminder` is consumed by `app/dashboard/homeowners/[id]/RemindersPanel.tsx`.
+- `Message` is consumed by `app/dashboard/homeowners/[id]/ConversationPanel.tsx`.
 - If the Supabase schema changes (e.g., a column is renamed), update this file and fix any downstream type errors.

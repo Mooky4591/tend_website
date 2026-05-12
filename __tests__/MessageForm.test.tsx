@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import MessageForm from '@/app/dashboard/users/[id]/MessageForm'
+import MessageForm from '@/app/dashboard/homeowners/[id]/MessageForm'
 
 const mockRefresh = jest.fn()
 

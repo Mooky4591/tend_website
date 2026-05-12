@@ -20,7 +20,7 @@ describe('DashboardNav', () => {
     mockUsePathname.mockReturnValue('/dashboard')
     render(<DashboardNav />)
     expect(screen.getByText('Overview')).toBeInTheDocument()
-    expect(screen.getByText('Users')).toBeInTheDocument()
+    expect(screen.getByText('Homeowners')).toBeInTheDocument()
     expect(screen.getByText('Billing')).toBeInTheDocument()
     expect(screen.getByText('Warranty Docs')).toBeInTheDocument()
   })
@@ -29,19 +29,19 @@ describe('DashboardNav', () => {
     mockUsePathname.mockReturnValue('/dashboard')
     render(<DashboardNav />)
     expect(screen.getByText('Overview').closest('a')?.className).toContain('border-navy')
-    expect(screen.getByText('Users').closest('a')?.className).not.toContain('border-navy')
+    expect(screen.getByText('Homeowners').closest('a')?.className).not.toContain('border-navy')
   })
 
-  it('does not mark Overview as active on /dashboard/users', () => {
-    mockUsePathname.mockReturnValue('/dashboard/users')
+  it('does not mark Overview as active on /dashboard/homeowners', () => {
+    mockUsePathname.mockReturnValue('/dashboard/homeowners')
     render(<DashboardNav />)
     expect(screen.getByText('Overview').closest('a')?.className).not.toContain('border-navy')
   })
 
-  it('marks Users as active when pathname starts with /dashboard/users', () => {
-    mockUsePathname.mockReturnValue('/dashboard/users/abc-123')
+  it('marks Homeowners as active when pathname starts with /dashboard/homeowners', () => {
+    mockUsePathname.mockReturnValue('/dashboard/homeowners/abc-123')
     render(<DashboardNav />)
-    expect(screen.getByText('Users').closest('a')?.className).toContain('border-navy')
+    expect(screen.getByText('Homeowners').closest('a')?.className).toContain('border-navy')
   })
 
   it('marks Billing as active when pathname starts with /dashboard/billing', () => {
@@ -59,6 +59,6 @@ describe('DashboardNav', () => {
   it('applies inactive styles to non-active tabs', () => {
     mockUsePathname.mockReturnValue('/dashboard')
     render(<DashboardNav />)
-    expect(screen.getByText('Users').closest('a')?.className).toContain('border-transparent')
+    expect(screen.getByText('Homeowners').closest('a')?.className).toContain('border-transparent')
   })
 })

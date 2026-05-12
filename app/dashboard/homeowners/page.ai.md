@@ -1,4 +1,4 @@
-# AI Contract: app/dashboard/users/page.tsx
+# AI Contract: app/dashboard/homeowners/page.tsx
 
 ## Purpose
 Server Component page (`UsersPage`) that lists all homeowners for the authenticated user's tenant in a table with name, phone, location, and status badge. Names link to the individual user detail page.
@@ -27,7 +27,7 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 - Each status badge is wrapped in `StatusTooltipBadge` which shows a `w-56` dark tooltip above the badge on hover via Tailwind `group`/`group-hover` (no client-side JS).
 - Static tooltip copy lives in the `STATUS_TOOLTIPS` constant (opted_out, complete, queued, pending). The `failed` tooltip is computed by `getFailedTooltip(failure_reason)`.
 - `getFailedTooltip` CTA mapping: `invalid_number | landline | disconnected` → update phone number; `delivery_timeout | network_error` → retry; `carrier_blocked | account_error` → contact support@trytendr.org; `null/unknown` → contact support.
-- Each name cell is a `<Link>` to `/dashboard/users/${h.id}`.
+- Each name cell is a `<Link>` to `/dashboard/homeowners/${h.id}`.
 - Phone numbers rendered with `font-mono text-xs`.
 - Total count displayed below the heading: `{homeowners?.length ?? 0} total`.
 - Empty-state row spanning 4 columns when no homeowners exist.
@@ -47,7 +47,7 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 - Failed badge with `failure_reason = 'carrier_blocked'` renders "support@trytendr.org" tooltip.
 - Failed badge with `failure_reason = 'account_error'` renders "support@trytendr.org" tooltip.
 - Failed badge with `failure_reason = null` renders "support@trytendr.org" default tooltip.
-- Name links navigate to `/dashboard/users/${id}`.
+- Name links navigate to `/dashboard/homeowners/${id}`.
 - Empty state renders when no homeowners exist.
 
 ## Notes for AI Agents

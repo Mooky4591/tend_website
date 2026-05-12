@@ -1,4 +1,4 @@
-# AI Contract: app/dashboard/users/[id]/RemindersPanel.tsx
+# AI Contract: app/dashboard/homeowners/[id]/RemindersPanel.tsx
 
 ## Purpose
 Client Component (`RemindersPanel`) that manages the full CRUD lifecycle for a homeowner's reminders — listing, inline editing, adding, and deleting — by calling the `/api/reminders` and `/api/reminders/[id]` routes. Uses `router.refresh()` in a `useTransition` for optimistic-style updates.
