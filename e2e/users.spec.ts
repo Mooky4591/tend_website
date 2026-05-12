@@ -175,10 +175,14 @@ test.describe('phone number editor', () => {
       if (await cancelBtn.isVisible({ timeout: 1_000 }).catch(() => false)) {
         await cancelBtn.click()
       }
-      // Restore Alice's phone regardless of whether the assertion above passed
+      // Restore Alice's phone regardless of whether the assertion above passed.
+      // After clicking Save, wait for the Edit button to reappear — that confirms
+      // setEditing(false) ran and the API call has settled, so Playwright cannot
+      // abort the request and leave Alice's phone at the temp value.
       await page.locator('button', { hasText: 'Edit' }).first().click()
       await page.locator('input[placeholder="+15551234567"]').fill(originalPhone)
       await page.locator('button', { hasText: 'Save' }).click()
+      await page.locator('button', { hasText: 'Edit' }).first().waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {})
     }
   })
 })
