@@ -304,7 +304,7 @@ async function seedTenantBHomeowners(tenantId: string): Promise<{ daveId: string
  * tenant_users row, which causes every dashboard query to return empty results
  * and makes detail-page tests time out with 404s.
  */
-async function verifyRLSPolicies(): Promise<void> {
+async function verifyRLSPolicies(aliceId: string): Promise<void> {
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
     email: E2E_EMAIL!,
     password: E2E_PASSWORD!,
@@ -326,6 +326,7 @@ async function verifyRLSPolicies(): Promise<void> {
     global: { headers: { Authorization: `Bearer ${signInData.session.access_token}` } },
   })
 
+  // Verify SELECT policy (20260428000000 + 20260429000001)
   const { data: rows } = await userClient.from('tenant_users').select('id').limit(1)
 
   if (!rows || rows.length === 0) {
@@ -344,9 +345,49 @@ async function verifyRLSPolicies(): Promise<void> {
 
   2. Paste and run:  supabase/migrations/20260428000000_tenant_users.sql
   3. Paste and run:  supabase/migrations/20260429000001_portal_rls_policies.sql
+  4. Paste and run:  supabase/migrations/20260508090000_users_update_policy.sql
 
-  4. Re-run this script: npm run seed:e2e
+  5. Re-run this script: npm run seed:e2e
 `)
+    process.exit(1)
+  }
+
+  // Verify UPDATE policy (20260508090000) — without this, phone number edits return
+  // PGRST116 and the app shows "Homeowner not found" even though the homeowner exists.
+  const { error: updateErr } = await userClient
+    .from('users')
+    .update({ phone_number: '+15550000001' })
+    .eq('id', aliceId)
+    .select('id')
+    .single()
+
+  if (updateErr?.code === 'PGRST116') {
+    const projectRef = new URL(SUPABASE_URL!).hostname.split('.')[0]
+    console.error(`
+  ❌  The UPDATE RLS policy for the users table is missing.
+
+  The E2E user can read homeowners but cannot update them. Without this policy,
+  the phone number editor returns "Homeowner not found" for every save attempt.
+
+  This migration must be applied to every Supabase environment
+  (test, development, and production).
+
+  Fix for this test project (one-time setup):
+
+  1. Open the Supabase SQL Editor:
+     https://supabase.com/dashboard/project/${projectRef}/sql/new
+
+  2. Paste and run:  supabase/migrations/20260508090000_users_update_policy.sql
+
+  3. Re-run this script: npm run seed:e2e
+
+  Remember to apply the same migration to your dev and production projects.
+`)
+    process.exit(1)
+  }
+
+  if (updateErr) {
+    console.error(`  ❌  UPDATE policy verification failed: ${updateErr.message}`)
     process.exit(1)
   }
 
@@ -404,7 +445,7 @@ async function main() {
   fs.writeFileSync(stateFile, JSON.stringify({ tenantId, aliceId, daveId }, null, 2))
 
   console.log('\n10. RLS policy verification')
-  await verifyRLSPolicies()
+  await verifyRLSPolicies(aliceId)
 
   console.log('\nSeed complete.')
   console.log(`  Tenant ID : ${tenantId}`)

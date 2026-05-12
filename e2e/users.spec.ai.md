@@ -19,6 +19,7 @@ End-to-end tests for /dashboard/homeowners and /dashboard/homeowners/[id]. Uses 
 - Assert clicking Add without a date shows validation error.
 - Create and then delete a reminder against real Supabase (full round-trip).
 - Mock PATCH /api/reminders/* for edit test to avoid stale test data accumulation.
+- Edit Alice's phone number to a temporary value, save via real Supabase API, verify the new value is displayed, then reset to the original value (idempotent round-trip).
 
 ## Not Allowed
 - Do not send real SMS — always mock /api/send-message.
@@ -41,6 +42,7 @@ End-to-end tests for /dashboard/homeowners and /dashboard/homeowners/[id]. Uses 
 - MessageForm: Send enabled after typing.
 - MessageForm: mocked success clears textarea.
 - MessageForm: mocked failure shows error text.
+- PhoneNumberEditor: edit phone to a temp value, save via real API, verify display updates, reset to original.
 - RemindersPanel: + Add button visible.
 - RemindersPanel: + Add opens form with select and date input.
 - RemindersPanel: Cancel hides the add form.

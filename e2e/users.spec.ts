@@ -150,6 +150,39 @@ test.describe('message form', () => {
   })
 })
 
+test.describe('phone number editor', () => {
+  test('phone number can be edited, saved, and reset via the real API', async ({ page }) => {
+    const userId = getSeedState()?.aliceId ?? null
+    if (!userId) {
+      test.skip()
+      return
+    }
+
+    await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
+
+    // Read the current displayed phone so we can restore it afterwards
+    const phoneDisplay = page.locator('p.font-mono').first()
+    const originalPhone = (await phoneDisplay.textContent()) ?? '+15550000001'
+
+    // Open the editor — the phone Edit button is the first Edit button in the DOM
+    await page.locator('button', { hasText: 'Edit' }).first().click()
+
+    // Change to a temporary test number
+    const input = page.locator('input[placeholder="+15551234567"]')
+    await input.fill('+15559990001')
+    await page.locator('button', { hasText: 'Save' }).click()
+
+    // After save the editor closes and the new number is displayed
+    await expect(page.locator('p.font-mono').first()).toContainText('+15559990001', { timeout: 10_000 })
+
+    // Reset to the original value so this test is idempotent
+    await page.locator('button', { hasText: 'Edit' }).first().click()
+    await page.locator('input[placeholder="+15551234567"]').fill(originalPhone)
+    await page.locator('button', { hasText: 'Save' }).click()
+    await expect(page.locator('p.font-mono').first()).toContainText(originalPhone, { timeout: 10_000 })
+  })
+})
+
 test.describe('reminders panel', () => {
   test('shows + Add button', async ({ page }) => {
     const userId = getSeedState()?.aliceId ?? null
