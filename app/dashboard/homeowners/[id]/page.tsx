@@ -46,37 +46,40 @@ export default async function UserDetailPage({ params }: { params: { id: string 
         </Link>
       </div>
 
-      <div className="mb-6">
-        <div className="bg-white rounded-2xl border border-border/20 p-4 lg:max-w-2xl">
-          <h1 className="text-2xl font-bold text-foreground mb-2">{homeowner.first_name ?? 'Homeowner'}</h1>
-          {(homeowner.onboarding_complete || homeowner.opted_out) && (
-            <div className="flex gap-2 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left column: homeowner info + conversation */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          {/* Homeowner info */}
+          <div className="bg-white rounded-2xl border border-border/20 p-4">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-2">Homeowner Information</h2>
+            <h1 className="text-2xl font-bold text-foreground mb-1">{homeowner.first_name ?? 'Homeowner'}</h1>
+            <PhoneNumberEditor userId={params.id} phoneNumber={homeowner.phone_number} />
+            {location && <p className="text-muted-foreground/60 text-sm mt-1">{location}</p>}
+            <div className="flex gap-2 mt-3">
               {homeowner.onboarding_complete && (
                 <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-success/10 text-success">Onboarding complete</span>
               )}
               {homeowner.opted_out && (
                 <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-error/10 text-error">Opted out</span>
               )}
+              {!homeowner.onboarding_complete && !homeowner.opted_out && (
+                <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-muted text-muted-foreground">Pending</span>
+              )}
             </div>
-          )}
-          <h2 className="text-sm font-semibold text-muted-foreground mb-3">Homeowner Information</h2>
-          <PhoneNumberEditor userId={params.id} phoneNumber={homeowner.phone_number} />
-          {location && <p className="text-muted-foreground/60 text-sm mt-2">{location}</p>}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Conversation thread */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-border/20 flex flex-col" style={{ minHeight: '500px' }}>
-          <div className="px-4 py-3 border-b border-border/20">
-            <h2 className="text-sm font-semibold text-muted-foreground">Conversation</h2>
           </div>
-          <ConversationPanel messages={(conversations ?? []) as Parameters<typeof ConversationPanel>[0]['messages']} />
-          <MessageForm userId={params.id} />
+
+          {/* Conversation thread */}
+          <div className="bg-white rounded-2xl border border-border/20 flex flex-col" style={{ minHeight: '500px' }}>
+            <div className="px-4 py-3 border-b border-border/20">
+              <h2 className="text-sm font-semibold text-muted-foreground">Conversation</h2>
+            </div>
+            <ConversationPanel messages={(conversations ?? []) as Parameters<typeof ConversationPanel>[0]['messages']} />
+            <MessageForm userId={params.id} />
+          </div>
         </div>
 
         {/* Reminders */}
-        <div className="bg-muted rounded-2xl border border-border/20 p-4">
+        <div className="bg-white rounded-2xl border border-border/20 p-4">
           <RemindersPanel reminders={reminders ?? []} userId={params.id} />
         </div>
       </div>
