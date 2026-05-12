@@ -352,16 +352,48 @@ async function verifyRLSPolicies(aliceId: string): Promise<void> {
     process.exit(1)
   }
 
-  // Verify UPDATE policy (20260508090000) — without this, phone number edits return
-  // PGRST116 and the app shows "Homeowner not found" even though the homeowner exists.
-  const { error: updateErr } = await userClient
+  // Verify SELECT policy on users table (20260429000001) separately from tenant_users,
+  // so that a missing users SELECT policy produces a targeted error rather than being
+  // conflated with a missing UPDATE policy below.
+  const { data: aliceRow, error: aliceSelectErr } = await userClient
+    .from('users')
+    .select('id')
+    .eq('id', aliceId)
+    .maybeSingle()
+
+  if (aliceSelectErr || !aliceRow) {
+    const projectRef = new URL(SUPABASE_URL!).hostname.split('.')[0]
+    console.error(`
+  ❌  The SELECT RLS policy for the users table is missing or Alice's row is not visible.
+
+  Fix (one-time setup):
+
+  1. Open the Supabase SQL Editor:
+     https://supabase.com/dashboard/project/${projectRef}/sql/new
+
+  2. Paste and run:  supabase/migrations/20260429000001_portal_rls_policies.sql
+
+  3. Re-run this script: npm run seed:e2e
+`)
+    process.exit(1)
+  }
+
+  // Verify UPDATE policy (20260508090000). Use .select() without .single() so that
+  // an empty result unambiguously means the UPDATE was blocked — not that a chained
+  // .single() fired because the SELECT-back returned zero rows due to a missing SELECT
+  // policy (which we already ruled out above).
+  const { data: updated, error: updateErr } = await userClient
     .from('users')
     .update({ phone_number: '+15550000001' })
     .eq('id', aliceId)
     .select('id')
-    .single()
 
-  if (updateErr?.code === 'PGRST116') {
+  if (updateErr) {
+    console.error(`  ❌  UPDATE policy verification failed: ${updateErr.message}`)
+    process.exit(1)
+  }
+
+  if (!updated || updated.length === 0) {
     const projectRef = new URL(SUPABASE_URL!).hostname.split('.')[0]
     console.error(`
   ❌  The UPDATE RLS policy for the users table is missing.
@@ -383,11 +415,6 @@ async function verifyRLSPolicies(aliceId: string): Promise<void> {
 
   Remember to apply the same migration to your dev and production projects.
 `)
-    process.exit(1)
-  }
-
-  if (updateErr) {
-    console.error(`  ❌  UPDATE policy verification failed: ${updateErr.message}`)
     process.exit(1)
   }
 

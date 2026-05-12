@@ -160,26 +160,26 @@ test.describe('phone number editor', () => {
 
     await page.goto(`/dashboard/homeowners/${userId}`, { waitUntil: 'networkidle' })
 
-    // Read the current displayed phone so we can restore it afterwards
-    const phoneDisplay = page.locator('p.font-mono').first()
-    const originalPhone = (await phoneDisplay.textContent()) ?? '+15550000001'
+    // Read current phone so the finally block can always restore it
+    const originalPhone = (await page.locator('p.font-mono').first().textContent()) ?? '+15550000001'
 
-    // Open the editor — the phone Edit button is the first Edit button in the DOM
-    await page.locator('button', { hasText: 'Edit' }).first().click()
-
-    // Change to a temporary test number
-    const input = page.locator('input[placeholder="+15551234567"]')
-    await input.fill('+15559990001')
-    await page.locator('button', { hasText: 'Save' }).click()
-
-    // After save the editor closes and the new number is displayed
-    await expect(page.locator('p.font-mono').first()).toContainText('+15559990001', { timeout: 10_000 })
-
-    // Reset to the original value so this test is idempotent
-    await page.locator('button', { hasText: 'Edit' }).first().click()
-    await page.locator('input[placeholder="+15551234567"]').fill(originalPhone)
-    await page.locator('button', { hasText: 'Save' }).click()
-    await expect(page.locator('p.font-mono').first()).toContainText(originalPhone, { timeout: 10_000 })
+    try {
+      // Open the phone editor — it is the first Edit button in the DOM
+      await page.locator('button', { hasText: 'Edit' }).first().click()
+      await page.locator('input[placeholder="+15551234567"]').fill('+15559990001')
+      await page.locator('button', { hasText: 'Save' }).click()
+      await expect(page.locator('p.font-mono').first()).toContainText('+15559990001', { timeout: 10_000 })
+    } finally {
+      // If Save failed mid-flight the editor may still be open — cancel it first
+      const cancelBtn = page.locator('button', { hasText: 'Cancel' })
+      if (await cancelBtn.isVisible({ timeout: 1_000 }).catch(() => false)) {
+        await cancelBtn.click()
+      }
+      // Restore Alice's phone regardless of whether the assertion above passed
+      await page.locator('button', { hasText: 'Edit' }).first().click()
+      await page.locator('input[placeholder="+15551234567"]').fill(originalPhone)
+      await page.locator('button', { hasText: 'Save' }).click()
+    }
   })
 })
 
