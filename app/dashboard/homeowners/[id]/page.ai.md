@@ -8,7 +8,7 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 - Fetch homeowner profile, conversations (ascending by `created_at`), and reminders (ascending by `due_date`) in parallel via `Promise.all`.
 - Call `notFound()` if the homeowner is not found.
 - Derive `location` string from address fields.
-- Render status badges for `onboarding_complete` and `opted_out`.
+- Render status badges for `onboarding_complete`, `opted_out`, and a "Pending" badge when neither is true; badge always appears at the bottom of the homeowner info card.
 - Render a homeowner information card and compose `PhoneNumberEditor` for phone mutations.
 - Compose `ConversationPanel`, `MessageForm`, and `RemindersPanel` with fetched data.
 
@@ -34,6 +34,7 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 - Homeowner name, phone editor, and location are rendered.
 - "Onboarding complete" badge renders when `onboarding_complete === true`.
 - "Opted out" badge renders when `opted_out === true`.
+- "Pending" badge renders when both `onboarding_complete` and `opted_out` are false.
 - `ConversationPanel` receives messages sorted ascending.
 - `RemindersPanel` receives reminders sorted by due date ascending.
 

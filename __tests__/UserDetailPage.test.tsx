@@ -130,6 +130,12 @@ describe('UserDetailPage', () => {
     expect(screen.getByText('Opted out')).toBeInTheDocument()
   })
 
+  it('shows the Pending badge when neither onboarding_complete nor opted_out', async () => {
+    mockUserSingle.mockResolvedValueOnce({ data: { ...HOMEOWNER, onboarding_complete: false, opted_out: false } })
+    render(await UserDetailPage({ params: { id: 'u1' } }))
+    expect(screen.getByText('Pending')).toBeInTheDocument()
+  })
+
   it('falls back to Homeowner when first_name is null', async () => {
     mockUserSingle.mockResolvedValueOnce({ data: { ...HOMEOWNER, first_name: null } })
     render(await UserDetailPage({ params: { id: 'u1' } }))
