@@ -1,16 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import DashboardCharts, { type ChartPoint } from './DashboardCharts'
 
-type StatCardProps = { label: string; value: number; sub?: string }
-
-function StatCard({ label, value, sub }: StatCardProps) {
-  return (
-    <div className="bg-white rounded-2xl border border-border/20 p-6">
-      <p className="text-sm text-muted-foreground/60">{label}</p>
-      <p className="text-3xl font-bold text-foreground mt-1">{value.toLocaleString()}</p>
-      {sub && <p className="text-xs text-muted-foreground/50 mt-1">{sub}</p>}
-    </div>
-  )
+function formatMonth(dateStr: string): string {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
 }
 
 export default async function DashboardPage() {
@@ -27,14 +20,31 @@ export default async function DashboardPage() {
   const tenantId = membership?.tenant_id ?? null
   const tenantName = (membership?.tenants as { name?: string } | null)?.name ?? 'Dashboard'
 
-  const { data: users } = await supabase
-    .from('users')
-    .select('onboarding_complete, opted_out')
-    .eq('tenant_id', tenantId ?? '')
+  const [{ data: users }, { data: snapshots }] = await Promise.all([
+    supabase
+      .from('users')
+      .select('onboarding_complete, opted_out')
+      .eq('tenant_id', tenantId ?? ''),
+    supabase
+      .from('monthly_billing_snapshots')
+      .select('billing_month, active_users, conversations')
+      .eq('tenant_id', tenantId ?? '')
+      .order('billing_month', { ascending: true }),
+  ])
 
   const total = users?.length ?? 0
-  const fullyProvisioned = users?.filter(u => u.onboarding_complete).length ?? 0
+  const completedOnboarding = users?.filter(u => u.onboarding_complete).length ?? 0
   const optedOut = users?.filter(u => u.opted_out).length ?? 0
+
+  const usersPerMonth: ChartPoint[] = (snapshots ?? []).map(s => ({
+    month: formatMonth(s.billing_month),
+    value: s.active_users,
+  }))
+
+  const messagesPerMonth: ChartPoint[] = (snapshots ?? []).map(s => ({
+    month: formatMonth(s.billing_month),
+    value: s.conversations,
+  }))
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
@@ -43,15 +53,26 @@ export default async function DashboardPage() {
         <p className="text-white/60 text-sm mt-1">Usage overview</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatCard label="Total homeowners" value={total} />
-        <StatCard
-          label="Fully provisioned"
-          value={fullyProvisioned}
-          sub="Onboarding complete"
-        />
-        <StatCard label="Opted out" value={optedOut} />
+      <div className="mb-4">
+        <div className="bg-white rounded-2xl border border-border/20 p-6">
+          <div className="grid grid-cols-3 divide-x divide-border/20">
+            <div className="pr-6">
+              <p className="text-sm text-muted-foreground/60">Total homeowners</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{total.toLocaleString()}</p>
+            </div>
+            <div className="px-6">
+              <p className="text-sm text-muted-foreground/60">Completed Onboarding</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{completedOnboarding.toLocaleString()}</p>
+            </div>
+            <div className="pl-6">
+              <p className="text-sm text-muted-foreground/60">Opted out</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{optedOut.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <DashboardCharts usersPerMonth={usersPerMonth} messagesPerMonth={messagesPerMonth} />
     </div>
   )
 }

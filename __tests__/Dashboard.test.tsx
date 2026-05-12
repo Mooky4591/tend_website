@@ -5,6 +5,7 @@ const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
 const mockTenantSingle = jest.fn()
 const mockUsersEq = jest.fn()
+const mockSnapshotsOrder = jest.fn()
 
 jest.mock('next/navigation', () => ({
   redirect: (path: string) => { mockRedirect(path); throw new Error(`NEXT_REDIRECT:${path}`) },
@@ -19,11 +20,18 @@ jest.mock('@/lib/supabase/server', () => ({
           return { select: () => ({ eq: () => ({ single: mockTenantSingle }) }) }
         case 'users':
           return { select: () => ({ eq: mockUsersEq }) }
+        case 'monthly_billing_snapshots':
+          return { select: () => ({ eq: () => ({ order: mockSnapshotsOrder }) }) }
         default:
           throw new Error(`Unexpected table in mock: ${table}`)
       }
     },
   }),
+}))
+
+jest.mock('@/app/dashboard/DashboardCharts', () => ({
+  __esModule: true,
+  default: () => <div data-testid="dashboard-charts" />,
 }))
 
 const AUTHED_USER = { id: 'user-1', email: 'admin@acme.com' }
@@ -34,6 +42,7 @@ beforeEach(() => {
   mockGetUser.mockResolvedValue({ data: { user: AUTHED_USER } })
   mockTenantSingle.mockResolvedValue({ data: MEMBERSHIP })
   mockUsersEq.mockResolvedValue({ data: [] })
+  mockSnapshotsOrder.mockResolvedValue({ data: [] })
 })
 
 describe('DashboardPage', () => {
@@ -59,7 +68,7 @@ describe('DashboardPage', () => {
     expect(screen.getAllByText('0')).toHaveLength(3)
   })
 
-  it('counts fully provisioned as onboarding_complete', async () => {
+  it('counts completed onboarding as onboarding_complete', async () => {
     mockUsersEq.mockResolvedValueOnce({
       data: [
         { onboarding_complete: true, opted_out: false },
@@ -71,7 +80,7 @@ describe('DashboardPage', () => {
     render(await DashboardPage())
 
     expect(screen.getByText('Total homeowners').closest('div')).toHaveTextContent('3')
-    expect(screen.getByText('Fully provisioned').closest('div')).toHaveTextContent('2')
+    expect(screen.getByText('Completed Onboarding').closest('div')).toHaveTextContent('2')
   })
 
   it('counts opted-out users correctly', async () => {
@@ -92,5 +101,16 @@ describe('DashboardPage', () => {
     mockUsersEq.mockResolvedValueOnce({ data: null })
     render(await DashboardPage())
     expect(screen.getAllByText('0')).toHaveLength(3)
+  })
+
+  it('handles null billing snapshots without crashing', async () => {
+    mockSnapshotsOrder.mockResolvedValueOnce({ data: null })
+    render(await DashboardPage())
+    expect(screen.getByTestId('dashboard-charts')).toBeInTheDocument()
+  })
+
+  it('renders the dashboard charts component', async () => {
+    render(await DashboardPage())
+    expect(screen.getByTestId('dashboard-charts')).toBeInTheDocument()
   })
 })
