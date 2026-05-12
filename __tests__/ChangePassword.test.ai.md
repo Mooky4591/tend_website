@@ -29,6 +29,8 @@ Unit tests for `app/dashboard/settings/change-password/page.tsx`. Verifies field
 - Shows generic error and re-enables button when an unexpected exception is thrown.
 - Shows success message and redirects to `/dashboard` on success.
 - Disables button and shows "Updating…" while in flight.
+- Disables the button while user email is still loading (getUser not yet resolved).
+- Resets loading to false after a successful password change (button shows "Update password", disabled by success).
 - Error element has `role="alert"`.
 - Success element has `role="status"`.
 - New password input has `minLength` of 6.

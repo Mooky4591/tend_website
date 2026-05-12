@@ -140,6 +140,22 @@ describe('ChangePasswordPage', () => {
     expect(screen.getByRole('button', { name: 'Update password' })).not.toBeDisabled()
   })
 
+  it('disables the button while user email is still loading', () => {
+    mockGetUser.mockReturnValueOnce(new Promise(() => {}))
+    render(<ChangePasswordPage />)
+    expect(screen.getByRole('button', { name: 'Update password' })).toBeDisabled()
+  })
+
+  it('resets loading to false after a successful password change', async () => {
+    render(<ChangePasswordPage />)
+    const user = await fillForm()
+
+    await user.click(screen.getByRole('button', { name: 'Update password' }))
+
+    await screen.findByRole('status')
+    expect(screen.getByRole('button', { name: 'Update password' })).toBeDisabled()
+  })
+
   it('new password input has minLength of 6', () => {
     render(<ChangePasswordPage />)
     expect(screen.getByLabelText('New password')).toHaveAttribute('minLength', '6')

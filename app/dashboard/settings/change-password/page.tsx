@@ -61,11 +61,12 @@ export default function ChangePasswordPage() {
       }
 
       setSuccess(true)
+      setLoading(false)
       try {
         router.push('/dashboard')
         router.refresh()
       } catch {
-        setLoading(false)
+        // loading already reset above
       }
     } catch {
       setError('An unexpected error occurred. Please try again.')
@@ -141,7 +142,7 @@ export default function ChangePasswordPage() {
           <div className="flex items-center gap-4 pt-1">
             <button
               type="submit"
-              disabled={loading || success}
+              disabled={loading || success || userEmail === null}
               className="bg-brand-600 hover:bg-brand-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-lg transition-colors text-sm"
             >
               {loading ? 'Updating…' : 'Update password'}
