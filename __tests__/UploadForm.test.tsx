@@ -125,4 +125,19 @@ describe('UploadForm', () => {
 
     resolveFetch!({ ok: true, json: async () => ({ chunksInserted: 2 }) } as Response)
   })
+
+  it('shows an error when the selected file exceeds 10 MB', async () => {
+    const user = userEvent.setup()
+    render(<UploadForm />)
+
+    await user.type(screen.getByPlaceholderText(/Premium Home Warranty/), 'Large Plan')
+    // Create a small File but override .size to simulate an oversized file
+    const bigFile = makeFile('big.pdf', 'application/pdf', 1)
+    Object.defineProperty(bigFile, 'size', { value: 10 * 1024 * 1024 + 1, configurable: true })
+    await user.upload(screen.getByLabelText(/PDF file/), bigFile)
+    await user.click(screen.getByRole('button', { name: 'Upload' }))
+
+    expect(screen.getByText('File must be under 10 MB.')).toBeInTheDocument()
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
 })

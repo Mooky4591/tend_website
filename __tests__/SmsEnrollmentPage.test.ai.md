@@ -37,3 +37,5 @@ Unit tests for `app/sms-enrollment/SmsEnrollmentForm.tsx`. Verifies field and bu
 - Shows a field error when phone has fewer than 10 digits.
 - Shows a field error when email is malformed.
 - Disables the submit button while submitting.
+- Shows "Network error" message when fetch throws (catch-block coverage).
+- Shows "Submission failed. Please try again." fallback when API error response has no `error` field.

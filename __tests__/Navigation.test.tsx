@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Navigation from '@/components/Navigation'
 
@@ -182,5 +182,22 @@ describe('Navigation', () => {
     await user.tab({ shift: true })
 
     expect(focusable[focusable.length - 1]).toHaveFocus()
+  })
+
+  it('applies shadow to header after scrolling past 8px', () => {
+    render(<Navigation />)
+    const header = screen.getByRole('banner')
+
+    expect(header.className).not.toContain('shadow-sm')
+
+    act(() => {
+      Object.defineProperty(window, 'scrollY', { value: 10, configurable: true })
+      window.dispatchEvent(new Event('scroll'))
+    })
+
+    expect(header.className).toContain('shadow-sm')
+
+    // Restore default
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
   })
 })

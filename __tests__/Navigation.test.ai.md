@@ -40,6 +40,7 @@ Integration tests for `components/Navigation.tsx`. Verifies static rendering (lo
 - Mobile menu is a navigation landmark with an accessible label.
 - Tab on last focusable item in mobile menu wraps to first (focus trap).
 - Shift+Tab on first focusable item in mobile menu wraps to last (focus trap).
+- Header applies `shadow-sm` class after a scroll event fires with `window.scrollY > 8`.
 
 ## Notes for AI Agents
 - Consumed by: CI test suite only.

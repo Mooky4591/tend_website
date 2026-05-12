@@ -35,3 +35,6 @@ Unit tests for `app/dashboard/homeowners/[id]/RemindersPanel.tsx`. Verifies remi
 - Ignores a second Delete click while the first is in flight.
 - Ignores a second Save click while the first is in flight.
 - Ignores a second Add click while the first is in flight.
+- Shows "Failed to delete" error and does not refresh when Delete request returns `ok: false`.
+- Shows "Failed to save" error and does not refresh when Save request returns `ok: false`.
+- Shows "Failed to add reminder" error and does not refresh when Add request returns `ok: false`.

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ChangePasswordPage from '@/app/dashboard/settings/change-password/page'
 
@@ -164,5 +164,34 @@ describe('ChangePasswordPage', () => {
   it('confirm password input has minLength of 6', () => {
     render(<ChangePasswordPage />)
     expect(screen.getByLabelText('Confirm new password')).toHaveAttribute('minLength', '6')
+  })
+
+  it('shows error when form is submitted while userEmail is null', async () => {
+    mockGetUser.mockReturnValueOnce(new Promise(() => {})) // never resolves
+    render(<ChangePasswordPage />)
+
+    const user = userEvent.setup()
+    await user.type(screen.getByLabelText('New password'), 'newpass123')
+    await user.type(screen.getByLabelText('Confirm new password'), 'newpass123')
+
+    const form = screen.getByRole('button', { name: 'Update password' }).closest('form')!
+    fireEvent.submit(form)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Unable to verify your account. Please sign in again.'
+    )
+    expect(mockSignInWithPassword).not.toHaveBeenCalled()
+  })
+
+  it('shows success and suppresses error when router.push throws synchronously', async () => {
+    mockPush.mockImplementationOnce(() => { throw new Error('Navigation blocked') })
+    render(<ChangePasswordPage />)
+    const user = await fillForm()
+
+    await user.click(screen.getByRole('button', { name: 'Update password' }))
+
+    expect(await screen.findByRole('status')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(mockRefresh).not.toHaveBeenCalled()
   })
 })

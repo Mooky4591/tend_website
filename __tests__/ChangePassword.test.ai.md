@@ -36,3 +36,5 @@ Unit tests for `app/dashboard/settings/change-password/page.tsx`. Verifies field
 - New password input has `minLength` of 6.
 - Confirm new password input has `minLength` of 6.
 - Cancel link points to `/dashboard`.
+- Shows "Unable to verify your account. Please sign in again." when form is submitted while userEmail is null (direct form submit bypassing disabled button).
+- Shows success and suppresses error when `router.push` throws synchronously (catch-block coverage).

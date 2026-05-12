@@ -137,4 +137,18 @@ describe('MessageForm', () => {
     await user.type(textarea, 'Line1{Shift>}{Enter}{/Shift}still typing')
     expect(global.fetch).not.toHaveBeenCalled()
   })
+
+  it('shows "Failed to send" fallback when API error response has no error field', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      json: async () => ({}),
+    })
+    const user = userEvent.setup()
+    render(<MessageForm userId="u1" />)
+
+    await user.type(screen.getByPlaceholderText(/Type a message/), 'Hello')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+
+    expect(await screen.findByText('Failed to send')).toBeInTheDocument()
+  })
 })

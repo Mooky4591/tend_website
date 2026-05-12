@@ -19,3 +19,6 @@ Unit tests for `PhoneNumberEditor` covering inline phone display and successful 
 - Cancel reverts the input to the initial phone value.
 - Shows the API error message on failure.
 - Saves and calls router refresh on success.
+- Shows "Phone number is required" and does not call API when input is blank or whitespace-only.
+- Shows "No phone number" when `phoneNumber` prop is `null`; initializes the edit input to an empty string.
+- Shows "Failed to update phone number" fallback when API error response has no `error` field.
