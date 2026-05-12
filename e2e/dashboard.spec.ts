@@ -7,9 +7,9 @@ test.describe('dashboard overview', () => {
     await page.goto('/dashboard')
   })
 
-  test('renders the three stat cards', async ({ page }) => {
+  test('renders the combined stat card with all three labels', async ({ page }) => {
     await expect(page.locator('text=Total homeowners')).toBeVisible()
-    await expect(page.locator('text=Fully provisioned')).toBeVisible()
+    await expect(page.locator('text=Completed Onboarding')).toBeVisible()
     await expect(page.locator('text=Opted out')).toBeVisible()
   })
 
