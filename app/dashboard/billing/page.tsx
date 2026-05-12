@@ -26,8 +26,8 @@ export default async function BillingPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Billing</h1>
-        <p className="text-muted-foreground/60 text-sm mt-1">Monthly usage snapshots</p>
+        <h1 className="text-2xl font-bold text-white">Billing</h1>
+        <p className="text-white/60 text-sm mt-1">Monthly usage snapshots</p>
       </div>
 
       <div className="bg-white rounded-2xl border border-border/20 overflow-hidden mb-6">
