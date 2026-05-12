@@ -41,7 +41,7 @@ export default async function UserDetailPage({ params }: { params: { id: string 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-6">
-        <Link href="/dashboard/homeowners" className="text-sm text-muted-foreground/60 hover:text-muted-foreground">
+        <Link href="/dashboard/homeowners" className="text-sm text-white hover:text-white/80">
           ← Back to homeowners
         </Link>
       </div>
