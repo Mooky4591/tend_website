@@ -71,7 +71,7 @@ export default async function UsersPage() {
         <p className="text-muted-foreground/60 text-sm mt-1">{homeowners?.length ?? 0} total</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border/20">
+      <div className="bg-white rounded-2xl border border-border/20 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border/20 bg-muted">
