@@ -32,6 +32,7 @@ Integration tests for `app/dashboard/homeowners/[id]/page.tsx`. Verifies auth re
 - Shows the "Onboarding complete" badge when applicable.
 - Does not show the "Onboarding complete" badge when false.
 - Shows the "Opted out" badge when applicable.
+- Shows the "Pending" badge when both `onboarding_complete` and `opted_out` are false.
 - Falls back to "Homeowner" heading when `first_name` is null.
 - Renders ConversationPanel, MessageForm, RemindersPanel, and PhoneNumberEditor.
 - Passes the homeowner's phone number to PhoneNumberEditor.
