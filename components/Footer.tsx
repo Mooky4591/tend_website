@@ -47,13 +47,7 @@ export default function Footer() {
             <ul className="space-y-2.5 list-none">
               {productLinks.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    {...(link.href.startsWith('http')
-                      ? { target: '_blank', rel: 'noopener noreferrer' }
-                      : {})}
-                    className="text-sm hover:text-white transition-colors"
-                  >
+                  <a href={link.href} className="text-sm hover:text-white transition-colors">
                     {link.label}
                   </a>
                 </li>
@@ -69,13 +63,7 @@ export default function Footer() {
             <ul className="space-y-2.5 list-none">
               {companyLinks.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    {...(link.href.startsWith('http')
-                      ? { target: '_blank', rel: 'noopener noreferrer' }
-                      : {})}
-                    className="text-sm hover:text-white transition-colors"
-                  >
+                  <a href={link.href} className="text-sm hover:text-white transition-colors">
                     {link.label}
                   </a>
                 </li>
@@ -91,13 +79,7 @@ export default function Footer() {
             <ul className="space-y-2.5 list-none">
               {legalLinks.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    {...(link.href.startsWith('http')
-                      ? { target: '_blank', rel: 'noopener noreferrer' }
-                      : {})}
-                    className="text-sm hover:text-white transition-colors"
-                  >
+                  <a href={link.href} className="text-sm hover:text-white transition-colors">
                     {link.label}
                   </a>
                 </li>
