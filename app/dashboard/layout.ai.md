@@ -23,7 +23,7 @@ Server Component layout (`DashboardLayout`) that wraps all `/dashboard` routes. 
 - Logo is rendered with `<Image src="/logo.png" alt="Tendr" width={102} height={34} priority />`.
 - `SettingsMenu` and `SignOutButton` are rendered together in a flex container in the header.
 - `<main>{children}</main>` is the slot for page content.
-- Background is `bg-mint`; header is `bg-white border-b border-border/20`.
+- Background uses `dashboard-bg` (navy→brand-900 gradient with subtle grid overlay defined in `globals.css`); header is `bg-white border-b border-border/20`.
 
 ## Tests Required
 - Unauthenticated users are redirected to `/login`.
