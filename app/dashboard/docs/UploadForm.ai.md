@@ -28,6 +28,7 @@ Client Component (`UploadForm`) that collects a plan name and PDF file, posts th
 - `startTransition(() => router.refresh())` must be called after a successful upload.
 - File input must be reset via `fileRef.current.value = ''` on success.
 - Button is `disabled` when `busy || !file || !planName.trim()`.
+- `handleUpload` must have a `catch` block that calls `setStatus({ type: 'error', message: 'Upload failed. Please try again.' })` for any uncaught error (e.g. network failure or non-JSON response).
 
 ## Tests Required
 - Displays error when submitted with no plan name.
@@ -37,6 +38,7 @@ Client Component (`UploadForm`) that collects a plan name and PDF file, posts th
 - Displays API error message when response is not ok.
 - Resets plan name and file after successful upload.
 - Button is disabled when file or plan name is missing.
+- Shows "Upload failed. Please try again." when fetch throws a network error.
 
 ## Notes for AI Agents
 - The 10 MB check is duplicated client-side here and server-side in `app/api/warranty-upload/route.ts`. Both must remain consistent.

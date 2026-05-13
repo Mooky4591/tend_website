@@ -3,10 +3,15 @@
  */
 
 import { uploadWarrantyDoc } from '@/lib/services/warrantyDocs'
-import { extractAndChunk } from '@/lib/pdf'
+import { extractAndChunk, PdfParseError } from '@/lib/pdf'
 import { embedChunks } from '@/lib/embed'
 
-jest.mock('@/lib/pdf', () => ({ extractAndChunk: jest.fn() }))
+jest.mock('@/lib/pdf', () => {
+  class PdfParseError extends Error {
+    constructor(message: string) { super(message); this.name = 'PdfParseError' }
+  }
+  return { extractAndChunk: jest.fn(), PdfParseError }
+})
 jest.mock('@/lib/embed', () => ({ embedChunks: jest.fn() }))
 
 const mockExtractAndChunk = extractAndChunk as jest.Mock
@@ -48,6 +53,19 @@ describe('uploadWarrantyDoc service', () => {
     mockExtractAndChunk.mockResolvedValueOnce([])
     const result = await uploadWarrantyDoc(makeSupabase(), 'tenant-1', 'Plan A', Buffer.from('pdf'))
     expect(result).toMatchObject({ status: 422 })
+  })
+
+  it('returns status 422 when extractAndChunk throws a PdfParseError', async () => {
+    mockExtractAndChunk.mockRejectedValueOnce(new PdfParseError('Invalid PDF structure.'))
+    const result = await uploadWarrantyDoc(makeSupabase(), 'tenant-1', 'Plan A', Buffer.from('pdf'))
+    expect(result).toMatchObject({ status: 422 })
+    expect((result as { error: string }).error).toContain('parse PDF')
+  })
+
+  it('returns status 500 when extractAndChunk throws an unexpected error', async () => {
+    mockExtractAndChunk.mockRejectedValueOnce(new Error('out of memory'))
+    const result = await uploadWarrantyDoc(makeSupabase(), 'tenant-1', 'Plan A', Buffer.from('pdf'))
+    expect(result).toMatchObject({ status: 500 })
   })
 
   it('returns status 502 when embedChunks throws', async () => {

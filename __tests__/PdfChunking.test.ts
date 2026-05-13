@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { chunkText, extractAndChunk } from '@/lib/pdf'
+import { chunkText, extractAndChunk, PdfParseError } from '@/lib/pdf'
 
 const mockGetText = jest.fn()
 const mockDestroy = jest.fn().mockResolvedValue(undefined)
@@ -93,5 +93,18 @@ describe('extractAndChunk', () => {
     mockGetText.mockRejectedValue(new Error('parse error'))
     await expect(extractAndChunk(Buffer.from('fake'))).rejects.toThrow('parse error')
     expect(mockDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  it('throws PdfParseError when getText() throws a known pdf-parse user error', async () => {
+    const err = Object.assign(new Error('Invalid PDF structure.'), { name: 'InvalidPDFException' })
+    mockGetText.mockRejectedValueOnce(err)
+    await expect(extractAndChunk(Buffer.from('fake'))).rejects.toThrow(PdfParseError)
+    expect(mockDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  it('re-throws non-PDF errors unchanged', async () => {
+    const err = new TypeError('unexpected runtime error')
+    mockGetText.mockRejectedValueOnce(err)
+    await expect(extractAndChunk(Buffer.from('fake'))).rejects.toThrow(TypeError)
   })
 })
