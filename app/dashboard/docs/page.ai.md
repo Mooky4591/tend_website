@@ -5,7 +5,7 @@ Server Component page (`DocsPage`) that lists uploaded warranty plan documents (
 
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
-- Query `warranty_documents` for `plan_name`, chunk count, and latest `created_at`, then sort descending by upload date.
+- Query `warranty_documents` for `plan_name` and `created_at` (ordered DESC), then group by `plan_name` in JavaScript to compute `chunk_count` and `uploaded_at` (max `created_at`), sorted descending by upload date.
 - Define `deleteDoc` as a `'use server'` action that re-authenticates, resolves tenant via `getTenantId` from `@/lib/auth`, deletes, and calls `revalidatePath('/dashboard/docs')`.
 - Render the document list with `DeleteDocButton` (bound action) and the `UploadForm` side by side.
 
@@ -35,5 +35,5 @@ Server Component page (`DocsPage`) that lists uploaded warranty plan documents (
 - `deleteDoc` calls `revalidatePath` after successful deletion.
 
 ## Notes for AI Agents
-- The Supabase query uses a Postgres aggregate alias (`chunk_count:count()`, `uploaded_at:created_at.max()`) which requires an `as unknown as DocRow[]` cast; do not remove the cast.
+- The Supabase query fetches raw chunk rows (`plan_name, created_at` ordered DESC) and groups them in JavaScript using a `Map`. This avoids PostgREST aggregate function dependencies.
 - Deletion via the DELETE API route (`app/api/warranty-docs/[planName]/route.ts`) is the client-side alternative path. Keep both consistent.

@@ -3,7 +3,7 @@ import DocsPage from '@/app/dashboard/docs/page'
 
 const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
-const mockDocsSelect = jest.fn()
+const mockDocsOrder = jest.fn()
 const mockDeleteEq = jest.fn()
 const mockRevalidatePath = jest.fn()
 const mockGetTenantId = jest.fn()
@@ -23,11 +23,11 @@ jest.mock('@/lib/supabase/server', () => ({
     from: (table: string) => {
       if (table === 'warranty_documents') {
         return {
-          select: mockDocsSelect,
+          select: () => ({ order: mockDocsOrder }),
           delete: () => ({ eq: () => ({ eq: () => mockDeleteEq() }) }),
         }
       }
-      return { select: mockDocsSelect }
+      return { select: jest.fn() }
     },
   }),
 }))
@@ -55,7 +55,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   Object.keys(capturedDeleteActions).forEach(k => delete capturedDeleteActions[k])
   mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
-  mockDocsSelect.mockResolvedValue({ data: [] })
+  mockDocsOrder.mockResolvedValue({ data: [] })
   mockGetTenantId.mockResolvedValue('tenant-1')
   mockDeleteEq.mockResolvedValue({ error: null })
 })
@@ -72,10 +72,10 @@ describe('DocsPage', () => {
   })
 
   it('renders each document with its plan name', async () => {
-    mockDocsSelect.mockResolvedValueOnce({
+    mockDocsOrder.mockResolvedValueOnce({
       data: [
-        { plan_name: 'Premium Plan', chunk_count: 42, uploaded_at: '2026-04-01T00:00:00Z' },
-        { plan_name: 'Basic Plan', chunk_count: 10, uploaded_at: '2026-03-01T00:00:00Z' },
+        { plan_name: 'Premium Plan', created_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Basic Plan', created_at: '2026-03-01T00:00:00Z' },
       ],
     })
     render(await DocsPage())
@@ -84,18 +84,22 @@ describe('DocsPage', () => {
   })
 
   it('displays chunk count for each document', async () => {
-    mockDocsSelect.mockResolvedValueOnce({
-      data: [{ plan_name: 'Plan A', chunk_count: 87, uploaded_at: '2026-04-01T00:00:00Z' }],
+    mockDocsOrder.mockResolvedValueOnce({
+      data: [
+        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
+      ],
     })
     render(await DocsPage())
-    expect(screen.getByText(/87 chunks/)).toBeInTheDocument()
+    expect(screen.getByText(/3 chunks/)).toBeInTheDocument()
   })
 
   it('renders documents sorted most-recent first', async () => {
-    mockDocsSelect.mockResolvedValueOnce({
+    mockDocsOrder.mockResolvedValueOnce({
       data: [
-        { plan_name: 'Older Plan', chunk_count: 5, uploaded_at: '2026-02-01T00:00:00Z' },
-        { plan_name: 'Newer Plan', chunk_count: 8, uploaded_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Newer Plan', created_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Older Plan', created_at: '2026-02-01T00:00:00Z' },
       ],
     })
     render(await DocsPage())
@@ -109,10 +113,10 @@ describe('DocsPage', () => {
   })
 
   it('renders a Delete button for each document', async () => {
-    mockDocsSelect.mockResolvedValueOnce({
+    mockDocsOrder.mockResolvedValueOnce({
       data: [
-        { plan_name: 'Plan A', chunk_count: 5, uploaded_at: '2026-04-01T00:00:00Z' },
-        { plan_name: 'Plan B', chunk_count: 3, uploaded_at: '2026-03-01T00:00:00Z' },
+        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Plan B', created_at: '2026-03-01T00:00:00Z' },
       ],
     })
     render(await DocsPage())
@@ -121,15 +125,15 @@ describe('DocsPage', () => {
   })
 
   it('handles null data response without crashing', async () => {
-    mockDocsSelect.mockResolvedValueOnce({ data: null })
+    mockDocsOrder.mockResolvedValueOnce({ data: null })
     render(await DocsPage())
     expect(screen.getByText('No documents uploaded yet')).toBeInTheDocument()
   })
 
   describe('deleteDoc server action', () => {
     async function renderWithDoc() {
-      mockDocsSelect.mockResolvedValueOnce({
-        data: [{ plan_name: 'Plan A', chunk_count: 5, uploaded_at: '2026-04-01T00:00:00Z' }],
+      mockDocsOrder.mockResolvedValueOnce({
+        data: [{ plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' }],
       })
       render(await DocsPage())
     }

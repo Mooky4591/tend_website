@@ -6,7 +6,8 @@ Integration tests for `app/api/warranty-upload/route.ts` (POST handler). Verifie
 ## Allowed Responsibilities
 - Mock `@/lib/supabase/server` to control auth and tenant lookup outcomes.
 - Mock `@/lib/pdf` and `@/lib/embed` to control extraction and embedding outcomes.
-- Assert on HTTP status codes, response bodies, and DB call arguments.
+- Mock `next/cache` to intercept `revalidatePath` calls.
+- Assert on HTTP status codes, response bodies, DB call arguments, and cache invalidation.
 
 ## Not Allowed
 - Do not mock `@/lib/auth` (getTenantId) itself — the mock supabase client flows through it correctly.
@@ -31,6 +32,7 @@ Integration tests for `app/api/warranty-upload/route.ts` (POST handler). Verifie
 - Atomic swap: inserts before deleting old chunks.
 - Skips delete when there are no existing chunks.
 - Returns 500 when old-chunk delete fails after insert succeeds.
+- Calls `revalidatePath('/dashboard/docs')` on successful upload.
 
 ## Notes for AI Agents
 - The 403 is produced by `forbidden()` from `@/lib/api-response` when `getTenantId` returns null.

@@ -9,7 +9,7 @@ Route handler for PDF warranty document uploads. Owns only HTTP concerns: authen
 - Parse `multipart/form-data` to extract `file` (PDF) and `plan_name`.
 - Enforce PDF-only uploads (`application/pdf`) and a 10 MB file size limit.
 - Convert the `File` to a `Buffer` and call `uploadWarrantyDoc` from `@/lib/services/warrantyDocs`.
-- Translate the service's error descriptor `{ error, status }` into the matching `NextResponse`, or return `{ chunksInserted }` on success.
+- Translate the service's error descriptor `{ error, status }` into the matching `NextResponse`, or call `revalidatePath('/dashboard/docs')` and return `{ chunksInserted }` on success.
 
 ## Not Allowed
 - Do not call `extractAndChunk` or `embedChunks` directly — delegated to `lib/services/warrantyDocs.ts`.

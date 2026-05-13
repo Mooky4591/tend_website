@@ -12,6 +12,11 @@ const mockTenantSingle = jest.fn()
 const mockDocSelectEq = jest.fn()
 const mockDocInsert = jest.fn()
 const mockDocDeleteIn = jest.fn()
+const mockRevalidatePath = jest.fn()
+
+jest.mock('next/cache', () => ({
+  revalidatePath: (...args: unknown[]) => mockRevalidatePath(...args),
+}))
 
 jest.mock('@/lib/supabase/server', () => ({
   createClient: () => ({
@@ -121,6 +126,11 @@ describe('POST /api/warranty-upload', () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.chunksInserted).toBe(2)
+  })
+
+  it('calls revalidatePath with /dashboard/docs on success', async () => {
+    await POST(makeRequest('Plan A'))
+    expect(mockRevalidatePath).toHaveBeenCalledWith('/dashboard/docs')
   })
 
   it('atomic swap: inserts new chunks before deleting old ones', async () => {

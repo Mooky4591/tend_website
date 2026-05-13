@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { uploadWarrantyDoc } from '@/lib/services/warrantyDocs'
 import { getTenantId } from '@/lib/auth'
@@ -35,5 +36,6 @@ export async function POST(request: NextRequest) {
     return serverError(result.error)
   }
 
+  revalidatePath('/dashboard/docs')
   return ok({ chunksInserted: result.chunksInserted })
 }
