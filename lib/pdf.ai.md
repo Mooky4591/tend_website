@@ -37,5 +37,5 @@ Server-side utility module providing `extractAndChunk` (extracts text from a PDF
 
 ## Notes for AI Agents
 - The 50-word overlap is intentional for retrieval quality. Do not remove it.
-- `pdf-parse` is required via `require()` inside the function body (not at the top level) and is listed in `serverExternalPackages` in `next.config.mjs` so Next.js loads it from `node_modules` at runtime rather than bundling it with webpack. Both are necessary: the dynamic `require` prevents the client bundle from pulling it in, and `serverExternalPackages` prevents webpack from inlining the server bundle where pdf-parse's internals fail.
+- `pdf-parse` is required via `require()` inside the function body (not at the top level) and is listed in `experimental.serverComponentsExternalPackages` in `next.config.mjs` so Next.js 14 loads it from `node_modules` at runtime rather than bundling it with webpack. Both are necessary: the dynamic `require` prevents the client bundle from pulling it in, and `serverComponentsExternalPackages` prevents webpack from inlining the server bundle where pdf-parse's internals fail.
 - Chunk size (500 words) and overlap (50 words) must stay consistent with how embeddings are stored in Supabase; changing them requires a full re-upload of all documents.
