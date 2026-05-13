@@ -30,4 +30,5 @@ Unit tests for `app/dashboard/docs/UploadForm.tsx`. Verifies the Upload button s
 - Shows error message when the API returns an error.
 - Disables the button and shows "Uploading…" for the full fetch round-trip.
 - Ignores a second click while an upload is already in flight.
+- Shows "Upload failed. Please try again." when fetch throws a network error.
 - Shows "File must be under 10 MB." error when the selected file exceeds 10 MB.
