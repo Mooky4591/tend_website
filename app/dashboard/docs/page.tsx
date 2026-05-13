@@ -16,20 +16,12 @@ export default async function DocsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data } = await supabase
-    .from('warranty_documents')
-    .select('plan_name, created_at')
-    .order('created_at', { ascending: false })
+  type DocRow = { plan_name: string; chunk_count: number; uploaded_at: string }
+  const { data, error } = await supabase.rpc('warranty_doc_summaries')
+  if (error) throw error
 
-  const planMap = new Map<string, { plan_name: string; chunk_count: number; uploaded_at: string }>()
-  for (const row of (data ?? []) as { plan_name: string; created_at: string }[]) {
-    if (!planMap.has(row.plan_name)) {
-      planMap.set(row.plan_name, { plan_name: row.plan_name, chunk_count: 1, uploaded_at: row.created_at })
-    } else {
-      planMap.get(row.plan_name)!.chunk_count++
-    }
-  }
-  const docs = Array.from(planMap.values()).sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at))
+  const docs = ((data ?? []) as DocRow[])
+    .sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at))
 
   async function deleteDoc(planName: string) {
     'use server'

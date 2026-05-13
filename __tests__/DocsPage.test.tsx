@@ -3,7 +3,7 @@ import DocsPage from '@/app/dashboard/docs/page'
 
 const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
-const mockDocsOrder = jest.fn()
+const mockRpc = jest.fn()
 const mockDeleteEq = jest.fn()
 const mockRevalidatePath = jest.fn()
 const mockGetTenantId = jest.fn()
@@ -20,14 +20,14 @@ jest.mock('next/cache', () => ({ revalidatePath: (...args: unknown[]) => mockRev
 jest.mock('@/lib/supabase/server', () => ({
   createClient: () => ({
     auth: { getUser: mockGetUser },
+    rpc: (...args: unknown[]) => mockRpc(...args),
     from: (table: string) => {
       if (table === 'warranty_documents') {
         return {
-          select: () => ({ order: mockDocsOrder }),
           delete: () => ({ eq: () => ({ eq: () => mockDeleteEq() }) }),
         }
       }
-      return { select: jest.fn() }
+      return {}
     },
   }),
 }))
@@ -55,7 +55,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   Object.keys(capturedDeleteActions).forEach(k => delete capturedDeleteActions[k])
   mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
-  mockDocsOrder.mockResolvedValue({ data: [] })
+  mockRpc.mockResolvedValue({ data: [], error: null })
   mockGetTenantId.mockResolvedValue('tenant-1')
   mockDeleteEq.mockResolvedValue({ error: null })
 })
@@ -72,11 +72,12 @@ describe('DocsPage', () => {
   })
 
   it('renders each document with its plan name', async () => {
-    mockDocsOrder.mockResolvedValueOnce({
+    mockRpc.mockResolvedValueOnce({
       data: [
-        { plan_name: 'Premium Plan', created_at: '2026-04-01T00:00:00Z' },
-        { plan_name: 'Basic Plan', created_at: '2026-03-01T00:00:00Z' },
+        { plan_name: 'Premium Plan', chunk_count: 42, uploaded_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Basic Plan', chunk_count: 10, uploaded_at: '2026-03-01T00:00:00Z' },
       ],
+      error: null,
     })
     render(await DocsPage())
     expect(screen.getByText('Premium Plan')).toBeInTheDocument()
@@ -84,23 +85,21 @@ describe('DocsPage', () => {
   })
 
   it('displays chunk count for each document', async () => {
-    mockDocsOrder.mockResolvedValueOnce({
-      data: [
-        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
-        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
-        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
-      ],
+    mockRpc.mockResolvedValueOnce({
+      data: [{ plan_name: 'Plan A', chunk_count: 87, uploaded_at: '2026-04-01T00:00:00Z' }],
+      error: null,
     })
     render(await DocsPage())
-    expect(screen.getByText(/3 chunks/)).toBeInTheDocument()
+    expect(screen.getByText(/87 chunks/)).toBeInTheDocument()
   })
 
   it('renders documents sorted most-recent first', async () => {
-    mockDocsOrder.mockResolvedValueOnce({
+    mockRpc.mockResolvedValueOnce({
       data: [
-        { plan_name: 'Newer Plan', created_at: '2026-04-01T00:00:00Z' },
-        { plan_name: 'Older Plan', created_at: '2026-02-01T00:00:00Z' },
+        { plan_name: 'Older Plan', chunk_count: 5, uploaded_at: '2026-02-01T00:00:00Z' },
+        { plan_name: 'Newer Plan', chunk_count: 8, uploaded_at: '2026-04-01T00:00:00Z' },
       ],
+      error: null,
     })
     render(await DocsPage())
     const body = document.body.textContent ?? ''
@@ -113,11 +112,12 @@ describe('DocsPage', () => {
   })
 
   it('renders a Delete button for each document', async () => {
-    mockDocsOrder.mockResolvedValueOnce({
+    mockRpc.mockResolvedValueOnce({
       data: [
-        { plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' },
-        { plan_name: 'Plan B', created_at: '2026-03-01T00:00:00Z' },
+        { plan_name: 'Plan A', chunk_count: 5, uploaded_at: '2026-04-01T00:00:00Z' },
+        { plan_name: 'Plan B', chunk_count: 3, uploaded_at: '2026-03-01T00:00:00Z' },
       ],
+      error: null,
     })
     render(await DocsPage())
     expect(screen.getByText('Delete Plan A')).toBeInTheDocument()
@@ -125,15 +125,21 @@ describe('DocsPage', () => {
   })
 
   it('handles null data response without crashing', async () => {
-    mockDocsOrder.mockResolvedValueOnce({ data: null })
+    mockRpc.mockResolvedValueOnce({ data: null, error: null })
     render(await DocsPage())
     expect(screen.getByText('No documents uploaded yet')).toBeInTheDocument()
   })
 
+  it('throws when the RPC query returns an error', async () => {
+    mockRpc.mockResolvedValueOnce({ data: null, error: { message: 'permission denied', code: '42501' } })
+    await expect(DocsPage()).rejects.toMatchObject({ message: 'permission denied' })
+  })
+
   describe('deleteDoc server action', () => {
     async function renderWithDoc() {
-      mockDocsOrder.mockResolvedValueOnce({
-        data: [{ plan_name: 'Plan A', created_at: '2026-04-01T00:00:00Z' }],
+      mockRpc.mockResolvedValueOnce({
+        data: [{ plan_name: 'Plan A', chunk_count: 5, uploaded_at: '2026-04-01T00:00:00Z' }],
+        error: null,
       })
       render(await DocsPage())
     }
