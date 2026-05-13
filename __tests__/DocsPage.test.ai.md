@@ -10,13 +10,13 @@ type: project
 Integration tests for `app/dashboard/docs/page.tsx`. Verifies auth redirect, document list rendering, empty state, chunk count display, sort order (most-recent first), UploadForm presence, and Delete buttons.
 
 ## Allowed Responsibilities
-- Mock `@/lib/supabase/server` to control `getUser`, `warranty_documents` select, and `warranty_documents` delete outcomes.
+- Mock `@/lib/supabase/server` to control `getUser`, `rpc('warranty_doc_summaries')` outcomes, and `warranty_documents` delete outcomes.
 - Mock `@/lib/auth` to control `getTenantId`.
 - Mock `next/navigation` to intercept `redirect`.
 - Mock `next/cache` for `revalidatePath`.
 - Stub `UploadForm` child component.
 - Stub `DeleteDocButton` to capture the `action` prop so `deleteDoc` can be invoked directly.
-- Assert on rendered plan names, chunk counts, sort order, button presence, and `deleteDoc` error/success behavior.
+- Assert on rendered plan names, chunk counts, sort order, button presence, RPC error throwing, and `deleteDoc` error/success behavior.
 
 ## Not Allowed
 - Do not test UploadForm or DeleteDocButton internals — they are stubbed.
@@ -34,6 +34,7 @@ Integration tests for `app/dashboard/docs/page.tsx`. Verifies auth redirect, doc
 - Renders the UploadForm.
 - Renders a Delete button for each document.
 - Handles null data response without crashing.
+- Throws when the RPC query returns an error.
 - `deleteDoc` throws "Unauthorized" when user is not authenticated.
 - `deleteDoc` throws "No tenant" when `getTenantId` returns null.
 - `deleteDoc` throws the DB error when the delete query fails.

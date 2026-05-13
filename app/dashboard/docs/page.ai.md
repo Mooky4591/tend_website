@@ -5,7 +5,7 @@ Server Component page (`DocsPage`) that lists uploaded warranty plan documents (
 
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
-- Query `warranty_documents` for `plan_name`, chunk count, and latest `created_at`, then sort descending by upload date.
+- Call `supabase.rpc('warranty_doc_summaries')` to retrieve one pre-aggregated row per plan (`plan_name`, `chunk_count`, `uploaded_at`). Throw on error. Sort the result descending by `uploaded_at`.
 - Define `deleteDoc` as a `'use server'` action that re-authenticates, resolves tenant via `getTenantId` from `@/lib/auth`, deletes, and calls `revalidatePath('/dashboard/docs')`.
 - Render the document list with `DeleteDocButton` (bound action) and the `UploadForm` side by side.
 
@@ -30,10 +30,11 @@ Server Component page (`DocsPage`) that lists uploaded warranty plan documents (
 - Unauthenticated user is redirected to `/login`.
 - Document list renders `plan_name`, chunk count, and formatted upload date.
 - Empty state renders when no documents are uploaded.
+- Throws when the RPC query returns an error (surfaces DB failures).
 - `deleteDoc` throws `'Unauthorized'` when called without a valid session.
 - `deleteDoc` throws `'No tenant'` when the user has no `tenant_users` row.
 - `deleteDoc` calls `revalidatePath` after successful deletion.
 
 ## Notes for AI Agents
-- The Supabase query uses a Postgres aggregate alias (`chunk_count:count()`, `uploaded_at:created_at.max()`) which requires an `as unknown as DocRow[]` cast; do not remove the cast.
+- Aggregation is handled in the database via the `warranty_doc_summaries()` SQL function (see `supabase/migrations/20260513000000_warranty_doc_summaries_fn.sql`). The function runs as SECURITY INVOKER so RLS on `warranty_documents` applies automatically.
 - Deletion via the DELETE API route (`app/api/warranty-docs/[planName]/route.ts`) is the client-side alternative path. Keep both consistent.

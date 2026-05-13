@@ -17,11 +17,10 @@ export default async function DocsPage() {
   if (!user) redirect('/login')
 
   type DocRow = { plan_name: string; chunk_count: number; uploaded_at: string }
-  const { data } = await supabase
-    .from('warranty_documents')
-    .select('plan_name, chunk_count:count(), uploaded_at:created_at.max()')
+  const { data, error } = await supabase.rpc('warranty_doc_summaries')
+  if (error) throw error
 
-  const docs = ((data ?? []) as unknown as DocRow[])
+  const docs = ((data ?? []) as DocRow[])
     .sort((a, b) => b.uploaded_at.localeCompare(a.uploaded_at))
 
   async function deleteDoc(planName: string) {
