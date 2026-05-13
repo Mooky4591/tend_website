@@ -21,6 +21,7 @@ Business-logic service for ingesting a warranty PDF: parsing text, generating em
 - `export async function uploadWarrantyDoc(supabase, tenantId: string, planName: string, buffer: Buffer): Promise<{ error: string; status: number } | { chunksInserted: number }>`
 
 ## Required Patterns
+- Wrap `extractAndChunk` in `try/catch`; return `{ error: 'Failed to parse PDF', status: 422 }` if it throws.
 - Return `{ error: 'No text could be extracted from this PDF', status: 422 }` when `extractAndChunk` returns an empty array.
 - Wrap `embedChunks` in `try/catch`; return `{ error: 'Failed to generate embeddings', status: 502 }` on failure.
 - `chunk_index` must be the zero-based position of the chunk in the extracted array.

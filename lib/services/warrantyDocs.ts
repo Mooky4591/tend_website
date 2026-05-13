@@ -12,7 +12,12 @@ export async function uploadWarrantyDoc(
   planName: string,
   buffer: Buffer,
 ): Promise<ServiceError | ServiceSuccess> {
-  const chunks = await extractAndChunk(buffer)
+  let chunks: string[]
+  try {
+    chunks = await extractAndChunk(buffer)
+  } catch {
+    return { error: 'Failed to parse PDF', status: 422 }
+  }
   if (chunks.length === 0) {
     return { error: 'No text could be extracted from this PDF', status: 422 }
   }

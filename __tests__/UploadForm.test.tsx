@@ -126,6 +126,19 @@ describe('UploadForm', () => {
     resolveFetch!({ ok: true, json: async () => ({ chunksInserted: 2 }) } as Response)
   })
 
+  it('shows a generic error when fetch throws a network error', async () => {
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    const user = userEvent.setup()
+    render(<UploadForm />)
+
+    await user.type(screen.getByPlaceholderText(/Premium Home Warranty/), 'Gold Plan')
+    await user.upload(screen.getByLabelText(/PDF file/), makeFile())
+    await user.click(screen.getByRole('button', { name: 'Upload' }))
+
+    expect(await screen.findByText('Upload failed. Please try again.')).toBeInTheDocument()
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+  })
+
   it('shows an error when the selected file exceeds 10 MB', async () => {
     const user = userEvent.setup()
     render(<UploadForm />)

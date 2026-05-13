@@ -44,6 +44,8 @@ export default function UploadForm() {
       setFile(null)
       if (fileRef.current) fileRef.current.value = ''
       startTransition(() => router.refresh())
+    } catch {
+      setStatus({ type: 'error', message: 'Upload failed. Please try again.' })
     } finally {
       setIsUploading(false)
     }
