@@ -21,7 +21,7 @@ Business-logic service for ingesting a warranty PDF: parsing text, generating em
 - `export async function uploadWarrantyDoc(supabase, tenantId: string, planName: string, buffer: Buffer): Promise<{ error: string; status: number } | { chunksInserted: number }>`
 
 ## Required Patterns
-- Wrap `extractAndChunk` in `try/catch`; return `{ error: 'Failed to parse PDF', status: 422 }` if it throws.
+- Wrap `extractAndChunk` in `try/catch`; if it throws a `PdfParseError` return `{ error: 'Failed to parse PDF', status: 422 }`; for any other error return `{ error: 'PDF processing failed', status: 500 }`.
 - Return `{ error: 'No text could be extracted from this PDF', status: 422 }` when `extractAndChunk` returns an empty array.
 - Wrap `embedChunks` in `try/catch`; return `{ error: 'Failed to generate embeddings', status: 502 }` on failure.
 - `chunk_index` must be the zero-based position of the chunk in the extracted array.
@@ -32,6 +32,8 @@ Business-logic service for ingesting a warranty PDF: parsing text, generating em
 ## Tests Required
 - Returns `{ chunksInserted: N }` on success.
 - Returns status 422 when no text is extracted.
+- Returns status 422 when `extractAndChunk` throws a `PdfParseError`.
+- Returns status 500 when `extractAndChunk` throws an unexpected (non-`PdfParseError`) error.
 - Returns status 502 when `embedChunks` throws.
 - Insert is called before delete (verified via call order tracking).
 - Delete is not called when there are no existing chunks.

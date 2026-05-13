@@ -28,6 +28,8 @@ Unit tests for `lib/services/warrantyDocs.ts`. Verifies success, all error paths
 ## Tests Required
 - Returns `{ chunksInserted: N }` on success.
 - Returns `{ status: 422 }` when `extractAndChunk` returns an empty array.
+- Returns `{ status: 422 }` when `extractAndChunk` throws a `PdfParseError`.
+- Returns `{ status: 500 }` when `extractAndChunk` throws an unexpected (non-`PdfParseError`) error.
 - Returns `{ status: 502 }` when `embedChunks` throws.
 - Inserted rows include correct `tenant_id`, `plan_name`, `chunk_index`, `content`, and `embedding`.
 - Existing-chunks query filters by the correct `plan_name` (asserted via `_mockPlanNameEq`).

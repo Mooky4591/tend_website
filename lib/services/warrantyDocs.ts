@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { extractAndChunk } from '@/lib/pdf'
+import { extractAndChunk, PdfParseError } from '@/lib/pdf'
 import { embedChunks } from '@/lib/embed'
 
 type ServiceError = { error: string; status: number }
@@ -15,8 +15,11 @@ export async function uploadWarrantyDoc(
   let chunks: string[]
   try {
     chunks = await extractAndChunk(buffer)
-  } catch {
-    return { error: 'Failed to parse PDF', status: 422 }
+  } catch (err) {
+    if (err instanceof PdfParseError) {
+      return { error: 'Failed to parse PDF', status: 422 }
+    }
+    return { error: 'PDF processing failed', status: 500 }
   }
   if (chunks.length === 0) {
     return { error: 'No text could be extracted from this PDF', status: 422 }

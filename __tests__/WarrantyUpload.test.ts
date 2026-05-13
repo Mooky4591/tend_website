@@ -108,14 +108,6 @@ describe('POST /api/warranty-upload', () => {
     expect(res.status).toBe(422)
   })
 
-  it('returns 422 when extractAndChunk throws (corrupt PDF)', async () => {
-    mockExtractAndChunk.mockRejectedValueOnce(new Error('Invalid PDF structure.'))
-    const res = await POST(makeRequest('Plan A'))
-    expect(res.status).toBe(422)
-    const body = await res.json()
-    expect(body.error).toContain('parse PDF')
-  })
-
   it('inserts new chunks with correct fields including chunk_index', async () => {
     await POST(makeRequest('Premium Plan'))
     expect(mockDocInsert).toHaveBeenCalledWith([

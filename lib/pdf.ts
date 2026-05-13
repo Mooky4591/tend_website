@@ -1,3 +1,12 @@
+const PDF_USER_ERROR_NAMES = new Set(['InvalidPDFException', 'PasswordException', 'FormatError'])
+
+export class PdfParseError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'PdfParseError'
+  }
+}
+
 export function chunkText(text: string): string[] {
   const words = text.split(/\s+/).filter(Boolean)
   const chunks: string[] = []
@@ -17,6 +26,11 @@ export async function extractAndChunk(buffer: Buffer): Promise<string[]> {
   try {
     const { text } = await parser.getText()
     return chunkText(text)
+  } catch (err) {
+    if (err instanceof Error && PDF_USER_ERROR_NAMES.has(err.name)) {
+      throw new PdfParseError(err.message)
+    }
+    throw err
   } finally {
     await parser.destroy()
   }
