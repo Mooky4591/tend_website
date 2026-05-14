@@ -4,8 +4,6 @@ import DashboardPage from '@/app/dashboard/page'
 const mockRedirect = jest.fn()
 const mockGetUser = jest.fn()
 const mockTenantSingle = jest.fn()
-const mockUsersEq = jest.fn()
-const mockSnapshotsOrder = jest.fn()
 
 jest.mock('next/navigation', () => ({
   redirect: (path: string) => { mockRedirect(path); throw new Error(`NEXT_REDIRECT:${path}`) },
@@ -18,10 +16,6 @@ jest.mock('@/lib/supabase/server', () => ({
       switch (table) {
         case 'tenant_users':
           return { select: () => ({ eq: () => ({ single: mockTenantSingle }) }) }
-        case 'users':
-          return { select: () => ({ eq: mockUsersEq }) }
-        case 'monthly_billing_snapshots':
-          return { select: () => ({ eq: () => ({ order: mockSnapshotsOrder }) }) }
         default:
           throw new Error(`Unexpected table in mock: ${table}`)
       }
@@ -29,9 +23,9 @@ jest.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
-jest.mock('@/app/dashboard/DashboardCharts', () => ({
+jest.mock('@/app/dashboard/DashboardContent', () => ({
   __esModule: true,
-  default: () => <div data-testid="dashboard-charts" />,
+  default: () => <div data-testid="dashboard-content" />,
 }))
 
 const AUTHED_USER = { id: 'user-1', email: 'admin@acme.com' }
@@ -41,8 +35,6 @@ beforeEach(() => {
   jest.clearAllMocks()
   mockGetUser.mockResolvedValue({ data: { user: AUTHED_USER } })
   mockTenantSingle.mockResolvedValue({ data: MEMBERSHIP })
-  mockUsersEq.mockResolvedValue({ data: [] })
-  mockSnapshotsOrder.mockResolvedValue({ data: [] })
 })
 
 describe('DashboardPage', () => {
@@ -63,54 +55,8 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument()
   })
 
-  it('shows zero counts when there are no users', async () => {
+  it('renders the DashboardContent component', async () => {
     render(await DashboardPage())
-    expect(screen.getAllByText('0')).toHaveLength(3)
-  })
-
-  it('counts completed onboarding as onboarding_complete', async () => {
-    mockUsersEq.mockResolvedValueOnce({
-      data: [
-        { onboarding_complete: true, opted_out: false },
-        { onboarding_complete: true, opted_out: false },
-        { onboarding_complete: false, opted_out: false },
-      ],
-    })
-
-    render(await DashboardPage())
-
-    expect(screen.getByText('Total homeowners').closest('div')).toHaveTextContent('3')
-    expect(screen.getByText('Completed Onboarding').closest('div')).toHaveTextContent('2')
-  })
-
-  it('counts opted-out users correctly', async () => {
-    mockUsersEq.mockResolvedValueOnce({
-      data: [
-        { onboarding_complete: false, opted_out: true },
-        { onboarding_complete: false, opted_out: true },
-        { onboarding_complete: false, opted_out: false },
-      ],
-    })
-
-    render(await DashboardPage())
-
-    expect(screen.getByText('Opted out').closest('div')).toHaveTextContent('2')
-  })
-
-  it('handles null users response without crashing', async () => {
-    mockUsersEq.mockResolvedValueOnce({ data: null })
-    render(await DashboardPage())
-    expect(screen.getAllByText('0')).toHaveLength(3)
-  })
-
-  it('handles null billing snapshots without crashing', async () => {
-    mockSnapshotsOrder.mockResolvedValueOnce({ data: null })
-    render(await DashboardPage())
-    expect(screen.getByTestId('dashboard-charts')).toBeInTheDocument()
-  })
-
-  it('renders the dashboard charts component', async () => {
-    render(await DashboardPage())
-    expect(screen.getByTestId('dashboard-charts')).toBeInTheDocument()
+    expect(screen.getByTestId('dashboard-content')).toBeInTheDocument()
   })
 })
