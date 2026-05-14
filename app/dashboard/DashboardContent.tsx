@@ -19,10 +19,11 @@ export default function DashboardContent({ tenantId }: Props) {
   const [messagesPerMonth, setMessagesPerMonth] = useState<ChartPoint[]>([])
 
   const fetchStats = useCallback(async () => {
-    const { data: users } = await supabase
+    const { data: users, error } = await supabase
       .from('users')
       .select('onboarding_complete, opted_out')
       .eq('tenant_id', tenantId)
+    if (error) { console.error('fetchStats error:', error); return }
     setStats({
       total: users?.length ?? 0,
       completedOnboarding: users?.filter(u => u.onboarding_complete).length ?? 0,
@@ -31,11 +32,12 @@ export default function DashboardContent({ tenantId }: Props) {
   }, [supabase, tenantId])
 
   const fetchSnapshots = useCallback(async () => {
-    const { data: snapshots } = await supabase
+    const { data: snapshots, error } = await supabase
       .from('monthly_billing_snapshots')
       .select('billing_month, active_users, conversations')
       .eq('tenant_id', tenantId)
       .order('billing_month', { ascending: true })
+    if (error) { console.error('fetchSnapshots error:', error); return }
     setUsersPerMonth((snapshots ?? []).map(s => ({
       month: formatMonth(s.billing_month),
       value: s.active_users,

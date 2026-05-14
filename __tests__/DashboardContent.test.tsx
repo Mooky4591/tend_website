@@ -41,6 +41,7 @@ jest.mock('@/lib/supabase/client', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks()
+  Object.keys(realtimeCallbacks).forEach(k => delete realtimeCallbacks[k])
   mockUsersEq.mockResolvedValue({ data: [] })
   mockSnapshotsOrder.mockResolvedValue({ data: [] })
 })
