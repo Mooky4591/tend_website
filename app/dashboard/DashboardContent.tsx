@@ -17,6 +17,8 @@ function formatMonthLabel(key: string): string {
   return new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
 }
 
+const PAGE_SIZE = 1000
+
 function enumerateMonths(startKey: string, endKey: string): string[] {
   const [sy, sm] = startKey.split('-').map(Number)
   const [ey, em] = endKey.split('-').map(Number)
@@ -38,13 +40,21 @@ export default function DashboardContent({ tenantId }: Props) {
   const [messagesPerMonth, setMessagesPerMonth] = useState<ChartPoint[]>([])
 
   const fetchUsers = useCallback(async () => {
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('created_at, onboarding_complete, opted_out')
-      .eq('tenant_id', tenantId)
-    if (error) { console.error('fetchUsers error:', error); return }
+    const rows: { created_at: string; onboarding_complete: boolean; opted_out: boolean }[] = []
+    let offset = 0
+    while (true) {
+      const { data, error } = await supabase
+        .from('users')
+        .select('created_at, onboarding_complete, opted_out')
+        .eq('tenant_id', tenantId)
+        .range(offset, offset + PAGE_SIZE - 1)
+      if (error) { console.error('fetchUsers error:', error); return }
+      const page = data ?? []
+      rows.push(...page)
+      if (page.length < PAGE_SIZE) break
+      offset += PAGE_SIZE
+    }
 
-    const rows = users ?? []
     setStats({
       total: rows.length,
       completedOnboarding: rows.filter(u => u.onboarding_complete).length,
@@ -77,13 +87,23 @@ export default function DashboardContent({ tenantId }: Props) {
   }, [supabase, tenantId])
 
   const fetchMessages = useCallback(async () => {
-    const { data: conversations, error } = await supabase
-      .from('conversations')
-      .select('created_at')
-      .eq('tenant_id', tenantId)
-    if (error) { console.error('fetchMessages error:', error); return }
+    const rows: { created_at: string }[] = []
+    let offset = 0
+    while (true) {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('created_at')
+        .eq('tenant_id', tenantId)
+        .range(offset, offset + PAGE_SIZE - 1)
+      if (error) { console.error('fetchMessages error:', error); return }
+      const page = data ?? []
+      for (const r of page) {
+        if (r.created_at) rows.push(r)
+      }
+      if (page.length < PAGE_SIZE) break
+      offset += PAGE_SIZE
+    }
 
-    const rows = (conversations ?? []).filter(r => r.created_at)
     if (rows.length === 0) {
       setMessagesPerMonth([])
       return
@@ -95,7 +115,7 @@ export default function DashboardContent({ tenantId }: Props) {
       counts.set(key, (counts.get(key) ?? 0) + 1)
     }
 
-    const firstKey = [...counts.keys()].sort()[0]
+    const firstKey = Array.from(counts.keys()).sort()[0]
     const nowKey = monthKey(new Date())
     const months = enumerateMonths(firstKey, nowKey)
     setMessagesPerMonth(months.map(key => ({

@@ -1,8 +1,12 @@
 import { render, screen, waitFor, act } from '@testing-library/react'
 import DashboardContent from '@/app/dashboard/DashboardContent'
 
-const mockUsersEq = jest.fn()
-const mockConversationsEq = jest.fn()
+const PAGE_SIZE = 1000
+
+const mockUsersRange = jest.fn()
+const mockUsersEq = jest.fn(() => ({ range: mockUsersRange }))
+const mockConversationsRange = jest.fn()
+const mockConversationsEq = jest.fn(() => ({ range: mockConversationsRange }))
 const mockRemoveChannel = jest.fn()
 const realtimeCallbacks: Record<string, (...args: unknown[]) => void> = {}
 
@@ -37,11 +41,25 @@ jest.mock('@/lib/supabase/client', () => ({
   },
 }))
 
+function makeUserRows(n: number, base = '2026-01') {
+  return Array.from({ length: n }, (_, i) => ({
+    created_at: `${base}-${String((i % 28) + 1).padStart(2, '0')}T00:00:00Z`,
+    onboarding_complete: false,
+    opted_out: false,
+  }))
+}
+
+function makeConversationRows(n: number, base = '2026-01') {
+  return Array.from({ length: n }, (_, i) => ({
+    created_at: `${base}-${String((i % 28) + 1).padStart(2, '0')}T00:00:00Z`,
+  }))
+}
+
 beforeEach(() => {
   jest.clearAllMocks()
   Object.keys(realtimeCallbacks).forEach(k => delete realtimeCallbacks[k])
-  mockUsersEq.mockResolvedValue({ data: [] })
-  mockConversationsEq.mockResolvedValue({ data: [] })
+  mockUsersRange.mockResolvedValue({ data: [] })
+  mockConversationsRange.mockResolvedValue({ data: [] })
 })
 
 describe('DashboardContent', () => {
@@ -64,7 +82,7 @@ describe('DashboardContent', () => {
   })
 
   it('displays correct stat counts from fetched data', async () => {
-    mockUsersEq.mockResolvedValueOnce({
+    mockUsersRange.mockResolvedValueOnce({
       data: [
         { created_at: '2026-01-15T00:00:00Z', onboarding_complete: true, opted_out: false },
         { created_at: '2026-02-10T00:00:00Z', onboarding_complete: true, opted_out: false },
@@ -85,7 +103,7 @@ describe('DashboardContent', () => {
   })
 
   it('handles null users response without crashing', async () => {
-    mockUsersEq.mockResolvedValueOnce({ data: null })
+    mockUsersRange.mockResolvedValueOnce({ data: null })
     await act(async () => {
       render(<DashboardContent tenantId="tenant-1" />)
     })
@@ -95,7 +113,7 @@ describe('DashboardContent', () => {
   })
 
   it('handles null conversations response without crashing', async () => {
-    mockConversationsEq.mockResolvedValueOnce({ data: null })
+    mockConversationsRange.mockResolvedValueOnce({ data: null })
     await act(async () => {
       render(<DashboardContent tenantId="tenant-1" />)
     })
@@ -111,7 +129,7 @@ describe('DashboardContent', () => {
   })
 
   it('re-fetches stats and updates the DOM when users realtime callback fires', async () => {
-    mockUsersEq.mockResolvedValue({ data: [] })
+    mockUsersRange.mockResolvedValue({ data: [] })
 
     await act(async () => {
       render(<DashboardContent tenantId="tenant-1" />)
@@ -119,7 +137,7 @@ describe('DashboardContent', () => {
 
     await waitFor(() => expect(screen.getAllByText('0')).toHaveLength(3))
 
-    mockUsersEq.mockResolvedValue({
+    mockUsersRange.mockResolvedValue({
       data: [
         { created_at: '2026-01-15T00:00:00Z', onboarding_complete: true, opted_out: false },
         { created_at: '2026-02-15T00:00:00Z', onboarding_complete: false, opted_out: false },
@@ -141,13 +159,45 @@ describe('DashboardContent', () => {
       render(<DashboardContent tenantId="tenant-1" />)
     })
 
-    expect(mockConversationsEq).toHaveBeenCalledTimes(1)
+    expect(mockConversationsRange).toHaveBeenCalledTimes(1)
 
     await act(async () => {
       realtimeCallbacks['conversations-changes']?.()
     })
 
-    expect(mockConversationsEq).toHaveBeenCalledTimes(2)
+    expect(mockConversationsRange).toHaveBeenCalledTimes(2)
+  })
+
+  it('pages through users beyond the PostgREST row limit so stats reflect every row', async () => {
+    mockUsersRange
+      .mockResolvedValueOnce({ data: makeUserRows(PAGE_SIZE) })
+      .mockResolvedValueOnce({ data: makeUserRows(250, '2026-02') })
+
+    await act(async () => {
+      render(<DashboardContent tenantId="tenant-1" />)
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Total homeowners').closest('div')).toHaveTextContent('1,250')
+    })
+    expect(mockUsersRange).toHaveBeenNthCalledWith(1, 0, PAGE_SIZE - 1)
+    expect(mockUsersRange).toHaveBeenNthCalledWith(2, PAGE_SIZE, 2 * PAGE_SIZE - 1)
+  })
+
+  it('pages through conversations beyond the PostgREST row limit so the messages chart reflects every row', async () => {
+    mockConversationsRange
+      .mockResolvedValueOnce({ data: makeConversationRows(PAGE_SIZE) })
+      .mockResolvedValueOnce({ data: makeConversationRows(42, '2026-02') })
+
+    await act(async () => {
+      render(<DashboardContent tenantId="tenant-1" />)
+    })
+
+    await waitFor(() => {
+      expect(mockConversationsRange).toHaveBeenCalledTimes(2)
+    })
+    expect(mockConversationsRange).toHaveBeenNthCalledWith(1, 0, PAGE_SIZE - 1)
+    expect(mockConversationsRange).toHaveBeenNthCalledWith(2, PAGE_SIZE, 2 * PAGE_SIZE - 1)
   })
 
   it('removes both channels on unmount', async () => {
