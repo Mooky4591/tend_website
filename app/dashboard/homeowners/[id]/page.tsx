@@ -69,7 +69,7 @@ export default async function UserDetailPage({ params }: { params: { id: string 
           </div>
 
           {/* Conversation thread */}
-          <div className="bg-white rounded-2xl border border-border/20 flex flex-col" style={{ minHeight: '500px' }}>
+          <div className="bg-white rounded-2xl border border-border/20 flex flex-col overflow-hidden" style={{ height: '600px' }}>
             <div className="px-4 py-3 border-b border-border/20">
               <h2 className="text-sm font-semibold text-muted-foreground">Conversation</h2>
             </div>
