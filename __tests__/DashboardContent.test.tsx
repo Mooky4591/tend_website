@@ -2,7 +2,7 @@ import { render, screen, waitFor, act } from '@testing-library/react'
 import DashboardContent from '@/app/dashboard/DashboardContent'
 
 const mockUsersEq = jest.fn()
-const mockSnapshotsOrder = jest.fn()
+const mockConversationsEq = jest.fn()
 const mockRemoveChannel = jest.fn()
 const realtimeCallbacks: Record<string, (...args: unknown[]) => void> = {}
 
@@ -28,9 +28,7 @@ jest.mock('@/lib/supabase/client', () => ({
     return {
       from: (table: string) => {
         if (table === 'users') return { select: () => ({ eq: mockUsersEq }) }
-        if (table === 'monthly_billing_snapshots') {
-          return { select: () => ({ eq: () => ({ order: mockSnapshotsOrder }) }) }
-        }
+        if (table === 'conversations') return { select: () => ({ eq: mockConversationsEq }) }
         throw new Error(`Unexpected table: ${table}`)
       },
       channel: makeChannel,
@@ -43,7 +41,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   Object.keys(realtimeCallbacks).forEach(k => delete realtimeCallbacks[k])
   mockUsersEq.mockResolvedValue({ data: [] })
-  mockSnapshotsOrder.mockResolvedValue({ data: [] })
+  mockConversationsEq.mockResolvedValue({ data: [] })
 })
 
 describe('DashboardContent', () => {
@@ -68,10 +66,10 @@ describe('DashboardContent', () => {
   it('displays correct stat counts from fetched data', async () => {
     mockUsersEq.mockResolvedValueOnce({
       data: [
-        { onboarding_complete: true, opted_out: false },
-        { onboarding_complete: true, opted_out: false },
-        { onboarding_complete: false, opted_out: true },
-        { onboarding_complete: false, opted_out: false },
+        { created_at: '2026-01-15T00:00:00Z', onboarding_complete: true, opted_out: false },
+        { created_at: '2026-02-10T00:00:00Z', onboarding_complete: true, opted_out: false },
+        { created_at: '2026-03-05T00:00:00Z', onboarding_complete: false, opted_out: true },
+        { created_at: '2026-04-20T00:00:00Z', onboarding_complete: false, opted_out: false },
       ],
     })
 
@@ -96,8 +94,8 @@ describe('DashboardContent', () => {
     })
   })
 
-  it('handles null snapshots response without crashing', async () => {
-    mockSnapshotsOrder.mockResolvedValueOnce({ data: null })
+  it('handles null conversations response without crashing', async () => {
+    mockConversationsEq.mockResolvedValueOnce({ data: null })
     await act(async () => {
       render(<DashboardContent tenantId="tenant-1" />)
     })
@@ -109,7 +107,7 @@ describe('DashboardContent', () => {
       render(<DashboardContent tenantId="tenant-1" />)
     })
     expect(realtimeCallbacks['users-changes']).toBeDefined()
-    expect(realtimeCallbacks['snapshots-changes']).toBeDefined()
+    expect(realtimeCallbacks['conversations-changes']).toBeDefined()
   })
 
   it('re-fetches stats and updates the DOM when users realtime callback fires', async () => {
@@ -123,9 +121,9 @@ describe('DashboardContent', () => {
 
     mockUsersEq.mockResolvedValue({
       data: [
-        { onboarding_complete: true, opted_out: false },
-        { onboarding_complete: false, opted_out: false },
-        { onboarding_complete: false, opted_out: true },
+        { created_at: '2026-01-15T00:00:00Z', onboarding_complete: true, opted_out: false },
+        { created_at: '2026-02-15T00:00:00Z', onboarding_complete: false, opted_out: false },
+        { created_at: '2026-03-15T00:00:00Z', onboarding_complete: false, opted_out: true },
       ],
     })
 
@@ -136,6 +134,20 @@ describe('DashboardContent', () => {
     await waitFor(() => {
       expect(screen.getByText('Total homeowners').closest('div')).toHaveTextContent('3')
     })
+  })
+
+  it('re-fetches messages when conversations realtime callback fires', async () => {
+    await act(async () => {
+      render(<DashboardContent tenantId="tenant-1" />)
+    })
+
+    expect(mockConversationsEq).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      realtimeCallbacks['conversations-changes']?.()
+    })
+
+    expect(mockConversationsEq).toHaveBeenCalledTimes(2)
   })
 
   it('removes both channels on unmount', async () => {
