@@ -27,7 +27,7 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 - `ConversationPanel` messages cast via `as Parameters<typeof ConversationPanel>[0]['messages']`.
 - Back link to `/dashboard/homeowners` rendered above the heading.
 - Pass `params.id` and `homeowner.phone_number` into `PhoneNumberEditor`.
-- Conversation card uses a bounded fixed height (e.g. `600px`) with `overflow-hidden` so `ConversationPanel`'s internal `overflow-y-auto` scrolls the messages list instead of expanding the page.
+- Conversation card uses a bounded responsive height (e.g. `min(600px, 70vh)`) with `overflow-hidden` so `ConversationPanel`'s internal `overflow-y-auto` scrolls the messages list instead of expanding the page, while still leaving room for the homeowner info card and reminders panel on short viewports.
 
 ## Tests Required
 - Unauthenticated user is redirected to `/login`.
