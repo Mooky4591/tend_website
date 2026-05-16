@@ -24,7 +24,7 @@ Client Component (`ConversationPanel`) that renders a scrollable list of convers
 - `'use client'` directive required.
 - `bubble(role)` helper maps role to Tailwind classes: user → `bg-sand text-deep-slate`, assistant → `bg-brand-600 text-white`, staff → `bg-deep-slate text-white`.
 - `useEffect` dependency is `[messages.length]`, not `[messages]`.
-- `bottomRef.current?.scrollIntoView({ behavior: 'auto' })` (not `'smooth'`).
+- `bottomRef.current?.scrollIntoView({ behavior: 'auto', block: 'nearest' })` (not `'smooth'`). `block: 'nearest'` keeps the scroll inside the panel's overflow container so the outer page does not scroll.
 - Staff label uses `text-brand-500`; timestamps use `text-muted-foreground/40`.
 
 ## Tests Required

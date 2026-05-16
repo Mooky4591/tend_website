@@ -13,7 +13,7 @@ export default function ConversationPanel({ messages }: { messages: Message[] })
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'auto' })
+    bottomRef.current?.scrollIntoView({ behavior: 'auto', block: 'nearest' })
   }, [messages.length])
 
   if (messages.length === 0) {
