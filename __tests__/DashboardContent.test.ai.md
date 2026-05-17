@@ -12,7 +12,7 @@ Unit tests for `app/dashboard/DashboardContent.tsx`. Verifies initial data fetch
 
 ## Allowed Responsibilities
 - Mock `@/lib/supabase/client` to control `users` and `conversations` query outcomes and capture realtime callbacks.
-- Expose `.range()` on the mocked query chain so pagination behavior can be asserted (call args and call counts).
+- Expose `.order()` (self-chaining) and `.range()` on the mocked query chain so deterministic ordering and pagination behavior can be asserted (call args and call counts).
 - Mock `@/app/dashboard/DashboardCharts` with a stub that renders `data-testid="dashboard-charts"`.
 - Assert on rendered stat values and realtime-triggered DOM updates.
 
@@ -25,7 +25,7 @@ Unit tests for `app/dashboard/DashboardContent.tsx`. Verifies initial data fetch
 - No exports — test file only.
 
 ## Mock Targets
-- `@/lib/supabase/client` — `createClient` returning stubs for `users`, `conversations`, `channel`, and `removeChannel`. Each table's chain ends in `.range()` so the test can drive paginated responses.
+- `@/lib/supabase/client` — `createClient` returning stubs for `users`, `conversations`, `channel`, and `removeChannel`. Each table's chain supports `.eq().order().order().range()` (the `.order` stub returns the chain so multiple orderings can be applied) so the test can drive paginated responses and assert ordering.
 - `@/app/dashboard/DashboardCharts` — default export stubbed as `() => <div data-testid="dashboard-charts" />`; requires `__esModule: true`
 
 ## Tests Required
@@ -39,5 +39,6 @@ Unit tests for `app/dashboard/DashboardContent.tsx`. Verifies initial data fetch
 - Re-fetches messages when the conversations realtime callback fires.
 - Pages through users beyond the PostgREST row limit so stats reflect every row (asserts `.range(0, 999)` then `.range(1000, 1999)` and a 1,250 total).
 - Pages through conversations beyond the PostgREST row limit so the messages chart reflects every row (asserts `.range(0, 999)` then `.range(1000, 1999)`).
+- Applies a deterministic order (`created_at` then `id`, both ascending) on both paginated queries.
 - Removes both channels on unmount.
 - Renders the `DashboardCharts` component.

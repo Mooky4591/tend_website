@@ -9,6 +9,7 @@ Client Component that owns all real-time data for the dashboard overview: fetche
 - Fetch `created_at`, `onboarding_complete`, and `opted_out` from the `users` table; derive `total`, `completedOnboarding`, `optedOut` counts, and a cumulative homeowners-per-month chart series (bucketed by `created_at` month, in local time).
 - Fetch `created_at` from the `conversations` table and derive a messages-per-month chart series (count of rows per month).
 - Page through both queries using `.range(offset, offset + PAGE_SIZE - 1)` until a page returns fewer than `PAGE_SIZE` rows, so PostgREST's default 1,000-row response cap does not silently truncate counts on active tenants.
+- Apply a deterministic order before paginating: `.order('created_at', { ascending: true }).order('id', { ascending: true })`. The `id` tie-breaker keeps page boundaries stable when multiple rows share a `created_at` timestamp.
 - Format chart series as `ChartPoint[]` with month labels like `"Jan 26"`, filling every month from the earliest data point through the current month with zero-count gaps preserved.
 - Subscribe to `postgres_changes` on `users` (filtered by `tenant_id`) and re-fetch users on any change.
 - Subscribe to `postgres_changes` on `conversations` (filtered by `tenant_id`) and re-fetch messages on any change.
@@ -47,3 +48,4 @@ Client Component that owns all real-time data for the dashboard overview: fetche
 - Renders the `DashboardCharts` component.
 - Pages through `users` results beyond the PostgREST row limit so stats reflect every row.
 - Pages through `conversations` results beyond the PostgREST row limit so the messages chart reflects every row.
+- Applies a deterministic order (`created_at` then `id`) before paginating both queries.

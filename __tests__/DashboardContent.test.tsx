@@ -4,9 +4,16 @@ import DashboardContent from '@/app/dashboard/DashboardContent'
 const PAGE_SIZE = 1000
 
 const mockUsersRange = jest.fn()
-const mockUsersEq = jest.fn(() => ({ range: mockUsersRange }))
+const mockUsersOrder = jest.fn()
+const usersChain = { order: mockUsersOrder, range: mockUsersRange }
+mockUsersOrder.mockReturnValue(usersChain)
+const mockUsersEq = jest.fn(() => usersChain)
+
 const mockConversationsRange = jest.fn()
-const mockConversationsEq = jest.fn(() => ({ range: mockConversationsRange }))
+const mockConversationsOrder = jest.fn()
+const conversationsChain = { order: mockConversationsOrder, range: mockConversationsRange }
+mockConversationsOrder.mockReturnValue(conversationsChain)
+const mockConversationsEq = jest.fn(() => conversationsChain)
 const mockRemoveChannel = jest.fn()
 const realtimeCallbacks: Record<string, (...args: unknown[]) => void> = {}
 
@@ -58,6 +65,8 @@ function makeConversationRows(n: number, base = '2026-01') {
 beforeEach(() => {
   jest.clearAllMocks()
   Object.keys(realtimeCallbacks).forEach(k => delete realtimeCallbacks[k])
+  mockUsersOrder.mockReturnValue(usersChain)
+  mockConversationsOrder.mockReturnValue(conversationsChain)
   mockUsersRange.mockResolvedValue({ data: [] })
   mockConversationsRange.mockResolvedValue({ data: [] })
 })
@@ -198,6 +207,19 @@ describe('DashboardContent', () => {
     })
     expect(mockConversationsRange).toHaveBeenNthCalledWith(1, 0, PAGE_SIZE - 1)
     expect(mockConversationsRange).toHaveBeenNthCalledWith(2, PAGE_SIZE, 2 * PAGE_SIZE - 1)
+  })
+
+  it('applies a deterministic order before paginating to keep page boundaries stable', async () => {
+    await act(async () => {
+      render(<DashboardContent tenantId="tenant-1" />)
+    })
+
+    await waitFor(() => {
+      expect(mockUsersOrder).toHaveBeenCalledWith('created_at', { ascending: true })
+      expect(mockUsersOrder).toHaveBeenCalledWith('id', { ascending: true })
+      expect(mockConversationsOrder).toHaveBeenCalledWith('created_at', { ascending: true })
+      expect(mockConversationsOrder).toHaveBeenCalledWith('id', { ascending: true })
+    })
   })
 
   it('removes both channels on unmount', async () => {

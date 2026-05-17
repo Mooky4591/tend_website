@@ -47,6 +47,8 @@ export default function DashboardContent({ tenantId }: Props) {
         .from('users')
         .select('created_at, onboarding_complete, opted_out')
         .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
         .range(offset, offset + PAGE_SIZE - 1)
       if (error) { console.error('fetchUsers error:', error); return }
       const page = data ?? []
@@ -94,6 +96,8 @@ export default function DashboardContent({ tenantId }: Props) {
         .from('conversations')
         .select('created_at')
         .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
         .range(offset, offset + PAGE_SIZE - 1)
       if (error) { console.error('fetchMessages error:', error); return }
       const page = data ?? []
