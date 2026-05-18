@@ -1,7 +1,12 @@
 /** @jest-environment node */
 
 const mockGetUser = jest.fn()
-const mockMemberQuery = jest.fn()
+// Two spies so we can assert both `.eq()` filters — column AND value — were applied
+// in the right places. A single passthrough on the inner eq() (the previous shape)
+// silently discarded the outer eq's args and could not catch a swapped or dropped
+// `auth_user_id` / `role` filter in production code.
+const mockMemberOuterEq = jest.fn()
+const mockMemberInnerEq = jest.fn()
 const mockUserSingle = jest.fn()
 const mockUserIn = jest.fn()
 
@@ -10,7 +15,16 @@ jest.mock('@/lib/supabase/server', () => ({
     auth: { getUser: mockGetUser },
     from: (table: string) => {
       if (table === 'tenant_users') {
-        return { select: () => ({ eq: () => ({ eq: (...args: unknown[]) => mockMemberQuery(...args) }) }) }
+        return {
+          select: () => ({
+            eq: (...outerArgs: unknown[]) => {
+              mockMemberOuterEq(...outerArgs)
+              return {
+                eq: (...innerArgs: unknown[]) => mockMemberInnerEq(...innerArgs),
+              }
+            },
+          }),
+        }
       }
       if (table === 'users') {
         return {
@@ -33,7 +47,7 @@ describe('PATCH /api/users/[id]/phone', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetUser.mockResolvedValue({ data: { user: { id: 'staff-1' } } })
-    mockMemberQuery.mockResolvedValue({ data: [{ tenant_id: 'tenant-1' }], error: null })
+    mockMemberInnerEq.mockResolvedValue({ data: [{ tenant_id: 'tenant-1' }], error: null })
   })
 
   it('returns 401 when unauthenticated', async () => {
@@ -44,10 +58,22 @@ describe('PATCH /api/users/[id]/phone', () => {
   })
 
   it('returns 403 when authenticated user has no admin membership in any tenant', async () => {
-    mockMemberQuery.mockResolvedValueOnce({ data: [], error: null })
+    mockMemberInnerEq.mockResolvedValueOnce({ data: [], error: null })
     const { PATCH } = await import('@/app/api/users/[id]/phone/route')
     const res = await PATCH({ json: async () => ({ phoneNumber: '+1555000' }) } as any, { params: { id: 'u1' } })
     expect(res.status).toBe(403)
+  })
+
+  it('applies the auth_user_id and role filters with the correct column names and values', async () => {
+    mockUserSingle.mockResolvedValueOnce({ data: { id: 'u1', phone_number: '+1555000' }, error: null })
+    const { PATCH } = await import('@/app/api/users/[id]/phone/route')
+    await PATCH({ json: async () => ({ phoneNumber: '+1555000' }) } as any, { params: { id: 'u1' } })
+
+    expect(mockMemberOuterEq).toHaveBeenCalledTimes(1)
+    expect(mockMemberOuterEq).toHaveBeenCalledWith('auth_user_id', 'staff-1')
+
+    expect(mockMemberInnerEq).toHaveBeenCalledTimes(1)
+    expect(mockMemberInnerEq).toHaveBeenCalledWith('role', 'admin')
   })
 
   it('returns 400 for empty input', async () => {
@@ -71,7 +97,7 @@ describe('PATCH /api/users/[id]/phone', () => {
   })
 
   it('scopes the update by .in(tenantIds) for an admin in multiple tenants', async () => {
-    mockMemberQuery.mockResolvedValueOnce({
+    mockMemberInnerEq.mockResolvedValueOnce({
       data: [{ tenant_id: 'tenant-1' }, { tenant_id: 'tenant-2' }],
       error: null,
     })
@@ -89,7 +115,7 @@ describe('PATCH /api/users/[id]/phone', () => {
   })
 
   it('returns 500 when membership query returns an error', async () => {
-    mockMemberQuery.mockResolvedValueOnce({ data: null, error: { message: 'DB connection error' } })
+    mockMemberInnerEq.mockResolvedValueOnce({ data: null, error: { message: 'DB connection error' } })
     const { PATCH } = await import('@/app/api/users/[id]/phone/route')
     const res = await PATCH({ json: async () => ({ phoneNumber: '+1555000' }) } as any, { params: { id: 'u1' } })
     expect(res.status).toBe(500)
