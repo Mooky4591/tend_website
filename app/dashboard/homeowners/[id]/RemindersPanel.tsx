@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Reminder } from '@/types'
 import { REMINDER_TYPES } from '@/lib/constants'
@@ -30,6 +30,19 @@ export default function RemindersPanel({
 
   // busy covers both the fetch round-trip and the subsequent router.refresh() transition
   const busy = isSubmitting || isPending
+
+  const addFormRef = useRef<HTMLDivElement | null>(null)
+  const editingCardRef = useRef<HTMLDivElement | null>(null)
+
+  // The list scrolls internally on lg+, so opening the add or edit form when the list
+  // is scrolled would otherwise leave the form rendered off-screen at the bottom.
+  useEffect(() => {
+    if (adding) addFormRef.current?.scrollIntoView?.({ block: 'nearest' })
+  }, [adding])
+
+  useEffect(() => {
+    if (editingId) editingCardRef.current?.scrollIntoView?.({ block: 'nearest' })
+  }, [editingId])
 
   function refresh() {
     startTransition(() => router.refresh())
@@ -92,7 +105,11 @@ export default function RemindersPanel({
 
       <div className="space-y-2 lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
         {reminders.map(r => (
-          <div key={r.id} className="bg-white border border-border/20 rounded-xl p-3">
+          <div
+            key={r.id}
+            ref={editingId === r.id ? editingCardRef : undefined}
+            className="bg-white border border-border/20 rounded-xl p-3"
+          >
             {editingId === r.id ? (
               <div className="flex flex-col gap-2">
                 <select
@@ -161,7 +178,10 @@ export default function RemindersPanel({
         )}
 
         {adding && (
-          <div className="bg-white border border-border/20 rounded-xl p-3 flex flex-col gap-2">
+          <div
+            ref={addFormRef}
+            className="bg-white border border-border/20 rounded-xl p-3 flex flex-col gap-2"
+          >
             <select
               value={newValues.reminderType}
               onChange={e => setNewValues(v => ({ ...v, reminderType: e.target.value }))}
