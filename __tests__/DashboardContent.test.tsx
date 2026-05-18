@@ -238,4 +238,34 @@ describe('DashboardContent', () => {
     })
     expect(screen.getByTestId('dashboard-charts')).toBeInTheDocument()
   })
+
+  it('stops paginating users on error and surfaces zero stats so a broken query never silently overcounts', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    mockUsersRange.mockResolvedValueOnce({ data: null, error: { message: 'rls denied' } })
+
+    await act(async () => {
+      render(<DashboardContent tenantId="tenant-1" />)
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Total homeowners').closest('div')).toHaveTextContent('0')
+    })
+    // A single call: pagination must abort on error rather than retrying or advancing offset
+    expect(mockUsersRange).toHaveBeenCalledTimes(1)
+    consoleSpy.mockRestore()
+  })
+
+  it('stops paginating conversations on error so a broken query never silently double-counts', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    mockConversationsRange.mockResolvedValueOnce({ data: null, error: { message: 'rls denied' } })
+
+    await act(async () => {
+      render(<DashboardContent tenantId="tenant-1" />)
+    })
+
+    await waitFor(() => {
+      expect(mockConversationsRange).toHaveBeenCalledTimes(1)
+    })
+    consoleSpy.mockRestore()
+  })
 })

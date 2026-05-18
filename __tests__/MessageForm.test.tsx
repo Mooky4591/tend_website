@@ -138,6 +138,15 @@ describe('MessageForm', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
+  it('does not send when the user presses Enter on a whitespace-only message', async () => {
+    const user = userEvent.setup()
+    render(<MessageForm userId="u1" />)
+    const textarea = screen.getByPlaceholderText(/Type a message/)
+
+    await user.type(textarea, '   {Enter}')
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
   it('shows "Failed to send" fallback when API error response has no error field', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: false,

@@ -32,3 +32,4 @@ Integration tests for `app/api/sms-enrollment/route.ts` (POST handler). Verifies
 - Returns 500 when DB insert fails.
 - Falls back to `x-real-ip` header for IP when `x-forwarded-for` is absent.
 - Stores `null` for `ip_address` when both `x-forwarded-for` and `x-real-ip` are absent.
+- Stores `null` for `user_agent` when the `user-agent` header is absent.

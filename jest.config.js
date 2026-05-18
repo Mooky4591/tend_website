@@ -16,6 +16,8 @@ const config = {
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
+    'lib/**/*.{ts,tsx}',
+    'middleware.ts',
     '!**/*.d.ts',
     '!**/node_modules/**',
   ],

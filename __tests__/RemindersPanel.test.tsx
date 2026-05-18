@@ -214,6 +214,81 @@ describe('RemindersPanel', () => {
     expect(mockRefresh).not.toHaveBeenCalled()
   })
 
+  it('scrolls the add form into view when + Add is clicked (so it is not hidden below the internal scroll region)', async () => {
+    const scrollSpy = jest.fn()
+    const originalScroll = (Element.prototype as unknown as { scrollIntoView?: typeof scrollSpy }).scrollIntoView
+    ;(Element.prototype as unknown as { scrollIntoView: typeof scrollSpy }).scrollIntoView = scrollSpy
+    try {
+      const user = userEvent.setup()
+      render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
+
+      await user.click(screen.getByRole('button', { name: '+ Add' }))
+
+      expect(scrollSpy).toHaveBeenCalledWith({ block: 'nearest' })
+    } finally {
+      if (originalScroll === undefined) {
+        delete (Element.prototype as unknown as { scrollIntoView?: typeof scrollSpy }).scrollIntoView
+      } else {
+        ;(Element.prototype as unknown as { scrollIntoView: typeof scrollSpy }).scrollIntoView = originalScroll
+      }
+    }
+  })
+
+  it('scrolls the editing card into view when Edit is clicked', async () => {
+    const scrollSpy = jest.fn()
+    const originalScroll = (Element.prototype as unknown as { scrollIntoView?: typeof scrollSpy }).scrollIntoView
+    ;(Element.prototype as unknown as { scrollIntoView: typeof scrollSpy }).scrollIntoView = scrollSpy
+    try {
+      const user = userEvent.setup()
+      render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+
+      await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
+
+      expect(scrollSpy).toHaveBeenCalledWith({ block: 'nearest' })
+    } finally {
+      if (originalScroll === undefined) {
+        delete (Element.prototype as unknown as { scrollIntoView?: typeof scrollSpy }).scrollIntoView
+      } else {
+        ;(Element.prototype as unknown as { scrollIntoView: typeof scrollSpy }).scrollIntoView = originalScroll
+      }
+    }
+  })
+
+  it('changing the reminder type in the edit form updates the select value', async () => {
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+
+    await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
+    const select = screen.getByRole('combobox') as HTMLSelectElement
+    await user.selectOptions(select, 'hvac_service')
+    expect(select.value).toBe('hvac_service')
+  })
+
+  it('changing the reminder type in the add form updates the select value', async () => {
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
+
+    await user.click(screen.getByRole('button', { name: '+ Add' }))
+    const select = screen.getByRole('combobox') as HTMLSelectElement
+    await user.selectOptions(select, 'hvac_service')
+    expect(select.value).toBe('hvac_service')
+  })
+
+  it('clicking Cancel in the add form closes it and clears any prior error', async () => {
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
+
+    // Trigger an error so we can verify Cancel clears it
+    await user.click(screen.getByRole('button', { name: '+ Add' }))
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    expect(await screen.findByText('Due date is required')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Due date is required')).not.toBeInTheDocument()
+  })
+
   it('shows error and does not refresh when Add request fails', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
     const user = userEvent.setup()

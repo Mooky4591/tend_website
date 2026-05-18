@@ -206,4 +206,13 @@ describe('POST /api/sms-enrollment', () => {
     await POST(makeRequest(validBody))
     expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ ip_address: null }))
   })
+
+  it('stores null for user_agent when the user-agent header is absent', async () => {
+    mockHeaderGet.mockImplementation((key: string) => {
+      if (key === 'x-forwarded-for') return '1.2.3.4'
+      return null // user-agent header missing
+    })
+    await POST(makeRequest(validBody))
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ user_agent: null }))
+  })
 })

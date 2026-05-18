@@ -74,6 +74,16 @@ describe('PhoneNumberEditor', () => {
     expect(screen.getByPlaceholderText('+15551234567')).toHaveValue('')
   })
 
+  it('cancel reverts back to "No phone number" when initial phoneNumber was null', () => {
+    render(<PhoneNumberEditor userId="u1" phoneNumber={null} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    fireEvent.change(screen.getByPlaceholderText('+15551234567'), { target: { value: '+15553333333' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.getByText('No phone number')).toBeInTheDocument()
+  })
+
   it('shows "Failed to update phone number" when API error response has no error field', async () => {
     mockUpdate.mockResolvedValue({ ok: false, json: async () => ({}) })
     render(<PhoneNumberEditor userId="u1" phoneNumber="+15550001111" />)
