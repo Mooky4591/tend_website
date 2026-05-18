@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react'
+import type { Metadata } from 'next'
 import RootLayout, { metadata } from '@/app/layout'
 
 // next/font/google is already mocked globally in jest.setup.ts
@@ -15,9 +16,45 @@ describe('RootLayout metadata', () => {
   })
 
   it('falls back to https://trytendr.org when NEXT_PUBLIC_SITE_URL is unset', () => {
-    // metadata is evaluated at module load — env wasn't set in the jest run,
-    // so the fallback URL should be active.
-    expect(metadata.metadataBase?.toString()).toBe('https://trytendr.org/')
+    // metadata is evaluated at module load time, so a CI- or shell-injected
+    // NEXT_PUBLIC_SITE_URL would silently break the cached top-of-file import.
+    // Re-import the module in isolation with the env var explicitly unset so
+    // this assertion exercises the fallback branch deterministically.
+    const originalUrl = process.env.NEXT_PUBLIC_SITE_URL
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    try {
+      let isolated: Metadata | undefined
+      jest.isolateModules(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        isolated = require('@/app/layout').metadata as Metadata
+      })
+      expect(isolated?.metadataBase?.toString()).toBe('https://trytendr.org/')
+    } finally {
+      if (originalUrl === undefined) {
+        delete process.env.NEXT_PUBLIC_SITE_URL
+      } else {
+        process.env.NEXT_PUBLIC_SITE_URL = originalUrl
+      }
+    }
+  })
+
+  it('honors NEXT_PUBLIC_SITE_URL when it is set', () => {
+    const originalUrl = process.env.NEXT_PUBLIC_SITE_URL
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://preview.example.com'
+    try {
+      let isolated: Metadata | undefined
+      jest.isolateModules(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        isolated = require('@/app/layout').metadata as Metadata
+      })
+      expect(isolated?.metadataBase?.toString()).toBe('https://preview.example.com/')
+    } finally {
+      if (originalUrl === undefined) {
+        delete process.env.NEXT_PUBLIC_SITE_URL
+      } else {
+        process.env.NEXT_PUBLIC_SITE_URL = originalUrl
+      }
+    }
   })
 
   it('exposes openGraph fields used by the link preview card', () => {

@@ -38,4 +38,5 @@ Unit tests for all exports of `lib/pdf.ts`: `chunkText` and `extractAndChunk`. V
 - `extractAndChunk`: calls `destroy()` after a successful extraction.
 - `extractAndChunk`: calls `destroy()` even when `getText()` throws.
 - `extractAndChunk`: throws `PdfParseError` when `getText()` throws a known pdf-parse user error (e.g. `InvalidPDFException`).
-- `extractAndChunk`: re-throws non-PDF errors unchanged.
+- `extractAndChunk`: re-throws non-PDF `Error` instances unchanged (e.g. `TypeError`).
+- `extractAndChunk`: re-throws non-`Error` rejection values (e.g. a plain string) unchanged — they must NOT be silently wrapped as `PdfParseError`; the original payload is preserved for the caller and `destroy()` still runs.

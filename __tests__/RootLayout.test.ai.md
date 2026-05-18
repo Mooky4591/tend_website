@@ -18,10 +18,12 @@ None — this is a test file.
 ## Required Patterns
 - Use `@testing-library/react`'s `render` for component assertions.
 - Read the rendered `<html>` and `<body>` from the returned `container` (jsdom permits nested html/body).
+- Any assertion that depends on `NEXT_PUBLIC_SITE_URL` must isolate the module load with `jest.isolateModules` after explicitly setting/unsetting the env var, then restore the original value in a `finally` block. `metadata` is evaluated at module load time, so the top-of-file `import { metadata }` only reflects the env value at that moment.
 
 ## Tests Required
 - `metadata.title` equals `'Tendr — AI Home Assistant Platform'`.
-- `metadata.metadataBase` resolves to `'https://trytendr.org'` when `NEXT_PUBLIC_SITE_URL` is unset.
+- `metadata.metadataBase` resolves to `'https://trytendr.org'` when `NEXT_PUBLIC_SITE_URL` is unset — uses `jest.isolateModules` with the env var explicitly deleted so the assertion does not flake under a CI- or shell-injected `NEXT_PUBLIC_SITE_URL`.
+- `metadata.metadataBase` reflects `NEXT_PUBLIC_SITE_URL` when it is set (env override branch, also under `jest.isolateModules`).
 - `<html>` has `lang="en"` and a className containing `scroll-smooth`.
 - `<body>` className includes the Inter mock font class.
 - Children are rendered inside the body.
