@@ -5,12 +5,12 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
-- Fetch homeowner profile, conversations (ascending by `created_at`), and reminders (ascending by `due_date`) in parallel via `Promise.all`.
+- Fetch homeowner profile (including `reminders_paused_at`), conversations (ascending by `created_at`), and reminders (including `skipped_at`, ascending by `due_date`) in parallel via `Promise.all`.
 - Call `notFound()` if the homeowner is not found.
 - Derive `location` string from address fields.
 - Render status badges for `onboarding_complete`, `opted_out`, and a "Pending" badge when neither is true; badge always appears at the bottom of the homeowner info card.
 - Render a homeowner information card and compose `PhoneNumberEditor` for phone mutations.
-- Compose `ConversationPanel`, `MessageForm`, and `RemindersPanel` with fetched data.
+- Compose `ConversationPanel`, `MessageForm`, and `RemindersPanel` with fetched data. Pass `remindersPaused={Boolean(homeowner.reminders_paused_at)}` to `RemindersPanel`.
 
 ## Not Allowed
 - Do not make direct Supabase mutations on this page; all mutations go through client components and API routes.

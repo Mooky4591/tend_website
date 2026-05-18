@@ -3,6 +3,7 @@ export type Reminder = {
   reminder_type: string
   due_date: string
   sent: boolean
+  skipped_at: string | null
 }
 
 export type MessageRole = 'user' | 'assistant' | 'staff'

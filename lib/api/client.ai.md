@@ -4,7 +4,7 @@
 Typed browser-side fetch wrappers for all internal API endpoints. Centralizes hardcoded URL strings and request shapes so client components make API calls through a single module rather than scattering `fetch('/api/...')` calls inline.
 
 ## Allowed Responsibilities
-- Export one function per API operation: `sendMessage`, `createReminder`, `updateReminder`, `deleteReminder`, `uploadWarrantyDoc`, `submitSmsEnrollment`, `updateHomeownerPhone`.
+- Export one function per API operation: `sendMessage`, `createReminder`, `updateReminder`, `deleteReminder`, `uploadWarrantyDoc`, `submitSmsEnrollment`, `updateHomeownerPhone`, `setRemindersPaused`.
 - Each function constructs the correct `fetch` call (URL, method, headers, body) and returns the raw `Response`.
 - For multipart uploads (`uploadWarrantyDoc`), build the `FormData` internally.
 
@@ -22,6 +22,7 @@ Typed browser-side fetch wrappers for all internal API endpoints. Centralizes ha
 - `export async function uploadWarrantyDoc(planName: string, file: File): Promise<Response>`
 - `export async function submitSmsEnrollment(body: object): Promise<Response>`
 - `export async function updateHomeownerPhone(userId: string, phoneNumber: string): Promise<Response>`
+- `export async function setRemindersPaused(userId: string, paused: boolean): Promise<Response>`
 
 ## Required Patterns
 - JSON endpoints must set `Content-Type: application/json` and stringify the body.

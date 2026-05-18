@@ -1,6 +1,6 @@
 ---
 name: ApiClient.test
-description: Unit tests for lib/api/client.ts — fetch URL, method, body, and FormData for all 7 functions
+description: Unit tests for lib/api/client.ts — fetch URL, method, body, and FormData for all 8 functions
 type: project
 ---
 
@@ -31,6 +31,9 @@ Unit tests for `lib/api/client.ts`. Verifies that each exported function calls `
 - `submitSmsEnrollment` POSTs to `/api/sms-enrollment` with correct JSON body.
 - `updateHomeownerPhone` PATCHes `/api/users/:id/phone` with `{ phoneNumber }` JSON body.
 - `updateHomeownerPhone` returns the raw Response without throwing on non-2xx.
+- `setRemindersPaused` PATCHes `/api/users/:id/reminders-pause` with `{ paused: true }` JSON body when paused.
+- `setRemindersPaused` PATCHes the same endpoint with `{ paused: false }` JSON body when unpausing.
+- `setRemindersPaused` returns the raw Response without throwing on non-2xx.
 - Non-2xx responses are returned to the caller without throwing.
 
 ## Notes for AI Agents

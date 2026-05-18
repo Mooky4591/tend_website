@@ -19,26 +19,26 @@ beforeEach(() => {
 })
 
 const REMINDERS = [
-  { id: 'rem-1', reminder_type: 'hvac_filter', due_date: '2026-06-01', sent: false },
-  { id: 'rem-2', reminder_type: 'hvac_service', due_date: '2026-09-01', sent: true },
+  { id: 'rem-1', reminder_type: 'hvac_filter', due_date: '2026-06-01', sent: false, skipped_at: null },
+  { id: 'rem-2', reminder_type: 'hvac_service', due_date: '2026-09-01', sent: true, skipped_at: null },
 ]
 
 describe('RemindersPanel', () => {
   it('renders each reminder with type and formatted date', () => {
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
     expect(screen.getByText('hvac_filter')).toBeInTheDocument()
     expect(screen.getByText('hvac_service')).toBeInTheDocument()
     expect(screen.getByText('Sent')).toBeInTheDocument()
   })
 
   it('shows empty state when there are no reminders', () => {
-    render(<RemindersPanel reminders={[]} userId="u1" />)
+    render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
     expect(screen.getByText('No reminders scheduled')).toBeInTheDocument()
   })
 
   it('clicking Edit shows an editable form pre-filled with current values', async () => {
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     const editButtons = screen.getAllByRole('button', { name: 'Edit' })
     await user.click(editButtons[0])
@@ -52,7 +52,7 @@ describe('RemindersPanel', () => {
   it('Save calls PATCH with the updated values and refreshes', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({}) })
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
     // Change the due date
@@ -70,7 +70,7 @@ describe('RemindersPanel', () => {
 
   it('Cancel hides the edit form without saving', async () => {
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
@@ -82,7 +82,7 @@ describe('RemindersPanel', () => {
   it('Delete calls DELETE endpoint and refreshes', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ ok: true }) })
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getAllByRole('button', { name: 'Delete' })[0])
 
@@ -94,7 +94,7 @@ describe('RemindersPanel', () => {
 
   it('clicking + Add shows the new-reminder form', async () => {
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={[]} userId="u1" />)
+    render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getByRole('button', { name: '+ Add' }))
 
@@ -106,7 +106,7 @@ describe('RemindersPanel', () => {
   it('Add calls POST /api/reminders with userId, type, date and refreshes', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ id: 'new-rem' }) })
     const user = userEvent.setup()
-    const { container } = render(<RemindersPanel reminders={[]} userId="user-123" />)
+    const { container } = render(<RemindersPanel reminders={[]} userId="user-123" remindersPaused={false} />)
 
     await user.click(screen.getByRole('button', { name: '+ Add' }))
 
@@ -126,7 +126,7 @@ describe('RemindersPanel', () => {
 
   it('shows error when Add is clicked without a due date', async () => {
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={[]} userId="u1" />)
+    render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getByRole('button', { name: '+ Add' }))
     await user.click(screen.getByRole('button', { name: 'Add' }))
@@ -141,7 +141,7 @@ describe('RemindersPanel', () => {
       new Promise(r => { resolveFetch = r as (v: Response) => void })
     )
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getAllByRole('button', { name: 'Delete' })[0])
     // All action buttons are now disabled — second click must be a no-op
@@ -158,7 +158,7 @@ describe('RemindersPanel', () => {
       new Promise(r => { resolveFetch = r as (v: Response) => void })
     )
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
     await user.click(screen.getByRole('button', { name: 'Save' }))
@@ -176,7 +176,7 @@ describe('RemindersPanel', () => {
       new Promise(r => { resolveFetch = r as (v: Response) => void })
     )
     const user = userEvent.setup()
-    const { container } = render(<RemindersPanel reminders={[]} userId="u1" />)
+    const { container } = render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getByRole('button', { name: '+ Add' }))
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement
@@ -194,7 +194,7 @@ describe('RemindersPanel', () => {
   it('shows error and does not refresh when Delete request fails', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getAllByRole('button', { name: 'Delete' })[0])
 
@@ -205,7 +205,7 @@ describe('RemindersPanel', () => {
   it('shows error and does not refresh when Save request fails', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
     const user = userEvent.setup()
-    render(<RemindersPanel reminders={REMINDERS} userId="u1" />)
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
     await user.click(screen.getByRole('button', { name: 'Save' }))
@@ -217,7 +217,7 @@ describe('RemindersPanel', () => {
   it('shows error and does not refresh when Add request fails', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
     const user = userEvent.setup()
-    const { container } = render(<RemindersPanel reminders={[]} userId="u1" />)
+    const { container } = render(<RemindersPanel reminders={[]} userId="u1" remindersPaused={false} />)
 
     await user.click(screen.getByRole('button', { name: '+ Add' }))
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement
@@ -226,5 +226,134 @@ describe('RemindersPanel', () => {
 
     expect(await screen.findByText('Failed to add reminder')).toBeInTheDocument()
     expect(mockRefresh).not.toHaveBeenCalled()
+  })
+
+  it('renders "Pause" when reminders are not paused', () => {
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Unpause' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Paused')).not.toBeInTheDocument()
+  })
+
+  it('renders "Unpause" and the Paused pill when reminders are paused', () => {
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />)
+    expect(screen.getByRole('button', { name: 'Unpause' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Pause' })).not.toBeInTheDocument()
+    expect(screen.getByText('Paused')).toBeInTheDocument()
+  })
+
+  it('reminder cards have the greyed-out class when paused', () => {
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />)
+    const cards = screen.getAllByTestId('reminder-card')
+    expect(cards).toHaveLength(REMINDERS.length)
+    for (const card of cards) {
+      expect(card.className).toContain('opacity-60')
+    }
+  })
+
+  it('reminder cards do not have the greyed-out class when not paused', () => {
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+    const cards = screen.getAllByTestId('reminder-card')
+    for (const card of cards) {
+      expect(card.className).not.toContain('opacity-60')
+    }
+  })
+
+  it('clicking Pause PATCHes the route with paused:true, flips the label, and refreshes', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({}) })
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+
+    await user.click(screen.getByRole('button', { name: 'Pause' }))
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith('/api/users/u1/reminders-pause', expect.objectContaining({
+        method: 'PATCH',
+        body: expect.stringContaining('"paused":true'),
+      }))
+    )
+    expect(await screen.findByRole('button', { name: 'Unpause' })).toBeInTheDocument()
+    expect(mockRefresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('clicking Unpause PATCHes the route with paused:false, flips the label, and refreshes', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({}) })
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />)
+
+    await user.click(screen.getByRole('button', { name: 'Unpause' }))
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith('/api/users/u1/reminders-pause', expect.objectContaining({
+        method: 'PATCH',
+        body: expect.stringContaining('"paused":false'),
+      }))
+    )
+    expect(await screen.findByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(mockRefresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows error and does not flip the label when pause request fails', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: false })
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+
+    await user.click(screen.getByRole('button', { name: 'Pause' }))
+
+    expect(await screen.findByText('Failed to update pause state')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(mockRefresh).not.toHaveBeenCalled()
+  })
+
+  it('ignores a second Pause click while the first is in flight', async () => {
+    let resolveFetch: (v: Response) => void
+    ;(global.fetch as jest.Mock).mockReturnValueOnce(
+      new Promise(r => { resolveFetch = r as (v: Response) => void })
+    )
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+
+    await user.click(screen.getByRole('button', { name: 'Pause' }))
+    await user.click(screen.getByRole('button', { name: 'Pause' }))
+
+    expect(global.fetch).toHaveBeenCalledTimes(1)
+
+    resolveFetch!({ ok: true, json: async () => ({}) } as Response)
+  })
+
+  it('resyncs the toggle when the remindersPaused prop changes', () => {
+    const { rerender } = render(
+      <RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />
+    )
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(screen.queryByText('Paused')).not.toBeInTheDocument()
+
+    rerender(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />)
+    expect(screen.getByRole('button', { name: 'Unpause' })).toBeInTheDocument()
+    expect(screen.getByText('Paused')).toBeInTheDocument()
+
+    rerender(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(screen.queryByText('Paused')).not.toBeInTheDocument()
+  })
+
+  it('resyncs the toggle when the userId prop changes (different homeowner reusing the instance)', () => {
+    const { rerender } = render(
+      <RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />
+    )
+    expect(screen.getByRole('button', { name: 'Unpause' })).toBeInTheDocument()
+
+    rerender(<RemindersPanel reminders={REMINDERS} userId="u2" remindersPaused={false} />)
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+  })
+
+  it('Edit still opens the inline form while paused', async () => {
+    const user = userEvent.setup()
+    render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />)
+
+    await user.click(screen.getAllByRole('button', { name: 'Edit' })[0])
+
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+    expect(screen.getByDisplayValue('2026-06-01')).toBeInTheDocument()
   })
 })

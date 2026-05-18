@@ -4,7 +4,7 @@
 Central repository for shared domain types used across both server and client modules. Eliminates per-file type declarations that would otherwise diverge.
 
 ## Allowed Responsibilities
-- Export `Reminder` — the shape of a row returned from the `reminders` table (id, reminder_type, due_date, sent).
+- Export `Reminder` — the shape of a row returned from the `reminders` table (id, reminder_type, due_date, sent, skipped_at).
 - Export `MessageRole` — the union of valid values for `conversations.role`.
 - Export `Message` — the shape of a row returned from the `conversations` table.
 
@@ -15,7 +15,7 @@ Central repository for shared domain types used across both server and client mo
 - Do not generate types from a database schema — keep these manually maintained until Supabase CLI codegen is adopted.
 
 ## Public Interfaces
-- `export type Reminder = { id: string; reminder_type: string; due_date: string; sent: boolean }`
+- `export type Reminder = { id: string; reminder_type: string; due_date: string; sent: boolean; skipped_at: string | null }`
 - `export type MessageRole = 'user' | 'assistant' | 'staff'`
 - `export type Message = { id: string; role: MessageRole; content: string; created_at: string }`
 
@@ -28,5 +28,6 @@ Central repository for shared domain types used across both server and client mo
 
 ## Notes for AI Agents
 - `Reminder` is consumed by `app/dashboard/homeowners/[id]/RemindersPanel.tsx`.
+- `Reminder.skipped_at` is written only by the background reminder-sending worker (when a reminder's `due_date` passes while `users.reminders_paused_at` is non-null). UI code must treat it as display-read-only, like `sent`.
 - `Message` is consumed by `app/dashboard/homeowners/[id]/ConversationPanel.tsx`.
 - If the Supabase schema changes (e.g., a column is renamed), update this file and fix any downstream type errors.
