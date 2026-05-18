@@ -33,6 +33,7 @@ Client Component (`RemindersPanel`) that manages the full CRUD lifecycle for a h
 - `formatDate` appends `T00:00:00` before parsing to avoid timezone off-by-one on date strings.
 - `handleAdd` must validate that `dueDate` is non-empty before the API call.
 - `handleTogglePause` flips a local `paused` state only after the API call returns `ok: true`; on failure the state is left untouched so the UI reflects the persisted truth.
+- The local `paused` state is seeded from `remindersPaused` and must be resynced via `useEffect` keyed on `[remindersPaused, userId]` so a fresh server-rendered value (e.g. after `router.refresh()` or a soft-nav to a different homeowner that reuses this instance) overrides the local optimistic value.
 - Root is a flex column on `lg+` (`lg:flex lg:flex-col lg:flex-1 lg:min-h-0`) so the panel can fill a height-constrained parent. The header row is `lg:flex-shrink-0` and the reminders list is `lg:flex-1 lg:min-h-0 lg:overflow-y-auto`, keeping the header pinned while the list scrolls. Below `lg`, the panel renders in natural flow with no scroll constraints.
 - When `adding` flips true or `editingId` changes, scroll the corresponding form into view via `useEffect` + a ref + `scrollIntoView({ block: 'nearest' })`. This prevents the add form (rendered at the bottom of the scrollable list) and the active edit form from being invisible when the list is scrolled. Call `scrollIntoView` optionally (`?.scrollIntoView?.(...)`) so missing implementations (e.g. jsdom) don't throw.
 

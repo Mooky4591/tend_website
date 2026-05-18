@@ -45,4 +45,6 @@ Unit tests for `app/dashboard/homeowners/[id]/RemindersPanel.tsx`. Verifies remi
 - Clicking Unpause PATCHes the same endpoint with `{ paused: false }`, flips the label back, and calls `router.refresh`.
 - Shows "Failed to update pause state" and does not flip the button label when the toggle request returns `ok: false`.
 - Ignores a second Pause click while the first is in flight.
+- Resyncs the toggle when `remindersPaused` prop changes between renders (covers `router.refresh()` returning a newer server value).
+- Resyncs the toggle when `userId` prop changes between renders (covers soft-nav reusing this instance for a different homeowner).
 - Edit still opens the inline form while paused (regression guard for "Edit/Delete/+ Add remain functional while paused").

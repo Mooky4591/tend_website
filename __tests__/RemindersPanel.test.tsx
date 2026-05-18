@@ -321,6 +321,32 @@ describe('RemindersPanel', () => {
     resolveFetch!({ ok: true, json: async () => ({}) } as Response)
   })
 
+  it('resyncs the toggle when the remindersPaused prop changes', () => {
+    const { rerender } = render(
+      <RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />
+    )
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(screen.queryByText('Paused')).not.toBeInTheDocument()
+
+    rerender(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />)
+    expect(screen.getByRole('button', { name: 'Unpause' })).toBeInTheDocument()
+    expect(screen.getByText('Paused')).toBeInTheDocument()
+
+    rerender(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={false} />)
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+    expect(screen.queryByText('Paused')).not.toBeInTheDocument()
+  })
+
+  it('resyncs the toggle when the userId prop changes (different homeowner reusing the instance)', () => {
+    const { rerender } = render(
+      <RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />
+    )
+    expect(screen.getByRole('button', { name: 'Unpause' })).toBeInTheDocument()
+
+    rerender(<RemindersPanel reminders={REMINDERS} userId="u2" remindersPaused={false} />)
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument()
+  })
+
   it('Edit still opens the inline form while paused', async () => {
     const user = userEvent.setup()
     render(<RemindersPanel reminders={REMINDERS} userId="u1" remindersPaused={true} />)

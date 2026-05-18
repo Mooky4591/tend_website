@@ -47,6 +47,13 @@ export default function RemindersPanel({
     if (editingId) editingCardRef.current?.scrollIntoView?.({ block: 'nearest' })
   }, [editingId])
 
+  // Resync local `paused` to props when the server-rendered prop changes — e.g.
+  // after router.refresh() returns a newer reminders_paused_at, or after soft
+  // navigation reuses this client component instance for a different homeowner.
+  useEffect(() => {
+    setPaused(remindersPaused)
+  }, [remindersPaused, userId])
+
   function refresh() {
     startTransition(() => router.refresh())
   }
