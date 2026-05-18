@@ -7,15 +7,20 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return unauthorized()
 
-  const { data: member, error: memberError } = await supabase
+  // tenant_users has UNIQUE (tenant_id, auth_user_id) but allows multiple rows per
+  // auth_user_id (one per tenant the staff member belongs to). Fetching all admin
+  // memberships and scoping the update with `.in('tenant_id', ...)` keeps multi-tenant
+  // admins working — `.maybeSingle()` would throw a "more than one row" error here.
+  const { data: memberships, error: memberError } = await supabase
     .from('tenant_users')
-    .select('role, tenant_id')
+    .select('tenant_id')
     .eq('auth_user_id', user.id)
     .eq('role', 'admin')
-    .maybeSingle()
 
   if (memberError) return serverError(memberError.message)
-  if (!member) return forbidden('Admin access required')
+  if (!memberships || memberships.length === 0) return forbidden('Admin access required')
+
+  const tenantIds = memberships.map(m => m.tenant_id)
 
   const body = await request.json() as { paused?: unknown }
   if (typeof body.paused !== 'boolean') return badRequest('paused must be a boolean')
@@ -26,7 +31,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     .from('users')
     .update({ reminders_paused_at })
     .eq('id', params.id)
-    .eq('tenant_id', member.tenant_id)
+    .in('tenant_id', tenantIds)
     .select('id, reminders_paused_at')
     .single()
 

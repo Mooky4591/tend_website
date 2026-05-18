@@ -24,12 +24,13 @@ Unit tests for `app/api/users/[id]/reminders-pause/route.ts`. Verifies authentic
 
 ## Tests Required
 - PATCH 401 when unauthenticated.
-- PATCH 403 when authenticated but not an admin member.
+- PATCH 403 when the caller has no admin membership in any tenant.
 - PATCH 400 when `paused` is missing.
 - PATCH 400 when `paused` is not a boolean.
 - PATCH 404 when row is not found (`PGRST116`).
 - PATCH 200 with `reminders_paused_at` set to an ISO timestamp when `paused: true`.
 - PATCH 200 with `reminders_paused_at` explicitly set to `null` when `paused: false`.
+- PATCH 200 for an admin in multiple tenants — the update is scoped with `.in('tenant_id', [...])` over every admin tenant_id (regression guard against `.maybeSingle()` blowing up on multi-row membership).
 - PATCH 500 when the membership query returns a DB error.
 - PATCH 500 when the update query fails with a non-`PGRST116` error code.
 

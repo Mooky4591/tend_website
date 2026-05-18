@@ -4,8 +4,8 @@
 Authenticated API route to pause or unpause reminder sending for one homeowner by toggling the `users.reminders_paused_at` timestamp.
 
 ## Allowed Responsibilities
-- Verify authenticated user via Supabase auth and ensure the caller has an admin `tenant_users` membership.
-- Resolve the caller's `tenant_id` from the admin membership row and scope the update to that tenant.
+- Verify authenticated user via Supabase auth and ensure the caller has at least one admin `tenant_users` membership.
+- Resolve the caller's admin `tenant_id`s (one or many — staff can admin multiple tenants) and scope the `users` update with `.in('tenant_id', tenantIds)`.
 - Validate that `paused` in the request body is a boolean.
 - Update `users.reminders_paused_at` (to `now()` when `paused === true`, to `null` when `false`) scoped to both `params.id` and the caller's `tenant_id`.
 - Return JSON API responses using `lib/api-response` helpers.
@@ -24,16 +24,18 @@ Authenticated API route to pause or unpause reminder sending for one homeowner b
 - Return 403 when authenticated but not an admin tenant member.
 - Return 400 when `paused` is missing or not a boolean.
 - Map `PGRST116` to 404.
-- Always select `tenant_id` from the `tenant_users` admin row and pass it as a second `eq` filter on the `users` update — never rely on `params.id` alone to scope the write.
+- Fetch the caller's admin memberships with a plain `.select('tenant_id').eq('auth_user_id', user.id).eq('role', 'admin')` — **do not** use `.maybeSingle()` or `.single()` here, because `tenant_users` allows multiple admin rows per `auth_user_id` and the single-row helpers would throw for multi-tenant admins.
+- Always scope the `users` update with `.in('tenant_id', tenantIds)` derived from the admin memberships — never rely on `params.id` alone to scope the write.
 - Compute the paused timestamp inside this route via `new Date().toISOString()` so the database row carries the exact moment the toggle was made.
 
 ## Tests Required
 - PATCH 401 when unauthenticated.
-- PATCH 403 when authenticated but not an admin member.
+- PATCH 403 when the caller has no admin membership in any tenant.
 - PATCH 400 when `paused` is missing or not a boolean.
 - PATCH 404 when row not found (`PGRST116`).
 - PATCH 200 with `reminders_paused_at` set to an ISO string on pause.
 - PATCH 200 with `reminders_paused_at` set to `null` on unpause.
+- PATCH 200 for an admin who belongs to multiple tenants — the update is scoped with `.in()` over all admin tenant_ids.
 - PATCH 500 when the membership query returns a DB error.
 - PATCH 500 when the update query fails with a non-`PGRST116` error code.
 

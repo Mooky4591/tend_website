@@ -1,22 +1,30 @@
 /** @jest-environment node */
 
 const mockGetUser = jest.fn()
-const mockMemberMaybeSingle = jest.fn()
+const mockMemberQuery = jest.fn()
 const mockUserSingle = jest.fn()
 const mockUserUpdate = jest.fn()
+const mockUserIn = jest.fn()
 
 jest.mock('@/lib/supabase/server', () => ({
   createClient: () => ({
     auth: { getUser: mockGetUser },
     from: (table: string) => {
       if (table === 'tenant_users') {
-        return { select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: mockMemberMaybeSingle }) }) }) }
+        return { select: () => ({ eq: () => ({ eq: (...args: unknown[]) => mockMemberQuery(...args) }) }) }
       }
       if (table === 'users') {
         return {
           update: (...args: unknown[]) => {
             mockUserUpdate(...args)
-            return { eq: () => ({ eq: () => ({ select: () => ({ single: mockUserSingle }) }) }) }
+            return {
+              eq: () => ({
+                in: (...inArgs: unknown[]) => {
+                  mockUserIn(...inArgs)
+                  return { select: () => ({ single: mockUserSingle }) }
+                },
+              }),
+            }
           },
         }
       }
@@ -29,7 +37,7 @@ describe('PATCH /api/users/[id]/reminders-pause', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetUser.mockResolvedValue({ data: { user: { id: 'staff-1' } } })
-    mockMemberMaybeSingle.mockResolvedValue({ data: { role: 'admin', tenant_id: 'tenant-1' }, error: null })
+    mockMemberQuery.mockResolvedValue({ data: [{ tenant_id: 'tenant-1' }], error: null })
   })
 
   it('returns 401 when unauthenticated', async () => {
@@ -39,8 +47,8 @@ describe('PATCH /api/users/[id]/reminders-pause', () => {
     expect(res.status).toBe(401)
   })
 
-  it('returns 403 when authenticated user is not an admin member', async () => {
-    mockMemberMaybeSingle.mockResolvedValueOnce({ data: null, error: null })
+  it('returns 403 when authenticated user has no admin membership in any tenant', async () => {
+    mockMemberQuery.mockResolvedValueOnce({ data: [], error: null })
     const { PATCH } = await import('@/app/api/users/[id]/reminders-pause/route')
     const res = await PATCH({ json: async () => ({ paused: true }) } as any, { params: { id: 'u1' } })
     expect(res.status).toBe(403)
@@ -91,8 +99,26 @@ describe('PATCH /api/users/[id]/reminders-pause', () => {
     expect(mockUserUpdate).toHaveBeenCalledWith({ reminders_paused_at: null })
   })
 
+  it('scopes the update by .in(tenantIds) for an admin in multiple tenants', async () => {
+    mockMemberQuery.mockResolvedValueOnce({
+      data: [{ tenant_id: 'tenant-1' }, { tenant_id: 'tenant-2' }],
+      error: null,
+    })
+    mockUserSingle.mockResolvedValueOnce({
+      data: { id: 'u1', reminders_paused_at: '2026-05-18T12:00:00.000Z' },
+      error: null,
+    })
+    const { PATCH } = await import('@/app/api/users/[id]/reminders-pause/route')
+    const res = await PATCH({ json: async () => ({ paused: true }) } as any, { params: { id: 'u1' } })
+    expect(res.status).toBe(200)
+    expect(mockUserIn).toHaveBeenCalledTimes(1)
+    const [column, ids] = mockUserIn.mock.calls[0]
+    expect(column).toBe('tenant_id')
+    expect(ids).toEqual(['tenant-1', 'tenant-2'])
+  })
+
   it('returns 500 when membership query returns an error', async () => {
-    mockMemberMaybeSingle.mockResolvedValueOnce({ data: null, error: { message: 'DB connection error' } })
+    mockMemberQuery.mockResolvedValueOnce({ data: null, error: { message: 'DB connection error' } })
     const { PATCH } = await import('@/app/api/users/[id]/reminders-pause/route')
     const res = await PATCH({ json: async () => ({ paused: true }) } as any, { params: { id: 'u1' } })
     expect(res.status).toBe(500)
