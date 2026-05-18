@@ -32,3 +32,4 @@ Unit tests for `app/dashboard/docs/UploadForm.tsx`. Verifies the Upload button s
 - Ignores a second click while an upload is already in flight.
 - Shows "Upload failed. Please try again." when fetch throws a network error.
 - Shows "File must be under 10 MB." error when the selected file exceeds 10 MB.
+- After clearing the file selection, the Upload button becomes disabled again and no fetch occurs (user-facing contract for the defensive `!file || !planName.trim()` guard).

@@ -12,10 +12,16 @@ const mockGetUser = jest.fn()
 
 // Capture the setAll callback so individual tests can trigger a simulated token refresh
 let capturedSetAll: ((cookies: { name: string; value: string; options?: object }[]) => void) | null = null
+let capturedGetAll: (() => { name: string; value: string }[]) | null = null
 
 jest.mock('@supabase/ssr', () => ({
-  createServerClient: (_url: string, _key: string, { cookies }: { cookies: { setAll: typeof capturedSetAll } }) => {
+  createServerClient: (
+    _url: string,
+    _key: string,
+    { cookies }: { cookies: { setAll: typeof capturedSetAll; getAll: typeof capturedGetAll } },
+  ) => {
     capturedSetAll = cookies.setAll
+    capturedGetAll = cookies.getAll
     return { auth: { getUser: mockGetUser } }
   },
 }))
@@ -27,6 +33,7 @@ function makeRequest(path: string) {
 beforeEach(() => {
   jest.clearAllMocks()
   capturedSetAll = null
+  capturedGetAll = null
 })
 
 describe('middleware', () => {
@@ -124,6 +131,22 @@ describe('middleware', () => {
       mockGetUser.mockResolvedValueOnce({ data: { user: null } })
       const res = await middleware(makeRequest('/forgot-password'))
       expect(res.status).not.toBe(307)
+    })
+  })
+
+  describe('cookie adapter', () => {
+    it('exposes request cookies to supabase via getAll so the auth client can read the session', async () => {
+      mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+      const req = new NextRequest(new URL('http://localhost/login'))
+      req.cookies.set('sb-access-token', 'tok')
+      req.cookies.set('sb-refresh-token', 'ref')
+
+      await middleware(req)
+
+      const cookies = capturedGetAll?.() ?? []
+      const names = cookies.map(c => c.name)
+      expect(names).toContain('sb-access-token')
+      expect(names).toContain('sb-refresh-token')
     })
   })
 })

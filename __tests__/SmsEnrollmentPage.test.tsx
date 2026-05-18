@@ -177,6 +177,20 @@ describe('SmsEnrollmentForm', () => {
     expect(screen.getByText(/Network error/i)).toBeInTheDocument()
   })
 
+  it('includes the optional Home System or Appliance value in the submission when filled', async () => {
+    render(<SmsEnrollmentForm />)
+    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
+    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
+    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
+    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fireEvent.change(screen.getByLabelText(/home system or appliance/i), { target: { value: 'Water Heater' } })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+
+    await waitFor(() => expect(mockFetch).toHaveBeenCalled())
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body)
+    expect(body.system_or_appliance).toBe('Water Heater')
+  })
+
   it('shows "Submission failed" fallback when API error response has no error field', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, json: async () => ({}) })
     render(<SmsEnrollmentForm />)

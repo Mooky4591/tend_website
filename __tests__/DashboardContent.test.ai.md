@@ -42,3 +42,5 @@ Unit tests for `app/dashboard/DashboardContent.tsx`. Verifies initial data fetch
 - Applies a deterministic order (`created_at` then `id`, both ascending) on both paginated queries.
 - Removes both channels on unmount.
 - Renders the `DashboardCharts` component.
+- Stops paginating users on a Supabase error and surfaces zero stats (single `.range()` call).
+- Stops paginating conversations on a Supabase error (single `.range()` call).

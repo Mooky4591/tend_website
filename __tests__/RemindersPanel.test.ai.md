@@ -48,3 +48,8 @@ Unit tests for `app/dashboard/homeowners/[id]/RemindersPanel.tsx`. Verifies remi
 - Resyncs the toggle when `remindersPaused` prop changes between renders (covers `router.refresh()` returning a newer server value).
 - Resyncs the toggle when `userId` prop changes between renders (covers soft-nav reusing this instance for a different homeowner).
 - Edit still opens the inline form while paused (regression guard for "Edit/Delete/+ Add remain functional while paused").
+- Scrolls the add form into view (`scrollIntoView({ block: 'nearest' })`) when "+ Add" is clicked so it is not hidden below the internal scroll region.
+- Scrolls the editing card into view when Edit is clicked.
+- Changing the reminder-type select in the edit form updates its value.
+- Changing the reminder-type select in the add form updates its value.
+- Clicking Cancel in the add form closes it and clears any prior error message.

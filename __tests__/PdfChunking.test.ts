@@ -107,4 +107,12 @@ describe('extractAndChunk', () => {
     mockGetText.mockRejectedValueOnce(err)
     await expect(extractAndChunk(Buffer.from('fake'))).rejects.toThrow(TypeError)
   })
+
+  it('re-throws non-Error rejections (e.g. a plain string) unchanged', async () => {
+    // A library that rejects with a non-Error value should not be silently
+    // wrapped as a PdfParseError — the caller deserves the original payload.
+    mockGetText.mockRejectedValueOnce('catastrophic string rejection')
+    await expect(extractAndChunk(Buffer.from('fake'))).rejects.toBe('catastrophic string rejection')
+    expect(mockDestroy).toHaveBeenCalledTimes(1)
+  })
 })

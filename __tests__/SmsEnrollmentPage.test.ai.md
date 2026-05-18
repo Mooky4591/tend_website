@@ -39,3 +39,4 @@ Unit tests for `app/sms-enrollment/SmsEnrollmentForm.tsx`. Verifies field and bu
 - Disables the submit button while submitting.
 - Shows "Network error" message when fetch throws (catch-block coverage).
 - Shows "Submission failed. Please try again." fallback when API error response has no `error` field.
+- Includes the optional `system_or_appliance` value in the submission body when the field is filled in.

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UploadForm from '@/app/dashboard/docs/UploadForm'
 
@@ -137,6 +137,24 @@ describe('UploadForm', () => {
 
     expect(await screen.findByText('Upload failed. Please try again.')).toBeInTheDocument()
     expect(global.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables the Upload button and does not fetch after the file is cleared', async () => {
+    // The `!file || !planName.trim()` guard inside handleUpload is a defensive
+    // backstop; the user-facing contract is that the button cannot be clicked
+    // when either field is missing. This test verifies that contract by
+    // populating both fields, clearing the file, and asserting the disabled state.
+    const user = userEvent.setup()
+    render(<UploadForm />)
+
+    await user.type(screen.getByPlaceholderText(/Premium Home Warranty/), 'Gold Plan')
+    const fileInput = screen.getByLabelText(/PDF file/) as HTMLInputElement
+    await user.upload(fileInput, makeFile())
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeEnabled()
+
+    fireEvent.change(fileInput, { target: { files: [] } })
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled()
+    expect(global.fetch).not.toHaveBeenCalled()
   })
 
   it('shows an error when the selected file exceeds 10 MB', async () => {

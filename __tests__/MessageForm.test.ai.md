@@ -32,4 +32,5 @@ Unit tests for `app/dashboard/homeowners/[id]/MessageForm.tsx`. Verifies disable
 - Disables the button and shows "Sending…" for the full fetch round-trip.
 - Ignores a second click while a send is already in flight.
 - Submits on Enter and does not submit on Shift+Enter.
+- Does not send when the user presses Enter on a whitespace-only message.
 - Shows "Failed to send" fallback when API error response has no `error` field.

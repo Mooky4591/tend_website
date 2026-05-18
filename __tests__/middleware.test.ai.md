@@ -24,3 +24,4 @@ Integration tests for `middleware.ts`. Verifies route protection (unauthenticate
 - Authenticated: redirects `/login` and `/forgot-password` to `/dashboard`.
 - Authenticated: allows `/dashboard` through without redirecting.
 - Authenticated: copies refreshed session cookies onto the redirect response.
+- Cookie adapter: `getAll` exposes the incoming request cookies to Supabase (so the SSR auth client can read the session).

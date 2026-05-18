@@ -183,6 +183,30 @@ describe('ChangePasswordPage', () => {
     expect(mockSignInWithPassword).not.toHaveBeenCalled()
   })
 
+  it('shows error and skips sign-in when supabase resolves to no user (e.g. session expired)', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+    render(<ChangePasswordPage />)
+
+    // Wait for the getUser effect to settle so setUserEmail(null) runs
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Update password' })).toBeDisabled(),
+    )
+
+    // Submit anyway by bypassing the disabled button via form submit event
+    const user = userEvent.setup()
+    await user.type(screen.getByLabelText('Current password'), 'oldpass')
+    await user.type(screen.getByLabelText('New password'), 'newpass123')
+    await user.type(screen.getByLabelText('Confirm new password'), 'newpass123')
+
+    const form = screen.getByRole('button', { name: 'Update password' }).closest('form')!
+    fireEvent.submit(form)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Unable to verify your account. Please sign in again.'
+    )
+    expect(mockSignInWithPassword).not.toHaveBeenCalled()
+  })
+
   it('shows success and suppresses error when router.push throws synchronously', async () => {
     mockPush.mockImplementationOnce(() => { throw new Error('Navigation blocked') })
     render(<ChangePasswordPage />)
