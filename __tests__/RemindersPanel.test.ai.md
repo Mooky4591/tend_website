@@ -1,13 +1,13 @@
 ---
 name: RemindersPanel.test
-description: Tests for app/dashboard/homeowners/[id]/RemindersPanel — list render, edit/save/cancel/delete/add CRUD flows, loading guards
+description: Tests for app/dashboard/homeowners/[id]/RemindersPanel — list render, edit/save/cancel/delete/add CRUD flows, loading guards, pause/unpause toggle
 type: project
 ---
 
 # AI Contract: __tests__/RemindersPanel.test.tsx
 
 ## Purpose
-Unit tests for `app/dashboard/homeowners/[id]/RemindersPanel.tsx`. Verifies reminder list rendering, empty state, inline edit form pre-fill, Save (PATCH), Cancel, Delete, Add (POST), due-date validation, in-flight double-click guards for all three operations, and `router.refresh` after mutations.
+Unit tests for `app/dashboard/homeowners/[id]/RemindersPanel.tsx`. Verifies reminder list rendering, empty state, inline edit form pre-fill, Save (PATCH), Cancel, Delete, Add (POST), due-date validation, in-flight double-click guards for all mutating operations, `router.refresh` after mutations, and the per-user Pause/Unpause toggle (button label, "Paused" pill, greyed cards, in-flight guard, failure handling).
 
 ## Allowed Responsibilities
 - Stub `global.fetch` to control PATCH/DELETE/POST outcomes.
@@ -38,3 +38,11 @@ Unit tests for `app/dashboard/homeowners/[id]/RemindersPanel.tsx`. Verifies remi
 - Shows "Failed to delete" error and does not refresh when Delete request returns `ok: false`.
 - Shows "Failed to save" error and does not refresh when Save request returns `ok: false`.
 - Shows "Failed to add reminder" error and does not refresh when Add request returns `ok: false`.
+- Renders the "Pause" button when `remindersPaused={false}`.
+- Renders the "Unpause" button and a "Paused" pill when `remindersPaused={true}`.
+- Reminder cards have the `opacity-60` greyed-out class when paused; not when unpaused.
+- Clicking Pause PATCHes `/api/users/:id/reminders-pause` with `{ paused: true }`, flips the label to "Unpause", and calls `router.refresh`.
+- Clicking Unpause PATCHes the same endpoint with `{ paused: false }`, flips the label back, and calls `router.refresh`.
+- Shows "Failed to update pause state" and does not flip the button label when the toggle request returns `ok: false`.
+- Ignores a second Pause click while the first is in flight.
+- Edit still opens the inline form while paused (regression guard for "Edit/Delete/+ Add remain functional while paused").

@@ -56,6 +56,7 @@ Migrations live in `supabase/migrations/`. Run them in order in the
 |-----------|-------------|
 | `20260428000000_tenant_users.sql` | Creates `tenant_users` join table; enables RLS on `tenants`, `tenant_users`, and `monthly_billing_snapshots` |
 | `20260429000001_portal_rls_policies.sql` | Adds RLS policies for `users`, `conversations`, `reminders`, and `warranty_documents` so portal dashboard members can only read their tenant's data |
+| `20260518000000_add_reminders_pause.sql` | Adds `users.reminders_paused_at` (admin-toggled pause flag) and `reminders.skipped_at` (worker-set permanent-skip marker) for the reminders pause/unpause feature |
 
 ### Schema overview
 
@@ -138,6 +139,10 @@ app/
     reminders/              # GET/POST — maintenance reminders collection
       [id]/                 # PATCH/DELETE — individual reminder by ID
     send-message/           # POST — send an SMS message via Twilio
+    users/
+      [id]/
+        phone/              # PATCH — update a homeowner's phone number
+        reminders-pause/    # PATCH — pause or unpause reminder sending for one homeowner
     warranty-docs/
       [planName]/           # GET — list warranty documents for a specific plan
     warranty-upload/        # POST — upload a warranty PDF

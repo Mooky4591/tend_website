@@ -18,7 +18,7 @@ export default async function UserDetailPage({ params }: { params: { id: string 
   ] = await Promise.all([
     supabase
       .from('users')
-      .select('id, first_name, phone_number, address, city, state, zip, onboarding_complete, opted_out')
+      .select('id, first_name, phone_number, address, city, state, zip, onboarding_complete, opted_out, reminders_paused_at')
       .eq('id', params.id)
       .single(),
     supabase
@@ -28,7 +28,7 @@ export default async function UserDetailPage({ params }: { params: { id: string 
       .order('created_at', { ascending: true }),
     supabase
       .from('reminders')
-      .select('id, reminder_type, due_date, sent')
+      .select('id, reminder_type, due_date, sent, skipped_at')
       .eq('user_id', params.id)
       .order('due_date', { ascending: true }),
   ])
@@ -83,7 +83,11 @@ export default async function UserDetailPage({ params }: { params: { id: string 
             the conversation card's bottom and scrolls internally instead of growing the row. */}
         <div className="lg:relative">
           <div className="bg-white rounded-2xl border border-border/20 p-4 lg:absolute lg:inset-0 lg:flex lg:flex-col lg:overflow-hidden">
-            <RemindersPanel reminders={reminders ?? []} userId={params.id} />
+            <RemindersPanel
+              reminders={reminders ?? []}
+              userId={params.id}
+              remindersPaused={Boolean(homeowner.reminders_paused_at)}
+            />
           </div>
         </div>
       </div>

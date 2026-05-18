@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Reminder } from '@/types'
 import { REMINDER_TYPES } from '@/lib/constants'
-import { createReminder, updateReminder, deleteReminder } from '@/lib/api/client'
+import { createReminder, updateReminder, deleteReminder, setRemindersPaused } from '@/lib/api/client'
 
 function formatDate(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
@@ -15,9 +15,11 @@ function formatDate(dateStr: string) {
 export default function RemindersPanel({
   reminders,
   userId,
+  remindersPaused,
 }: {
   reminders: Reminder[]
   userId: string
+  remindersPaused: boolean
 }) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -27,6 +29,7 @@ export default function RemindersPanel({
   const [adding, setAdding] = useState(false)
   const [newValues, setNewValues] = useState({ reminderType: 'hvac_filter', dueDate: '' })
   const [error, setError] = useState<string | null>(null)
+  const [paused, setPaused] = useState(remindersPaused)
 
   // busy covers both the fetch round-trip and the subsequent router.refresh() transition
   const busy = isSubmitting || isPending
@@ -73,6 +76,20 @@ export default function RemindersPanel({
     }
   }
 
+  async function handleTogglePause() {
+    setError(null)
+    setIsSubmitting(true)
+    try {
+      const next = !paused
+      const res = await setRemindersPaused(userId, next)
+      if (!res.ok) { setError('Failed to update pause state'); return }
+      setPaused(next)
+      refresh()
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   async function handleAdd() {
     if (!newValues.dueDate) { setError('Due date is required'); return }
     setError(null)
@@ -91,14 +108,35 @@ export default function RemindersPanel({
   return (
     <div className="lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
       <div className="flex items-center justify-between mb-3 lg:flex-shrink-0">
-        <h2 className="text-sm font-semibold text-muted-foreground">Scheduled Reminders</h2>
-        <button
-          onClick={() => setAdding(true)}
-          className="text-xs px-3 py-1.5 bg-navy text-white rounded-lg hover:bg-deep-slate transition-colors"
-          disabled={busy}
-        >
-          + Add
-        </button>
+        <h2 className="text-sm font-semibold text-muted-foreground">
+          Scheduled Reminders
+          {paused && (
+            <span className="ml-2 inline-block px-2 py-0.5 text-xs rounded-full bg-muted text-foreground align-middle">
+              Paused
+            </span>
+          )}
+        </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleTogglePause}
+            disabled={busy}
+            aria-pressed={paused}
+            className={
+              paused
+                ? 'text-xs px-3 py-1.5 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors'
+                : 'text-xs px-3 py-1.5 border border-border/20 text-muted-foreground rounded-lg hover:bg-muted transition-colors'
+            }
+          >
+            {paused ? 'Unpause' : 'Pause'}
+          </button>
+          <button
+            onClick={() => setAdding(true)}
+            className="text-xs px-3 py-1.5 bg-navy text-white rounded-lg hover:bg-deep-slate transition-colors"
+            disabled={busy}
+          >
+            + Add
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-xs text-error mb-2 lg:flex-shrink-0">{error}</p>}
@@ -108,7 +146,12 @@ export default function RemindersPanel({
           <div
             key={r.id}
             ref={editingId === r.id ? editingCardRef : undefined}
-            className="bg-white border border-border/20 rounded-xl p-3"
+            data-testid="reminder-card"
+            className={
+              paused
+                ? 'bg-white border border-border/20 rounded-xl p-3 opacity-60'
+                : 'bg-white border border-border/20 rounded-xl p-3'
+            }
           >
             {editingId === r.id ? (
               <div className="flex flex-col gap-2">

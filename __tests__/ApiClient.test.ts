@@ -6,6 +6,7 @@ import {
   uploadWarrantyDoc,
   submitSmsEnrollment,
   updateHomeownerPhone,
+  setRemindersPaused,
 } from '@/lib/api/client'
 
 const mockFetch = jest.fn()
@@ -102,6 +103,28 @@ describe('updateHomeownerPhone', () => {
   it('returns the raw Response without throwing on non-2xx', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, status: 403 })
     const res = await updateHomeownerPhone('u1', '+15559999999')
+    expect(res).toMatchObject({ ok: false, status: 403 })
+  })
+})
+
+describe('setRemindersPaused', () => {
+  it('PATCHes /api/users/:id/reminders-pause with paused:true JSON body', async () => {
+    await setRemindersPaused('u1', true)
+    expect(mockFetch).toHaveBeenCalledWith('/api/users/u1/reminders-pause', expect.objectContaining({
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+    }))
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ paused: true })
+  })
+
+  it('PATCHes the same endpoint with paused:false JSON body', async () => {
+    await setRemindersPaused('u1', false)
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ paused: false })
+  })
+
+  it('returns the raw Response without throwing on non-2xx', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403 })
+    const res = await setRemindersPaused('u1', true)
     expect(res).toMatchObject({ ok: false, status: 403 })
   })
 })

@@ -55,3 +55,11 @@ export async function updateHomeownerPhone(userId: string, phoneNumber: string):
     body: JSON.stringify({ phoneNumber }),
   })
 }
+
+export async function setRemindersPaused(userId: string, paused: boolean): Promise<Response> {
+  return fetch(`/api/users/${userId}/reminders-pause`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paused }),
+  })
+}
