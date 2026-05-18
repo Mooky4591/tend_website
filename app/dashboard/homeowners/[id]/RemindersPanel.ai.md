@@ -28,6 +28,7 @@ Client Component (`RemindersPanel`) that manages the full CRUD lifecycle for a h
 - `refresh()` helper wraps `startTransition(() => router.refresh())`.
 - `formatDate` appends `T00:00:00` before parsing to avoid timezone off-by-one on date strings.
 - `handleAdd` must validate that `dueDate` is non-empty before the API call.
+- Root is a flex column on `lg+` (`lg:flex lg:flex-col lg:flex-1 lg:min-h-0`) so the panel can fill a height-constrained parent. The header row is `lg:flex-shrink-0` and the reminders list is `lg:flex-1 lg:min-h-0 lg:overflow-y-auto`, keeping the header pinned while the list scrolls. Below `lg`, the panel renders in natural flow with no scroll constraints.
 
 ## Tests Required
 - Renders all reminders with type and formatted date.

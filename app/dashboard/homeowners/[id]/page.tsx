@@ -78,9 +78,13 @@ export default async function UserDetailPage({ params }: { params: { id: string 
           </div>
         </div>
 
-        {/* Reminders */}
-        <div className="bg-white rounded-2xl border border-border/20 p-4">
-          <RemindersPanel reminders={reminders ?? []} userId={params.id} />
+        {/* Reminders — on lg+, an absolutely-positioned inner card fills the row height
+            set by the left column (homeowner info + conversation), so the panel matches
+            the conversation card's bottom and scrolls internally instead of growing the row. */}
+        <div className="lg:relative">
+          <div className="bg-white rounded-2xl border border-border/20 p-4 lg:absolute lg:inset-0 lg:flex lg:flex-col lg:overflow-hidden">
+            <RemindersPanel reminders={reminders ?? []} userId={params.id} />
+          </div>
         </div>
       </div>
     </div>

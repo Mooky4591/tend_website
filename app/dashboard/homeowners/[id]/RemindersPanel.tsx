@@ -76,8 +76,8 @@ export default function RemindersPanel({
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
+    <div className="lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
+      <div className="flex items-center justify-between mb-3 lg:flex-shrink-0">
         <h2 className="text-sm font-semibold text-muted-foreground">Scheduled Reminders</h2>
         <button
           onClick={() => setAdding(true)}
@@ -88,9 +88,9 @@ export default function RemindersPanel({
         </button>
       </div>
 
-      {error && <p className="text-xs text-error mb-2">{error}</p>}
+      {error && <p className="text-xs text-error mb-2 lg:flex-shrink-0">{error}</p>}
 
-      <div className="space-y-2">
+      <div className="space-y-2 lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
         {reminders.map(r => (
           <div key={r.id} className="bg-white border border-border/20 rounded-xl p-3">
             {editingId === r.id ? (

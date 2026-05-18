@@ -28,6 +28,7 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 - Back link to `/dashboard/homeowners` rendered above the heading.
 - Pass `params.id` and `homeowner.phone_number` into `PhoneNumberEditor`.
 - Conversation card uses a bounded responsive height (e.g. `min(600px, 70vh)`) with `overflow-hidden` so `ConversationPanel`'s internal `overflow-y-auto` scrolls the messages list instead of expanding the page, while still leaving room for the homeowner info card and reminders panel on short viewports.
+- On `lg+`, the reminders column is wrapped so its inner card is absolutely positioned (`lg:absolute lg:inset-0`) within a `lg:relative` parent. This keeps the reminders card from driving grid-row height: it stretches to match the left column (homeowner info + conversation) and scrolls internally rather than expanding the row when there are many reminders. Below `lg`, the reminders card flows naturally beneath the conversation.
 
 ## Tests Required
 - Unauthenticated user is redirected to `/login`.
