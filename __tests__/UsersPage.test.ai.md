@@ -34,6 +34,9 @@ Integration tests for `app/dashboard/homeowners/page.tsx`. Verifies auth redirec
 - Failed badge with `failure_reason = 'delivery_timeout' | 'network_error'` shows "retry option will be available" tooltip.
 - Failed badge with `failure_reason = 'carrier_blocked' | 'account_error'` shows "support@trytendr.org" tooltip.
 - Failed badge with `failure_reason = null` shows default "support@trytendr.org" tooltip.
-- Shows "—" when `first_name` is null.
+- Shows "—" when both `first_name` and `last_name` are null.
+- Renders `"first_name last_name"` when both name parts are present.
+- Renders just `first_name` when `last_name` is null.
+- Renders just `last_name` when `first_name` is null.
 - Handles null homeowners response without crashing.
 - Shows empty state when user has no tenant membership.

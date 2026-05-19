@@ -25,7 +25,8 @@ jest.mock('next/headers', () => ({
 }))
 
 const validBody = {
-  full_name: 'Jane Homeowner',
+  first_name: 'Jane',
+  last_name: 'Homeowner',
   phone: '5551234567',
   email: 'jane@example.com',
   home_address: '123 Main St',
@@ -71,8 +72,14 @@ describe('POST /api/sms-enrollment', () => {
     expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({ sms_consent: false }))
   })
 
-  it('returns 400 when full_name is missing', async () => {
-    const { full_name: _, ...body } = validBody
+  it('returns 400 when first_name is missing', async () => {
+    const { first_name: _, ...body } = validBody
+    const res = await POST(makeRequest(body))
+    expect(res.status).toBe(400)
+  })
+
+  it('returns 400 when last_name is missing', async () => {
+    const { last_name: _, ...body } = validBody
     const res = await POST(makeRequest(body))
     expect(res.status).toBe(400)
   })
@@ -96,8 +103,22 @@ describe('POST /api/sms-enrollment', () => {
   })
 
   it('returns 400 when required fields are blank strings', async () => {
-    const res = await POST(makeRequest({ ...validBody, full_name: '   ' }))
+    const res = await POST(makeRequest({ ...validBody, first_name: '   ' }))
     expect(res.status).toBe(400)
+  })
+
+  it('returns 400 when last_name is a blank string', async () => {
+    const res = await POST(makeRequest({ ...validBody, last_name: '   ' }))
+    expect(res.status).toBe(400)
+  })
+
+  it('writes first_name, last_name, and a computed full_name to the row', async () => {
+    await POST(makeRequest(validBody))
+    expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({
+      first_name: 'Jane',
+      last_name: 'Homeowner',
+      full_name: 'Jane Homeowner',
+    }))
   })
 
   it('stores IP address and user agent from headers', async () => {
@@ -126,9 +147,16 @@ describe('POST /api/sms-enrollment', () => {
   })
 
   it('trims whitespace and normalizes phone to E.164 before storing', async () => {
-    await POST(makeRequest({ ...validBody, full_name: '  Jane  ', phone: ' 5551234567 ' }))
+    await POST(makeRequest({
+      ...validBody,
+      first_name: '  Jane  ',
+      last_name: '  Homeowner  ',
+      phone: ' 5551234567 ',
+    }))
     expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({
-      full_name: 'Jane',
+      first_name: 'Jane',
+      last_name: 'Homeowner',
+      full_name: 'Jane Homeowner',
       phone: '+15551234567',
     }))
   })

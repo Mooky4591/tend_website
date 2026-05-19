@@ -6,8 +6,8 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
 - Resolve `tenant_id` via `getTenantId` from `@/lib/auth`.
-- Query the `users` table for the tenant's homeowners, ordered by `created_at` descending.
-- Render a table with columns: Name, Phone, Location, Status.
+- Query the `users` table (including `first_name` and `last_name`) for the tenant's homeowners, ordered by `created_at` descending.
+- Render a table with columns: Name, Phone, Location, Status. The Name cell shows `${first_name} ${last_name}` (falsy parts filtered out) and falls back to `—` when both are null.
 - Apply `statusBadge` to determine the correct badge color, label, and hover tooltip per row.
 - Use `getFailedTooltip(failure_reason)` to produce context-aware tooltip copy when `onboarding_status === 'failed'`.
 
@@ -36,6 +36,7 @@ Server Component page (`UsersPage`) that lists all homeowners for the authentica
 ## Tests Required
 - Unauthenticated user is redirected to `/login`.
 - Table renders each homeowner row with name, phone, city/state, and status badge.
+- Name cell renders `${first_name} ${last_name}` when both are present, just `first_name` (or `last_name`) when only one is present, and `—` when both are null.
 - `statusBadge` returns "Opted out" badge when `opted_out === true` (even if `onboarding_complete === true`).
 - `statusBadge` returns "Complete" badge when `onboarding_complete === true` and not opted out.
 - `statusBadge` returns "Queued"/"Failed"/"Pending" based on `onboarding_status`.

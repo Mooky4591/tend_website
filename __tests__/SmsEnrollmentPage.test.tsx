@@ -11,10 +11,36 @@ beforeEach(() => {
   mockFetch.mockResolvedValue({ ok: true, json: async () => ({ ok: true }) })
 })
 
+function fillRequiredFields({
+  first = 'Jane',
+  last = 'Homeowner',
+  phone = '5551234567',
+  email,
+  address = '123 Main St',
+  provider = 'AHS',
+}: {
+  first?: string
+  last?: string
+  phone?: string
+  email?: string
+  address?: string
+  provider?: string
+} = {}) {
+  fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: first } })
+  fireEvent.change(screen.getByLabelText(/last name/i), { target: { value: last } })
+  fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: phone } })
+  if (email !== undefined) {
+    fireEvent.change(screen.getByLabelText(/email address/i), { target: { value: email } })
+  }
+  fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: address } })
+  fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: provider } })
+}
+
 describe('SmsEnrollmentForm', () => {
   it('renders the heading fields and submit button', () => {
     render(<SmsEnrollmentForm />)
-    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/first name/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/last name/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/mobile phone/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/home address/i)).toBeInTheDocument()
@@ -55,12 +81,21 @@ describe('SmsEnrollmentForm', () => {
     expect(checkbox).not.toBeChecked()
   })
 
+  it('submits with first_name and last_name as separate fields', async () => {
+    render(<SmsEnrollmentForm />)
+    fillRequiredFields({ first: 'Jane', last: 'Homeowner' })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+
+    await waitFor(() => expect(mockFetch).toHaveBeenCalled())
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body)
+    expect(body.first_name).toBe('Jane')
+    expect(body.last_name).toBe('Homeowner')
+    expect(body).not.toHaveProperty('full_name')
+  })
+
   it('submits with sms_consent: true when checkbox is checked', async () => {
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane Homeowner' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('checkbox'))
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
@@ -71,10 +106,7 @@ describe('SmsEnrollmentForm', () => {
 
   it('submits with sms_consent: false when checkbox is left unchecked', async () => {
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane Homeowner' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
     await waitFor(() => expect(mockFetch).toHaveBeenCalled())
@@ -84,10 +116,7 @@ describe('SmsEnrollmentForm', () => {
 
   it('shows the opted-in success message when consent was given', async () => {
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('checkbox'))
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
@@ -97,10 +126,7 @@ describe('SmsEnrollmentForm', () => {
 
   it('shows the no-consent success message when checkbox was left unchecked', async () => {
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
     await waitFor(() => screen.getByRole('status'))
@@ -110,10 +136,7 @@ describe('SmsEnrollmentForm', () => {
   it('shows an error message when the API returns an error', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, json: async () => ({ error: 'DB error' }) })
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
     await waitFor(() => screen.getByRole('alert'))
@@ -126,38 +149,44 @@ describe('SmsEnrollmentForm', () => {
     expect(mockFetch).not.toHaveBeenCalled()
   })
 
-  it('shows a field error when phone has fewer than 10 digits', async () => {
+  it('shows a first-name field error and does not submit when first name is blank', () => {
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '12345' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields({ first: '' })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+    expect(screen.getByText('First name is required')).toBeInTheDocument()
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
+  it('shows a last-name field error and does not submit when last name is blank', () => {
+    render(<SmsEnrollmentForm />)
+    fillRequiredFields({ last: '' })
+    fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
+    expect(screen.getByText('Last name is required')).toBeInTheDocument()
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
+  it('shows a field error when phone has fewer than 10 digits', () => {
+    render(<SmsEnrollmentForm />)
+    fillRequiredFields({ phone: '12345' })
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
     expect(screen.getByText(/valid phone number/i)).toBeInTheDocument()
     expect(mockFetch).not.toHaveBeenCalled()
   })
 
-  it('shows a field error when email is malformed', async () => {
+  it('shows a field error when email is malformed', () => {
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/email address/i), { target: { value: 'not-an-email' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields({ email: 'not-an-email' })
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
     expect(screen.getByText(/valid email address/i)).toBeInTheDocument()
     expect(mockFetch).not.toHaveBeenCalled()
   })
 
-  it('disables the submit button while submitting', async () => {
+  it('disables the submit button while submitting', () => {
     let resolve: (v: unknown) => void
     mockFetch.mockReturnValueOnce(new Promise(r => { resolve = r }))
 
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
     expect(screen.getByRole('button', { name: /submitting/i })).toBeDisabled()
@@ -167,10 +196,7 @@ describe('SmsEnrollmentForm', () => {
   it('shows network error message when fetch throws', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network failure'))
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
     await waitFor(() => screen.getByRole('alert'))
@@ -179,10 +205,7 @@ describe('SmsEnrollmentForm', () => {
 
   it('includes the optional Home System or Appliance value in the submission when filled', async () => {
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.change(screen.getByLabelText(/home system or appliance/i), { target: { value: 'Water Heater' } })
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
@@ -194,10 +217,7 @@ describe('SmsEnrollmentForm', () => {
   it('shows "Submission failed" fallback when API error response has no error field', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, json: async () => ({}) })
     render(<SmsEnrollmentForm />)
-    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: 'Jane' } })
-    fireEvent.change(screen.getByLabelText(/mobile phone/i), { target: { value: '5551234567' } })
-    fireEvent.change(screen.getByLabelText(/home address/i), { target: { value: '123 Main St' } })
-    fireEvent.change(screen.getByLabelText(/warranty provider/i), { target: { value: 'AHS' } })
+    fillRequiredFields()
     fireEvent.click(screen.getByRole('button', { name: /enroll in tendr sms/i }))
 
     await waitFor(() => screen.getByRole('alert'))

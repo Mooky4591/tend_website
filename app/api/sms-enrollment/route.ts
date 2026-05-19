@@ -12,7 +12,8 @@ import {
 } from '@/lib/sms-consent'
 
 export interface SmsEnrollmentBody {
-  full_name?: string
+  first_name?: string
+  last_name?: string
   phone?: string
   email?: string
   home_address?: string
@@ -29,11 +30,20 @@ export async function POST(request: NextRequest) {
     return badRequest('Invalid request body')
   }
 
-  const { full_name, phone, email, home_address, warranty_provider, system_or_appliance, sms_consent } = body
+  const { first_name, last_name, phone, email, home_address, warranty_provider, system_or_appliance, sms_consent } = body
 
-  if (!full_name?.trim() || !phone?.trim() || !home_address?.trim() || !warranty_provider?.trim()) {
-    return badRequest('full_name, phone, home_address, and warranty_provider are required')
+  if (
+    !first_name?.trim() ||
+    !last_name?.trim() ||
+    !phone?.trim() ||
+    !home_address?.trim() ||
+    !warranty_provider?.trim()
+  ) {
+    return badRequest('first_name, last_name, phone, home_address, and warranty_provider are required')
   }
+
+  const firstNameValue = first_name.trim()
+  const lastNameValue = last_name.trim()
 
   const phoneResult = normalizePhone(phone)
   if ('error' in phoneResult) return badRequest(phoneResult.error)
@@ -49,8 +59,13 @@ export async function POST(request: NextRequest) {
 
   const supabase = createClient()
 
+  // full_name is NOT NULL in sms_enrollments for backward compatibility with
+  // downstream consumers that have not migrated to first_name + last_name yet.
+  // It is derived here from the two new columns, not from the request body.
   const { error } = await supabase.from('sms_enrollments').insert({
-    full_name: full_name.trim(),
+    first_name: firstNameValue,
+    last_name: lastNameValue,
+    full_name: `${firstNameValue} ${lastNameValue}`,
     phone: phoneResult.value,
     email: emailValue,
     home_address: home_address.trim(),

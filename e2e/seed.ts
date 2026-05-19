@@ -132,6 +132,7 @@ async function seedHomeowners(tenantId: string): Promise<{ aliceId: string }> {
       {
         tenant_id: tenantId,
         first_name: 'E2E Alice',
+        last_name: 'Anderson',
         phone_number: '+15550000001',
         address: '1 Test Lane',
         city: 'Atlanta',
@@ -144,6 +145,7 @@ async function seedHomeowners(tenantId: string): Promise<{ aliceId: string }> {
       {
         tenant_id: tenantId,
         first_name: 'E2E Bob',
+        last_name: 'Brown',
         phone_number: '+15550000002',
         city: 'Atlanta',
         state: 'GA',
@@ -154,6 +156,7 @@ async function seedHomeowners(tenantId: string): Promise<{ aliceId: string }> {
       {
         tenant_id: tenantId,
         first_name: 'E2E Carol',
+        last_name: 'Carter',
         phone_number: '+15550000003',
         city: 'Atlanta',
         state: 'GA',
@@ -280,6 +283,7 @@ async function seedTenantBHomeowners(tenantId: string): Promise<{ daveId: string
       {
         tenant_id: tenantId,
         first_name: 'E2E Dave',
+        last_name: 'Davis',
         phone_number: '+15550000004',
         city: 'Atlanta',
         state: 'GA',
