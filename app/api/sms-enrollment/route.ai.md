@@ -22,7 +22,7 @@ Public (unauthenticated) route handler that records a homeowner's SMS enrollment
 - `export async function POST(request: NextRequest): Promise<NextResponse>`
 
 ## Required Patterns
-- Required fields: `first_name`, `last_name`, `phone`, `home_address`, `warranty_provider`. Return 400 if any are missing/blank.
+- Required fields: `first_name`, `last_name`, `phone`, `home_address`, `warranty_provider`. Return 400 if any are missing/blank. The 400 body must name only the missing/blank fields (joined with `, `) followed by ` is required` (one) or ` are required` (more than one) — never a fixed list of all five.
 - The route does NOT accept `full_name` from the client. `full_name` is derived server-side as `${first_name} ${last_name}` and written alongside the new columns so existing consumers reading `sms_enrollments.full_name` continue to work.
 - Call `normalizePhone(phone)` from `@/lib/validators`; return 400 with `phoneResult.error` if `'error' in phoneResult`.
 - Call `isValidEmail(email)` from `@/lib/validators` when email is provided; return 400 if invalid.

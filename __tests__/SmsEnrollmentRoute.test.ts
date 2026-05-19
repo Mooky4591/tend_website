@@ -112,6 +112,21 @@ describe('POST /api/sms-enrollment', () => {
     expect(res.status).toBe(400)
   })
 
+  it('400 body names only the missing field when one required field is blank', async () => {
+    const res = await POST(makeRequest({ ...validBody, last_name: '' }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('last_name is required')
+  })
+
+  it('400 body lists every missing field with "are required" when multiple are blank', async () => {
+    const { last_name: _l, home_address: _h, ...body } = validBody
+    const res = await POST(makeRequest(body))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('last_name, home_address are required')
+  })
+
   it('writes first_name, last_name, and a computed full_name to the row', async () => {
     await POST(makeRequest(validBody))
     expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({

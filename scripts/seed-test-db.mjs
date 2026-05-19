@@ -155,7 +155,7 @@ function makeUser(spec, i) {
   return {
     tenant_id: TENANT_ID,
     first_name: spec.first_name,
-    last_name: spec.last_name ?? `seed-${String(i + 1).padStart(2, '0')}`,
+    last_name: spec.last_name ?? null,
     phone_number: seedPhone(i),
     address,
     city,

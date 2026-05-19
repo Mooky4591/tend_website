@@ -32,20 +32,24 @@ export async function POST(request: NextRequest) {
 
   const { first_name, last_name, phone, email, home_address, warranty_provider, system_or_appliance, sms_consent } = body
 
-  if (
-    !first_name?.trim() ||
-    !last_name?.trim() ||
-    !phone?.trim() ||
-    !home_address?.trim() ||
-    !warranty_provider?.trim()
-  ) {
-    return badRequest('first_name, last_name, phone, home_address, and warranty_provider are required')
+  const requiredFields: [string, string | undefined][] = [
+    ['first_name', first_name],
+    ['last_name', last_name],
+    ['phone', phone],
+    ['home_address', home_address],
+    ['warranty_provider', warranty_provider],
+  ]
+  const missing = requiredFields.filter(([, v]) => !v?.trim()).map(([k]) => k)
+  if (missing.length > 0) {
+    return badRequest(`${missing.join(', ')} ${missing.length === 1 ? 'is' : 'are'} required`)
   }
 
-  const firstNameValue = first_name.trim()
-  const lastNameValue = last_name.trim()
+  // The `!` assertions are sound: `missing.length === 0` above guarantees each
+  // of these required fields has a non-blank string value.
+  const firstNameValue = first_name!.trim()
+  const lastNameValue = last_name!.trim()
 
-  const phoneResult = normalizePhone(phone)
+  const phoneResult = normalizePhone(phone!)
   if ('error' in phoneResult) return badRequest(phoneResult.error)
 
   const emailValue = email?.trim() || null
@@ -68,8 +72,8 @@ export async function POST(request: NextRequest) {
     full_name: `${firstNameValue} ${lastNameValue}`,
     phone: phoneResult.value,
     email: emailValue,
-    home_address: home_address.trim(),
-    warranty_provider: warranty_provider.trim(),
+    home_address: home_address!.trim(),
+    warranty_provider: warranty_provider!.trim(),
     system_or_appliance: system_or_appliance?.trim() || null,
     sms_consent: sms_consent === true,
     consent_language_version: CONSENT_LANGUAGE_VERSION,

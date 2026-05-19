@@ -20,6 +20,7 @@ Integration tests for `app/api/sms-enrollment/route.ts` (POST handler). Verifies
 ## Tests Required
 - Returns 201 on valid submission.
 - Returns 400 for each missing required field and for blank required fields, including `first_name` and `last_name`.
+- 400 body names only the missing/blank field when exactly one is bad (e.g. `"last_name is required"`), and lists each missing field comma-joined with `"are required"` when more than one is bad — never a fixed list of all five.
 - Writes `first_name`, `last_name`, and a computed `full_name` (`${first_name} ${last_name}`) to the inserted row.
 - Trims whitespace on `first_name` and `last_name` (and the derived `full_name`) before storage.
 - Returns 400 for malformed JSON body.
