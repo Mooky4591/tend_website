@@ -22,18 +22,21 @@ Unit tests for `app/sms-enrollment/SmsEnrollmentForm.tsx`. Verifies field and bu
 - No exports — test file only.
 
 ## Tests Required
-- Renders all heading fields and submit button.
+- Renders all heading fields (including separate First Name and Last Name) and submit button.
 - SMS consent checkbox is unchecked by default.
 - Renders the full A2P consent language from `CONSENT_LANGUAGE`.
 - Renders the Terms link with correct href.
 - Renders the Privacy Policy link with correct href.
 - Allows the consent checkbox to be toggled.
+- Submits with `first_name` and `last_name` as separate fields in the request body (no `full_name`).
 - Submits with `sms_consent: true` when checkbox is checked.
 - Submits with `sms_consent: false` when checkbox is left unchecked.
 - Shows the opted-in success message when consent was given.
 - Shows the no-consent success message when checkbox was left unchecked.
 - Shows an error message when the API returns an error.
 - Does not call fetch when required fields are empty.
+- Shows "First name is required" error and does not submit when first name is blank.
+- Shows "Last name is required" error and does not submit when last name is blank.
 - Shows a field error when phone has fewer than 10 digits.
 - Shows a field error when email is malformed.
 - Disables the submit button while submitting.

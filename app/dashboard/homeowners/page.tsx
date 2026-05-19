@@ -60,7 +60,7 @@ export default async function UsersPage() {
 
   const { data: homeowners } = await supabase
     .from('users')
-    .select('id, first_name, phone_number, city, state, onboarding_complete, onboarding_status, opted_out, failure_reason, created_at')
+    .select('id, first_name, last_name, phone_number, city, state, onboarding_complete, onboarding_status, opted_out, failure_reason, created_at')
     .eq('tenant_id', tenantId ?? '')
     .order('created_at', { ascending: false })
 
@@ -86,7 +86,7 @@ export default async function UsersPage() {
               <tr key={h.id} className="border-b border-border/10 hover:bg-muted transition-colors">
                 <td className="px-4 py-3">
                   <Link href={`/dashboard/homeowners/${h.id}`} className="font-medium text-foreground hover:underline">
-                    {h.first_name ?? '—'}
+                    {[h.first_name, h.last_name].filter(Boolean).join(' ') || '—'}
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground/80 font-mono text-xs">{h.phone_number}</td>

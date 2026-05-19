@@ -18,7 +18,7 @@ export default async function UserDetailPage({ params }: { params: { id: string 
   ] = await Promise.all([
     supabase
       .from('users')
-      .select('id, first_name, phone_number, address, city, state, zip, onboarding_complete, opted_out, reminders_paused_at')
+      .select('id, first_name, last_name, phone_number, address, city, state, zip, onboarding_complete, opted_out, reminders_paused_at')
       .eq('id', params.id)
       .single(),
     supabase
@@ -35,6 +35,7 @@ export default async function UserDetailPage({ params }: { params: { id: string 
 
   if (!homeowner) notFound()
 
+  const fullName = [homeowner.first_name, homeowner.last_name].filter(Boolean).join(' ') || 'Homeowner'
   const location = [homeowner.address, homeowner.city, homeowner.state, homeowner.zip]
     .filter(Boolean).join(', ')
 
@@ -52,7 +53,7 @@ export default async function UserDetailPage({ params }: { params: { id: string 
           {/* Homeowner info */}
           <div className="bg-white rounded-2xl border border-border/20 p-4">
             <h2 className="text-sm font-semibold text-muted-foreground mb-2">Homeowner Information</h2>
-            <h1 className="text-2xl font-bold text-foreground mb-1">{homeowner.first_name ?? 'Homeowner'}</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-1">{fullName}</h1>
             <PhoneNumberEditor userId={params.id} phoneNumber={homeowner.phone_number} />
             {location && <p className="text-muted-foreground/60 text-sm mt-1">{location}</p>}
             <div className="flex gap-2 mt-3">

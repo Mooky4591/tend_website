@@ -22,7 +22,8 @@ Public (unauthenticated) route handler that records a homeowner's SMS enrollment
 - `export async function POST(request: NextRequest): Promise<NextResponse>`
 
 ## Required Patterns
-- Required fields: `full_name`, `phone`, `home_address`, `warranty_provider`. Return 400 if any are missing/blank.
+- Required fields: `first_name`, `last_name`, `phone`, `home_address`, `warranty_provider`. Return 400 if any are missing/blank. The 400 body must name only the missing/blank fields (joined with `, `) followed by ` is required` (one) or ` are required` (more than one) — never a fixed list of all five.
+- The route does NOT accept `full_name` from the client. `full_name` is derived server-side as `${first_name} ${last_name}` and written alongside the new columns so existing consumers reading `sms_enrollments.full_name` continue to work.
 - Call `normalizePhone(phone)` from `@/lib/validators`; return 400 with `phoneResult.error` if `'error' in phoneResult`.
 - Call `isValidEmail(email)` from `@/lib/validators` when email is provided; return 400 if invalid.
 - `sms_consent` must be stored as `sms_consent === true` (boolean coercion).
@@ -30,7 +31,9 @@ Public (unauthenticated) route handler that records a homeowner's SMS enrollment
 - `CONSENT_LANGUAGE`, `CONSENT_LANGUAGE_VERSION`, `TERMS_URL`, `PRIVACY_POLICY_URL`, `ENROLLMENT_SOURCE_URL` must all be written to the row.
 
 ## Tests Required
-- POST returns 400 when `full_name` is missing.
+- POST returns 400 when `first_name` is missing.
+- POST returns 400 when `last_name` is missing.
+- POST writes `first_name`, `last_name`, and a computed `full_name` (`${first_name} ${last_name}`) to the row.
 - POST returns 400 when `phone` has fewer than 10 digits.
 - POST returns 400 when `email` is provided but invalid.
 - POST normalizes a 10-digit phone to `+1` prefix.

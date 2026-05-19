@@ -5,11 +5,11 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 
 ## Allowed Responsibilities
 - Authenticate the user and redirect to `/login` if unauthenticated.
-- Fetch homeowner profile (including `reminders_paused_at`), conversations (ascending by `created_at`), and reminders (including `skipped_at`, ascending by `due_date`) in parallel via `Promise.all`.
+- Fetch homeowner profile (including `first_name`, `last_name`, and `reminders_paused_at`), conversations (ascending by `created_at`), and reminders (including `skipped_at`, ascending by `due_date`) in parallel via `Promise.all`.
 - Call `notFound()` if the homeowner is not found.
 - Derive `location` string from address fields.
 - Render status badges for `onboarding_complete`, `opted_out`, and a "Pending" badge when neither is true; badge always appears at the bottom of the homeowner info card.
-- Render a homeowner information card and compose `PhoneNumberEditor` for phone mutations.
+- Render a homeowner information card and compose `PhoneNumberEditor` for phone mutations. The display name is `${first_name} ${last_name}` (falsy parts filtered out), falling back to `'Homeowner'` when both are null.
 - Compose `ConversationPanel`, `MessageForm`, and `RemindersPanel` with fetched data. Pass `remindersPaused={Boolean(homeowner.reminders_paused_at)}` to `RemindersPanel`.
 
 ## Not Allowed
@@ -33,7 +33,7 @@ Server Component page (`UserDetailPage`) that fetches and displays a single home
 ## Tests Required
 - Unauthenticated user is redirected to `/login`.
 - `notFound()` is called when the homeowner row does not exist.
-- Homeowner name, phone editor, and location are rendered.
+- Homeowner name, phone editor, and location are rendered. The name renders as `${first_name} ${last_name}` when both are present; falls back gracefully when one or both are null.
 - "Onboarding complete" badge renders when `onboarding_complete === true`.
 - "Opted out" badge renders when `opted_out === true`.
 - "Pending" badge renders when both `onboarding_complete` and `opted_out` are false.

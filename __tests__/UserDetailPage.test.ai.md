@@ -26,14 +26,16 @@ Integration tests for `app/dashboard/homeowners/[id]/page.tsx`. Verifies auth re
 ## Tests Required
 - Redirects to `/login` when unauthenticated.
 - Calls `notFound` when the homeowner does not exist.
-- Renders the homeowner name and phone number.
+- Renders the homeowner's full name (`${first_name} ${last_name}`) and phone number.
+- Renders just the first name when `last_name` is null.
+- Renders just the last name when `first_name` is null.
 - Renders the full address when all location fields are present.
 - Omits the address line when location fields are null.
 - Shows the "Onboarding complete" badge when applicable.
 - Does not show the "Onboarding complete" badge when false.
 - Shows the "Opted out" badge when applicable.
 - Shows the "Pending" badge when both `onboarding_complete` and `opted_out` are false.
-- Falls back to "Homeowner" heading when `first_name` is null.
+- Falls back to "Homeowner" heading when both `first_name` and `last_name` are null.
 - Renders ConversationPanel, MessageForm, RemindersPanel, and PhoneNumberEditor.
 - Passes the homeowner's phone number to PhoneNumberEditor.
 - Handles null conversations and reminders responses without crashing.

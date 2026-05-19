@@ -142,12 +142,36 @@ describe('UsersPage', () => {
     expect(screen.getByText(/support@trytendr\.org/i)).toBeInTheDocument()
   })
 
-  it('shows — when first_name is null', async () => {
+  it('shows — when both first_name and last_name are null', async () => {
     mockUsersOrder.mockResolvedValueOnce({
-      data: [{ id: 'u1', first_name: null, phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, created_at: '2026-01-01' }],
+      data: [{ id: 'u1', first_name: null, last_name: null, phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, created_at: '2026-01-01' }],
     })
     render(await UsersPage())
     expect(screen.getByRole('link', { name: '—' })).toBeInTheDocument()
+  })
+
+  it('renders "first last" when both name parts are present', async () => {
+    mockUsersOrder.mockResolvedValueOnce({
+      data: [{ id: 'u1', first_name: 'Alice', last_name: 'Smith', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, failure_reason: null, created_at: '2026-01-01' }],
+    })
+    render(await UsersPage())
+    expect(screen.getByRole('link', { name: 'Alice Smith' })).toBeInTheDocument()
+  })
+
+  it('renders just first_name when last_name is null', async () => {
+    mockUsersOrder.mockResolvedValueOnce({
+      data: [{ id: 'u1', first_name: 'Alice', last_name: null, phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, failure_reason: null, created_at: '2026-01-01' }],
+    })
+    render(await UsersPage())
+    expect(screen.getByRole('link', { name: 'Alice' })).toBeInTheDocument()
+  })
+
+  it('renders just last_name when first_name is null', async () => {
+    mockUsersOrder.mockResolvedValueOnce({
+      data: [{ id: 'u1', first_name: null, last_name: 'Smith', phone_number: '+1', city: null, state: null, onboarding_complete: false, onboarding_status: null, opted_out: false, failure_reason: null, created_at: '2026-01-01' }],
+    })
+    render(await UsersPage())
+    expect(screen.getByRole('link', { name: 'Smith' })).toBeInTheDocument()
   })
 
   it('handles null homeowners response without crashing', async () => {

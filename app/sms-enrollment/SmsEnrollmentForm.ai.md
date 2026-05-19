@@ -5,7 +5,7 @@ Client Component (`SmsEnrollmentForm`) that collects homeowner SMS enrollment da
 
 ## Allowed Responsibilities
 - Manage `FormState` and `FieldErrors` state.
-- Client-side validate required fields (`full_name`, `phone`, `home_address`, `warranty_provider`) and optional fields (`email`, `system_or_appliance`).
+- Client-side validate required fields (`first_name`, `last_name`, `phone`, `home_address`, `warranty_provider`) and optional fields (`email`, `system_or_appliance`).
 - Validate phone using `isValidPhone` from `@/lib/validators`; validate email using `isValidEmail` from `@/lib/validators`.
 - Call `submitSmsEnrollment` from `@/lib/api/client` to POST the form data.
 - Render success state with different copy depending on `form.sms_consent`.
@@ -34,7 +34,8 @@ Client Component (`SmsEnrollmentForm`) that collects homeowner SMS enrollment da
 
 ## Tests Required
 - `sms_consent` checkbox starts unchecked.
-- Submitting without `full_name` shows a field-level error.
+- Submitting without `first_name` shows a field-level error on first name.
+- Submitting without `last_name` shows a field-level error on last name.
 - Submitting with a phone under 10 digits shows a phone error.
 - Submitting with an invalid email format shows an email error.
 - Successful submission shows the success state.

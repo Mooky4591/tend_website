@@ -65,6 +65,7 @@ jest.mock('@/app/dashboard/homeowners/[id]/PhoneNumberEditor', () => {
 const HOMEOWNER = {
   id: 'u1',
   first_name: 'Alice',
+  last_name: 'Smith',
   phone_number: '+15551234567',
   address: '123 Main St',
   city: 'Austin',
@@ -94,10 +95,22 @@ describe('UserDetailPage', () => {
     expect(mockNotFound).toHaveBeenCalled()
   })
 
-  it('renders the homeowner name and phone number', async () => {
+  it('renders the homeowner full name and phone number', async () => {
     render(await UserDetailPage({ params: { id: 'u1' } }))
-    expect(screen.getByText('Alice')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Alice Smith' })).toBeInTheDocument()
     expect(screen.getByTestId('phone-editor')).toHaveTextContent('+15551234567')
+  })
+
+  it('renders only the first name when last_name is null', async () => {
+    mockUserSingle.mockResolvedValueOnce({ data: { ...HOMEOWNER, last_name: null } })
+    render(await UserDetailPage({ params: { id: 'u1' } }))
+    expect(screen.getByRole('heading', { name: 'Alice' })).toBeInTheDocument()
+  })
+
+  it('renders only the last name when first_name is null', async () => {
+    mockUserSingle.mockResolvedValueOnce({ data: { ...HOMEOWNER, first_name: null } })
+    render(await UserDetailPage({ params: { id: 'u1' } }))
+    expect(screen.getByRole('heading', { name: 'Smith' })).toBeInTheDocument()
   })
 
   it('renders the full address when all location fields are present', async () => {
@@ -136,8 +149,8 @@ describe('UserDetailPage', () => {
     expect(screen.getByText('Pending')).toBeInTheDocument()
   })
 
-  it('falls back to Homeowner when first_name is null', async () => {
-    mockUserSingle.mockResolvedValueOnce({ data: { ...HOMEOWNER, first_name: null } })
+  it('falls back to Homeowner when both first_name and last_name are null', async () => {
+    mockUserSingle.mockResolvedValueOnce({ data: { ...HOMEOWNER, first_name: null, last_name: null } })
     render(await UserDetailPage({ params: { id: 'u1' } }))
     expect(screen.getByRole('heading', { name: 'Homeowner' })).toBeInTheDocument()
   })

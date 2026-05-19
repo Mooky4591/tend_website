@@ -6,7 +6,8 @@ import { isValidPhone, isValidEmail } from '@/lib/validators'
 import { submitSmsEnrollment } from '@/lib/api/client'
 
 interface FormState {
-  full_name: string
+  first_name: string
+  last_name: string
   phone: string
   email: string
   home_address: string
@@ -16,7 +17,8 @@ interface FormState {
 }
 
 const empty: FormState = {
-  full_name: '',
+  first_name: '',
+  last_name: '',
   phone: '',
   email: '',
   home_address: '',
@@ -26,7 +28,8 @@ const empty: FormState = {
 }
 
 interface FieldErrors {
-  full_name?: string
+  first_name?: string
+  last_name?: string
   phone?: string
   email?: string
   home_address?: string
@@ -46,7 +49,8 @@ export default function SmsEnrollmentForm() {
 
   function validate(): boolean {
     const errs: FieldErrors = {}
-    if (!form.full_name.trim()) errs.full_name = 'Full name is required'
+    if (!form.first_name.trim()) errs.first_name = 'First name is required'
+    if (!form.last_name.trim()) errs.last_name = 'Last name is required'
     if (!form.phone.trim()) {
       errs.phone = 'Mobile phone number is required'
     } else if (!isValidPhone(form.phone)) {
@@ -106,23 +110,44 @@ export default function SmsEnrollmentForm() {
         </div>
       )}
 
-      <div>
-        <label htmlFor="full_name" className="block text-sm font-medium text-muted-foreground mb-1.5">
-          Full Name <span aria-hidden="true" className="text-error">*</span>
-        </label>
-        <input
-          id="full_name"
-          type="text"
-          required
-          autoComplete="name"
-          aria-invalid={!!fieldErrors.full_name}
-          aria-describedby={fieldErrors.full_name ? 'full_name-error' : undefined}
-          value={form.full_name}
-          onChange={e => set('full_name', e.target.value)}
-          className="w-full rounded-lg border border-border/30 px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground/40 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-          placeholder="Jane Homeowner"
-        />
-        {fieldErrors.full_name && <p id="full_name-error" role="alert" className="mt-1 text-xs text-error">{fieldErrors.full_name}</p>}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="first_name" className="block text-sm font-medium text-muted-foreground mb-1.5">
+            First Name <span aria-hidden="true" className="text-error">*</span>
+          </label>
+          <input
+            id="first_name"
+            type="text"
+            required
+            autoComplete="given-name"
+            aria-invalid={!!fieldErrors.first_name}
+            aria-describedby={fieldErrors.first_name ? 'first_name-error' : undefined}
+            value={form.first_name}
+            onChange={e => set('first_name', e.target.value)}
+            className="w-full rounded-lg border border-border/30 px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground/40 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            placeholder="Jane"
+          />
+          {fieldErrors.first_name && <p id="first_name-error" role="alert" className="mt-1 text-xs text-error">{fieldErrors.first_name}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="last_name" className="block text-sm font-medium text-muted-foreground mb-1.5">
+            Last Name <span aria-hidden="true" className="text-error">*</span>
+          </label>
+          <input
+            id="last_name"
+            type="text"
+            required
+            autoComplete="family-name"
+            aria-invalid={!!fieldErrors.last_name}
+            aria-describedby={fieldErrors.last_name ? 'last_name-error' : undefined}
+            value={form.last_name}
+            onChange={e => set('last_name', e.target.value)}
+            className="w-full rounded-lg border border-border/30 px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground/40 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            placeholder="Homeowner"
+          />
+          {fieldErrors.last_name && <p id="last_name-error" role="alert" className="mt-1 text-xs text-error">{fieldErrors.last_name}</p>}
+        </div>
       </div>
 
       <div>
