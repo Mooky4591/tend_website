@@ -77,17 +77,46 @@ export async function validateOnboardingCompleteness(
     .eq('user_id', userId)
     .single()
 
-  // 3. Fetch all user conversations for context (role: 'user' messages only)
-  const { data: conversations } = await supabase
+  // 3. Fetch all conversations (user AND assistant) in chronological order.
+  //    Both roles are needed to scope each unknown response to the field
+  //    the assistant was asking about immediately before it.
+  const { data: conversationRows } = await supabase
     .from('conversations')
     .select('content, role')
     .eq('user_id', userId)
-    .eq('role', 'user')
     .order('created_at', { ascending: true })
 
-  const userMessages = (conversations ?? []).map(c => c.content ?? '')
+  const allMessages = (conversationRows ?? []).map(c => ({
+    content: c.content ?? '',
+    role: c.role as string,
+  }))
 
-  // 4. Determine which fields are gaps
+  // Build the set of fields the user explicitly said they don't know.
+  // Scope each unknown response to the field label found in:
+  //   (a) the user's own message (e.g. "I don't know the year built"), OR
+  //   (b) the immediately preceding assistant message (the AI's question).
+  // An unscoped response — no field label in either message — does NOT suppress
+  // any field, preventing an off-topic "I don't know" from hiding genuine gaps.
+  const suppressedFields = new Set<string>()
+  for (let i = 0; i < allMessages.length; i++) {
+    const msg = allMessages[i]
+    if (msg.role !== 'user' || !containsUnknownPhrase(msg.content)) continue
+
+    const userMsgLower = msg.content.toLowerCase()
+    const precedingAssistantLower =
+      i > 0 && allMessages[i - 1].role === 'assistant'
+        ? allMessages[i - 1].content.toLowerCase()
+        : null
+
+    for (const field of REQUIRED_HOME_DETAIL_FIELDS) {
+      const fieldLabel = field.replace(/_/g, ' ')
+      if (userMsgLower.includes(fieldLabel) || precedingAssistantLower?.includes(fieldLabel)) {
+        suppressedFields.add(field)
+      }
+    }
+  }
+
+  // 4. Classify gaps — null fields not covered by a scoped unknown response
   const gaps: string[] = []
 
   for (const field of REQUIRED_HOME_DETAIL_FIELDS) {
@@ -103,14 +132,7 @@ export async function validateOnboardingCompleteness(
 
     if (!isMissing) continue
 
-    // Check if the user ever said they don't know.
-    // Field-label co-occurrence is NOT required: in real onboarding flows the user
-    // answers "I don't know" to the AI's question, and the field label only appears
-    // in the AI's message (which is not in userMessages). Requiring the label here
-    // causes false-positive gaps for valid "I don't know" answers.
-    const userSaidUnknown = userMessages.some(msg => containsUnknownPhrase(msg))
-
-    if (!userSaidUnknown) {
+    if (!suppressedFields.has(field)) {
       gaps.push(field)
     }
   }

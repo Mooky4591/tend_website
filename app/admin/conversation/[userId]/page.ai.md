@@ -6,7 +6,9 @@ Shows all messages in chat style, the homeowner's home_details in a sidebar, act
 (mark reviewed, flag, unflag), and any AI quality flag details.
 
 ## Allowed Responsibilities
-- Fetch all conversations, user info, and home_details for the given userId.
+- Fetch all conversations for the given userId using `.range(from, from + PAGE_SIZE - 1)` pagination
+  to avoid Supabase's 1,000-row default cap silently truncating high-volume threads.
+- Fetch user info and home_details alongside the paginated message list.
 - Render messages in chronological order with role, content, and timestamp.
 - Show AI quality flag details (issue types and descriptions) when present.
 - Render action buttons: Mark Reviewed (POST to `/api/admin/conversations/[userId]/review`),

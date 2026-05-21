@@ -5,7 +5,7 @@ export default async function OnboardingGapsPage() {
 
   const { data: users } = await supabase
     .from('users')
-    .select('id, first_name, last_name, phone_number, onboarding_gaps, onboarding_complete, created_at')
+    .select('id, first_name, last_name, phone_number, onboarding_gaps, onboarding_complete')
     .eq('onboarding_gap_flagged', true)
     .order('created_at', { ascending: false })
 
@@ -29,7 +29,7 @@ export default async function OnboardingGapsPage() {
               <tr>
                 <th>Name</th>
                 <th>Phone</th>
-                <th>Onboarding Completed</th>
+                <th>Onboarding</th>
                 <th>Missing Fields</th>
                 <th>Action</th>
               </tr>
@@ -43,8 +43,10 @@ export default async function OnboardingGapsPage() {
                   <td style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: '12px' }}>
                     {row.phone_number ?? '—'}
                   </td>
-                  <td style={{ color: '#64748b', fontSize: '12px' }}>
-                    {row.onboarding_complete ? new Date(row.created_at).toLocaleDateString() : 'Not complete'}
+                  <td>
+                    <span className={`badge ${row.onboarding_complete ? 'badge-green' : 'badge-gray'}`}>
+                      {row.onboarding_complete ? 'Complete' : 'Incomplete'}
+                    </span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>

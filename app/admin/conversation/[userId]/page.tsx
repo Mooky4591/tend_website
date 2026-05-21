@@ -1,20 +1,47 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { notFound } from 'next/navigation'
 
+type ConvoMessage = {
+  id: string
+  role: string
+  content: string
+  created_at: string
+  ai_quality_flag: boolean | null
+  ai_quality_reason: string | null
+  manually_reviewed: boolean | null
+  manually_flagged: boolean | null
+  manually_flagged_reason: string | null
+}
+
 async function getThreadData(userId: string) {
   const supabase = createServiceClient()
 
-  const [
-    { data: user },
-    { data: messages },
-    { data: homeDetails },
-  ] = await Promise.all([
+  // Paginate messages to avoid Supabase's 1,000-row default cap silently
+  // truncating high-volume threads. The quality monitor uses the same pattern.
+  const PAGE_SIZE = 1000
+  const messages: ConvoMessage[] = []
+  let from = 0
+
+  for (;;) {
+    const { data: page } = await supabase
+      .from('conversations')
+      .select('id, role, content, created_at, ai_quality_flag, ai_quality_reason, manually_reviewed, manually_flagged, manually_flagged_reason')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (!page || page.length === 0) break
+    messages.push(...(page as ConvoMessage[]))
+    if (page.length < PAGE_SIZE) break
+    from += PAGE_SIZE
+  }
+
+  const [{ data: user }, { data: homeDetails }] = await Promise.all([
     supabase.from('users').select('id, first_name, last_name, phone_number').eq('id', userId).single(),
-    supabase.from('conversations').select('id, role, content, created_at, ai_quality_flag, ai_quality_reason, manually_reviewed, manually_flagged, manually_flagged_reason').eq('user_id', userId).order('created_at', { ascending: true }),
     supabase.from('home_details').select('*').eq('user_id', userId).single(),
   ])
 
-  return { user, messages: messages ?? [], homeDetails }
+  return { user, messages, homeDetails }
 }
 
 export default async function ConversationThreadPage({ params }: { params: { userId: string } }) {
