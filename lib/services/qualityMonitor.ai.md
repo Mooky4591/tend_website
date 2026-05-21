@@ -36,6 +36,9 @@ are detected.
 
 ## Required Patterns
 - `since` threshold: `Date.now() - 24 * 60 * 60 * 1000` (exactly 24 hours back).
+- Conversation fetch uses `.range(from, from + PAGE_SIZE - 1)` with `PAGE_SIZE = 1000` and
+  loops until a page returns fewer than `PAGE_SIZE` rows. This avoids Supabase's default
+  1,000-row cap silently truncating high-volume periods.
 - Conversation thread format: `[timestamp] Role: content` per line, ordered ascending by `created_at`.
   Role mapping: `role='user'` → `Homeowner`; `role='assistant'` → `Assistant`; any other role
   (e.g. `role='staff'`) → `Staff`. Staff messages must not be labelled `Assistant`.
@@ -54,6 +57,7 @@ are detected.
 - `runNightlyQualityReview` calls `sendAdminAlert` on Claude API errors.
 - `runNightlyQualityReview` calls `sendAdminAlert` when the conversations fetch fails.
 - `runNightlyQualityReview` labels `staff`-role messages as `Staff` (not `Assistant`) in the thread.
+- `runNightlyQualityReview` fetches a second page when the first returns exactly `PAGE_SIZE` rows.
 
 ## Notes for AI Agents
 - Consumed by `app/api/cron/quality-review/route.ts`.

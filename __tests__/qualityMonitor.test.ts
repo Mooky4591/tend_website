@@ -83,6 +83,9 @@ describe('runNightlyQualityReview', () => {
     const updateFn = jest.fn().mockReturnValue({
       eq: jest.fn().mockResolvedValue(updateResult),
     })
+    // range() terminates the fetch chain and resolves the page.
+    // Returning fewer than PAGE_SIZE rows (1000) stops the pagination loop.
+    const mockRange = jest.fn().mockResolvedValue({ data: conversations, error: convError })
 
     return {
       from: jest.fn((table: string) => {
@@ -90,11 +93,7 @@ describe('runNightlyQualityReview', () => {
           return {
             select: jest.fn().mockReturnValue({
               gte: jest.fn().mockReturnValue({
-                order: jest.fn().mockResolvedValue({ data: conversations, error: convError }),
-              }),
-              update: updateFn,
-              eq: jest.fn().mockReturnValue({
-                update: updateFn,
+                order: jest.fn().mockReturnValue({ range: mockRange }),
               }),
             }),
             update: updateFn,
@@ -112,6 +111,7 @@ describe('runNightlyQualityReview', () => {
         return {}
       }),
       _updateFn: updateFn,
+      _mockRange: mockRange,
     }
   }
 
@@ -206,7 +206,9 @@ describe('runNightlyQualityReview', () => {
           return {
             select: jest.fn().mockReturnValue({
               gte: jest.fn().mockReturnValue({
-                order: jest.fn().mockResolvedValue({ data: convos, error: null }),
+                order: jest.fn().mockReturnValue({
+                  range: jest.fn().mockResolvedValue({ data: convos, error: null }),
+                }),
               }),
             }),
             update: updateFn,
@@ -230,5 +232,58 @@ describe('runNightlyQualityReview', () => {
     expect(updateFn).toHaveBeenCalledWith(
       expect.objectContaining({ ai_quality_flag: true, ai_quality_reason: expect.any(String) }),
     )
+  })
+
+  it('fetches a second page when the first returns exactly PAGE_SIZE (1000) rows', async () => {
+    const AnthropicMock = jest.requireMock('@anthropic-ai/sdk')
+    AnthropicMock.mockImplementation(() => ({
+      messages: { create: jest.fn().mockResolvedValue(makeAnthropicResponse('{"flagged":false,"issues":[]}')) },
+    }))
+
+    // First page: exactly 1000 rows for u1 → triggers second page fetch.
+    const firstPage = Array.from({ length: 1000 }, (_, i) => ({
+      id: `c${i}`,
+      user_id: 'u1',
+      role: 'user',
+      content: `message ${i}`,
+      created_at: new Date().toISOString(),
+    }))
+    // Second page: empty → loop stops.
+    const mockRange = jest.fn()
+      .mockResolvedValueOnce({ data: firstPage, error: null })
+      .mockResolvedValueOnce({ data: [],        error: null })
+
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === 'conversations') {
+          return {
+            select: jest.fn().mockReturnValue({
+              gte: jest.fn().mockReturnValue({
+                order: jest.fn().mockReturnValue({ range: mockRange }),
+              }),
+            }),
+            update: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) }),
+          }
+        }
+        if (table === 'home_details') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({ data: null }),
+              }),
+            }),
+          }
+        }
+        return {}
+      }),
+    }
+
+    const result = await runNightlyQualityReview(supabase as unknown as Parameters<typeof runNightlyQualityReview>[0])
+    // range should have been called twice: page 0 and page 1000
+    expect(mockRange).toHaveBeenCalledTimes(2)
+    expect(mockRange).toHaveBeenNthCalledWith(1, 0, 999)
+    expect(mockRange).toHaveBeenNthCalledWith(2, 1000, 1999)
+    // u1 was reviewed from the 1000 rows on page 1
+    expect(result.reviewed).toBe(1)
   })
 })

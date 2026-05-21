@@ -117,28 +117,45 @@ export async function runNightlyQualityReview(
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
-  // 1. Pull all conversations from the last 24 hours
-  const { data: recentConversations, error: convError } = await supabase
-    .from('conversations')
-    .select('id, user_id, role, content, created_at')
-    .gte('created_at', since)
-    .order('created_at', { ascending: true })
+  // 1. Pull all conversations from the last 24 hours, paginating in chunks of
+  //    PAGE_SIZE to avoid Supabase's default 1,000-row cap silently truncating
+  //    high-volume periods.
+  const PAGE_SIZE = 1000
+  type ConvoRow = { id: string; user_id: string; role: string; content: string; created_at: string }
+  const allConversations: ConvoRow[] = []
+  let from = 0
 
-  if (convError) {
-    console.error('[QualityMonitor] Failed to fetch conversations:', convError.message)
-    await sendAdminAlert('api_failure', null, `Quality review failed to fetch conversations: ${convError.message}`)
-    return { reviewed: 0, flagged: 0 }
+  for (;;) {
+    const { data, error: convError } = await supabase
+      .from('conversations')
+      .select('id, user_id, role, content, created_at')
+      .gte('created_at', since)
+      .order('created_at', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (convError) {
+      console.error('[QualityMonitor] Failed to fetch conversations:', convError.message)
+      await sendAdminAlert('api_failure', null, `Quality review failed to fetch conversations: ${convError.message}`)
+      return { reviewed: 0, flagged: 0 }
+    }
+
+    if (data && data.length > 0) {
+      allConversations.push(...(data as ConvoRow[]))
+    }
+
+    // If fewer than PAGE_SIZE rows returned, we have reached the last page.
+    if (!data || data.length < PAGE_SIZE) break
+    from += PAGE_SIZE
   }
 
-  if (!recentConversations || recentConversations.length === 0) {
+  if (allConversations.length === 0) {
     console.log('[QualityMonitor] No conversations in the last 24 hours.')
     return { reviewed: 0, flagged: 0 }
   }
 
   // 2. Group by user_id
-  type ConvoRow = { id: string; user_id: string; role: string; content: string; created_at: string }
   const byUser = new Map<string, ConvoRow[]>()
-  for (const convo of recentConversations as ConvoRow[]) {
+  for (const convo of allConversations) {
     const list = byUser.get(convo.user_id) ?? []
     list.push(convo)
     byUser.set(convo.user_id, list)

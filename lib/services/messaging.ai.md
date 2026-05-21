@@ -25,7 +25,7 @@ Business-logic service for sending an outbound SMS from a staff user to a homeow
 - Query `tenants` by `homeowner.tenant_id`; return `{ error: 'Tenant has no Twilio number configured', status: 500 }` if `twilio_phone_number` is null.
 - Wrap `sendSms` in `.then(() => null).catch(err => err)` to distinguish success from failure without throwing.
 - Return `{ error: 'SMS delivery failed', status: 502 }` if Twilio rejects.
-- Call `sendAdminAlert(supabase, 'delivery_failure', userId, ...)` when Twilio rejects, before returning the error.
+- Call `sendAdminAlert('delivery_failure', userId, ...)` when Twilio rejects, before returning the error.
 - Insert conversation with `{ user_id, tenant_id, role: 'staff', content: message }`.
 - Return `{ error: 'Message sent but could not be saved: ' + insertError.message, status: 500 }` if the DB insert fails.
 
