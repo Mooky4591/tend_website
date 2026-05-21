@@ -3,20 +3,31 @@ import { createServiceClient } from '@/lib/supabase/service'
 export default async function AlertsPage() {
   const supabase = createServiceClient()
 
-  const { data: alerts } = await supabase
-    .from('system_alerts')
-    .select(`
-      id,
-      alert_type,
-      description,
-      created_at,
-      user_id,
-      users:user_id (first_name, last_name, phone_number)
-    `)
-    .eq('resolved', false)
-    .order('created_at', { ascending: false })
+  const PAGE_SIZE = 1000
+  type AlertRow = {
+    id: string
+    alert_type: string
+    description: string
+    created_at: string
+    user_id: string | null
+    users: { first_name?: string; last_name?: string; phone_number?: string } | null
+  }
+  const rows: AlertRow[] = []
+  let from = 0
 
-  const rows = alerts ?? []
+  for (;;) {
+    const { data: page } = await supabase
+      .from('system_alerts')
+      .select('id, alert_type, description, created_at, user_id, users:user_id (first_name, last_name, phone_number)')
+      .eq('resolved', false)
+      .order('created_at', { ascending: false })
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (!page || page.length === 0) break
+    rows.push(...(page as AlertRow[]))
+    if (page.length < PAGE_SIZE) break
+    from += PAGE_SIZE
+  }
 
   return (
     <div>
@@ -43,7 +54,7 @@ export default async function AlertsPage() {
             </thead>
             <tbody>
               {rows.map(row => {
-                const user = row.users as { first_name?: string; last_name?: string; phone_number?: string } | null
+                const user = row.users
                 const userName = user
                   ? [user.first_name, user.last_name].filter(Boolean).join(' ') || '—'
                   : '—'

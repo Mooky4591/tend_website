@@ -5,7 +5,9 @@ System alerts page at `/admin/alerts`. Lists all unresolved `system_alerts` rows
 and a "Resolve" button.
 
 ## Allowed Responsibilities
-- Fetch unresolved alerts with joined user data using the service-role client.
+- Fetch **all** unresolved alerts with joined user data using the service-role client.
+  Pagination loop: `PAGE_SIZE = 1000`, `.range(from, from + PAGE_SIZE - 1)`, break when
+  `page.length < PAGE_SIZE`. This avoids silent truncation at Supabase's default 1 000-row cap.
 - Display: alert type badge, user name/phone (if applicable), description, created timestamp.
 - Render a "Resolve" form that POSTs to `/api/admin/alerts/[id]/resolve`.
 
