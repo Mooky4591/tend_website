@@ -9,22 +9,27 @@ this layout.
 - Read `x-pathname` from `headers()` (set by middleware) to determine the current path.
 - Call `isAdminAuthenticated()` and redirect to `/admin/login` if the session is invalid,
   **unless** the current path is `/admin/login` (prevents the redirect loop).
-- Render the `<html>`, `<head>`, and `<body>` tags with global admin styles (inline `<style>`).
-- Render a top navigation bar with links to all admin pages.
+- Export a `metadata` object to set the admin segment page title (`'Admin — Tendr'`).
+- Import `./admin.css` for admin-section utility classes (buttons, badges, cards, tables).
+- Render a top navigation bar with links to all admin pages using inline styles.
 - Render the logout button (POST form to `/api/admin/auth` with `action=logout`).
 - Pass `children` through as the main content area.
 
 ## Not Allowed
+- Do not render `<html>`, `<head>`, or `<body>` tags — this is a nested layout; only the root
+  layout (`app/layout.tsx`) defines document-level elements.
 - Do not use Supabase auth.
-- Do not import Tailwind CSS — all styling is via inline styles and the embedded `<style>` tag.
+- Do not import Tailwind CSS — styling is via inline `style={{}}` props and `./admin.css`.
 - Do not fetch any data — the layout is presentation-only.
 - Do not render user-specific data.
 
 ## Public Interfaces
+- `export const metadata: Metadata`
 - `export default function AdminLayout({ children }): JSX.Element`
 
 ## Tests Required
 - Redirects to `/admin/login` when not authenticated.
+- Does NOT redirect on `/admin/login` (prevents login loop).
 - Renders navigation links to all admin pages when authenticated.
 - Renders a logout form that POSTs to `/api/admin/auth`.
 

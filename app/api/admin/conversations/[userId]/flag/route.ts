@@ -6,13 +6,14 @@ import { isAdminAuthenticated } from '@/lib/admin-auth'
  * POST /api/admin/conversations/[userId]/flag
  * Manually flags or unflags the most recent conversation for a user.
  * Body: `reason` (string) or `unflag=true` to clear.
+ * Uses 303 See Other so browser form submissions follow the redirect as GET.
  */
 export async function POST(
   request: NextRequest,
   { params }: { params: { userId: string } },
 ) {
   if (!isAdminAuthenticated()) {
-    return NextResponse.redirect(new URL('/admin/login', request.url))
+    return NextResponse.redirect(new URL('/admin/login', request.url), { status: 303 })
   }
 
   const supabase = createServiceClient()
@@ -48,5 +49,6 @@ export async function POST(
 
   return NextResponse.redirect(
     new URL(`/admin/conversation/${params.userId}`, request.url),
+    { status: 303 },
   )
 }

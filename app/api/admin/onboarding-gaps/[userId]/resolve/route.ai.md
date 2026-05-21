@@ -17,9 +17,14 @@ on the users table.
 ## Public Interfaces
 - `export async function POST(request, { params }): Promise<NextResponse>`
 
+## Required Patterns
+- **All redirects must use status 303** (`NextResponse.redirect(url, { status: 303 })`) so
+  browsers follow them as GET requests, completing the Post/Redirect/Get pattern.
+
 ## Tests Required
-- POST redirects to login when not authenticated.
+- POST redirects to `/admin/login` with status 303 when not authenticated.
 - POST sets `onboarding_gap_flagged = false`.
+- POST redirects to `/admin/onboarding-gaps` with status 303 on success.
 
 ## Notes for AI Agents
 - Uses service-role client.

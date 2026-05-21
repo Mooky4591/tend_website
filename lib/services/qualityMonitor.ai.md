@@ -37,6 +37,8 @@ are detected.
 ## Required Patterns
 - `since` threshold: `Date.now() - 24 * 60 * 60 * 1000` (exactly 24 hours back).
 - Conversation thread format: `[timestamp] Role: content` per line, ordered ascending by `created_at`.
+  Role mapping: `role='user'` → `Homeowner`; `role='assistant'` → `Assistant`; any other role
+  (e.g. `role='staff'`) → `Staff`. Staff messages must not be labelled `Assistant`.
 - Claude response parsing: strip markdown code fences before `JSON.parse`.
 - Reason string for `ai_quality_reason`: issues joined as `[type] description; [type] description`.
 - On Claude API error: call `sendAdminAlert` with type `"api_failure"` then `continue` to next user.
@@ -51,6 +53,7 @@ are detected.
 - `runNightlyQualityReview` updates `ai_quality_flag` and `ai_quality_reason` on the most recent conversation when flagged.
 - `runNightlyQualityReview` calls `sendAdminAlert` on Claude API errors.
 - `runNightlyQualityReview` calls `sendAdminAlert` when the conversations fetch fails.
+- `runNightlyQualityReview` labels `staff`-role messages as `Staff` (not `Assistant`) in the thread.
 
 ## Notes for AI Agents
 - Consumed by `app/api/cron/quality-review/route.ts`.

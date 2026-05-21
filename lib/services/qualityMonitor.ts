@@ -151,7 +151,7 @@ export async function runNightlyQualityReview(
     // 3. Assemble conversation thread
     const thread = messages
       .map(m => {
-        const role = m.role === 'user' ? 'Homeowner' : 'Assistant'
+        const role = m.role === 'user' ? 'Homeowner' : m.role === 'assistant' ? 'Assistant' : 'Staff'
         const ts = new Date(m.created_at).toLocaleString()
         return `[${ts}] ${role}: ${m.content}`
       })

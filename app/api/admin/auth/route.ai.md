@@ -25,13 +25,15 @@ sets the admin session cookie on success, and clears it on logout.
 - Redirect to `/admin/login?error=...` for missing password, unconfigured ADMIN_PASSWORD, and wrong password.
 - Set cookie using `adminCookieOptions` from `lib/admin-auth.ts`.
 - On logout: set cookie with `maxAge: 0` to expire it immediately.
+- **All redirects must use status 303** (`NextResponse.redirect(url, { status: 303 })`) so
+  browsers follow them as GET requests, completing the standard Post/Redirect/Get pattern.
 
 ## Tests Required
-- POST with `action=logout` clears the cookie and redirects to `/admin/login`.
-- POST with correct password sets the session cookie and redirects to `/admin`.
-- POST with wrong password redirects to `/admin/login` with an error param.
-- POST with missing password redirects to `/admin/login` with an error param.
-- POST when `ADMIN_PASSWORD` is not set redirects to `/admin/login` with an error param.
+- POST with `action=logout` clears the cookie and redirects to `/admin/login` with status 303.
+- POST with correct password sets the session cookie and redirects to `/admin` with status 303.
+- POST with wrong password redirects to `/admin/login` with an error param and status 303.
+- POST with missing password redirects to `/admin/login` with an error param and status 303.
+- POST when `ADMIN_PASSWORD` is not set redirects to `/admin/login` with an error param and status 303.
 
 ## Notes for AI Agents
 - Consumed by the `<form>` element in `app/admin/login/page.tsx`.

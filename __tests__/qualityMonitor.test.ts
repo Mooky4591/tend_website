@@ -154,6 +154,30 @@ describe('runNightlyQualityReview', () => {
     expect(result.flagged).toBe(0)
   })
 
+  it('labels staff messages as "Staff" and assistant messages as "Assistant" in the review thread', async () => {
+    const AnthropicMock = jest.requireMock('@anthropic-ai/sdk')
+    const mockCreate = jest.fn().mockResolvedValue(makeAnthropicResponse('{"flagged":false,"issues":[]}'))
+    AnthropicMock.mockImplementation(() => ({
+      messages: { create: mockCreate },
+    }))
+
+    const ts = new Date().toISOString()
+    const convos = [
+      { id: 'c1', user_id: 'u1', role: 'user',      content: 'Homeowner says hi',   created_at: ts },
+      { id: 'c2', user_id: 'u1', role: 'assistant',  content: 'AI responds',          created_at: ts },
+      { id: 'c3', user_id: 'u1', role: 'staff',      content: 'Staff note here',      created_at: ts },
+    ]
+    const supabase = makeSupabase({ conversations: convos })
+    await runNightlyQualityReview(supabase as unknown as Parameters<typeof runNightlyQualityReview>[0])
+
+    const prompt: string = mockCreate.mock.calls[0][0].messages[0].content
+    expect(prompt).toContain('Homeowner:')
+    expect(prompt).toContain('Assistant:')
+    expect(prompt).toContain('Staff:')
+    // Staff messages must NOT be mislabelled as Assistant
+    expect(prompt).not.toContain('Assistant: Staff note here')
+  })
+
   it('updates ai_quality_flag and ai_quality_reason when flagged', async () => {
     // Mock Anthropic to return flagged result
     const AnthropicMock = jest.requireMock('@anthropic-ai/sdk')

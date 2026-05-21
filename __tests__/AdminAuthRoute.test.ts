@@ -35,7 +35,7 @@ describe('POST /api/admin/auth', () => {
   it('sets the session cookie and redirects to /admin on correct password', async () => {
     const { POST } = await import('@/app/api/admin/auth/route')
     const res = await POST(makeFormRequest({ password: 'correct-password' }))
-    expect(res.status).toBe(307)
+    expect(res.status).toBe(303)
     expect(res.headers.get('location')).toContain('/admin')
     expect(res.headers.get('set-cookie')).toContain('admin_session')
   })
@@ -43,7 +43,7 @@ describe('POST /api/admin/auth', () => {
   it('redirects to /admin/login with error on wrong password', async () => {
     const { POST } = await import('@/app/api/admin/auth/route')
     const res = await POST(makeFormRequest({ password: 'wrong' }))
-    expect(res.status).toBe(307)
+    expect(res.status).toBe(303)
     expect(res.headers.get('location')).toContain('/admin/login')
     expect(res.headers.get('location')).toContain('error=')
   })
@@ -51,7 +51,7 @@ describe('POST /api/admin/auth', () => {
   it('redirects to /admin/login with error when password is missing', async () => {
     const { POST } = await import('@/app/api/admin/auth/route')
     const res = await POST(makeFormRequest({}))
-    expect(res.status).toBe(307)
+    expect(res.status).toBe(303)
     expect(res.headers.get('location')).toContain('/admin/login')
     expect(res.headers.get('location')).toContain('error=')
   })
@@ -60,14 +60,14 @@ describe('POST /api/admin/auth', () => {
     delete process.env.ADMIN_PASSWORD
     const { POST } = await import('@/app/api/admin/auth/route')
     const res = await POST(makeFormRequest({ password: 'any' }))
-    expect(res.status).toBe(307)
+    expect(res.status).toBe(303)
     expect(res.headers.get('location')).toContain('/admin/login')
   })
 
   it('clears the cookie and redirects to /admin/login on logout', async () => {
     const { POST } = await import('@/app/api/admin/auth/route')
     const res = await POST(makeFormRequest({ action: 'logout' }))
-    expect(res.status).toBe(307)
+    expect(res.status).toBe(303)
     expect(res.headers.get('location')).toContain('/admin/login')
     const cookie = res.headers.get('set-cookie') ?? ''
     expect(cookie).toContain('admin_session=')

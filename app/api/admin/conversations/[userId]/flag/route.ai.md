@@ -18,10 +18,15 @@ Admin action route that manually flags or unflags the most recent conversation f
 ## Public Interfaces
 - `export async function POST(request, { params }): Promise<NextResponse>`
 
+## Required Patterns
+- **All redirects must use status 303** (`NextResponse.redirect(url, { status: 303 })`) so
+  browsers follow them as GET requests, completing the Post/Redirect/Get pattern.
+
 ## Tests Required
-- POST redirects to login when not authenticated.
+- POST redirects to `/admin/login` with status 303 when not authenticated.
 - POST sets `manually_flagged = true` and the reason when flagging.
 - POST sets `manually_flagged = false` and `reason = null` when unflaging.
+- POST redirects to the conversation thread page with status 303 on success.
 
 ## Notes for AI Agents
 - Uses service-role client.
