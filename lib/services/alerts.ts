@@ -1,17 +1,16 @@
 import sgMail from '@sendgrid/mail'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { createServiceClient } from '@/lib/supabase/service'
 
 /**
  * Inserts a system_alerts row and sends an admin email via SendGrid.
+ * Uses a service-role Supabase client internally so the INSERT always
+ * bypasses RLS regardless of the calling context.
  *
- * @param supabase      Supabase client (service-role to bypass RLS)
  * @param alertType     Category: "api_failure", "delivery_failure", "onboarding_stuck", etc.
  * @param userId        Optional homeowner user ID associated with the alert
  * @param description   Human-readable description of what went wrong
  */
 export async function sendAdminAlert(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: SupabaseClient<any, any, any>,
   alertType: string,
   userId: string | null,
   description: string,
@@ -20,6 +19,7 @@ export async function sendAdminAlert(
 
   // 1. Insert into system_alerts (best-effort; don't throw on failure)
   try {
+    const supabase = createServiceClient()
     await supabase.from('system_alerts').insert({
       alert_type: alertType,
       user_id: userId ?? null,

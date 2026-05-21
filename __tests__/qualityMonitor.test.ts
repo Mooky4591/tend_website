@@ -125,7 +125,6 @@ describe('runNightlyQualityReview', () => {
     const supabase = makeSupabase({ convError: { message: 'DB down' } })
     await runNightlyQualityReview(supabase as unknown as Parameters<typeof runNightlyQualityReview>[0])
     expect(sendAdminAlert).toHaveBeenCalledWith(
-      expect.anything(),
       'api_failure',
       null,
       expect.stringContaining('DB down'),
@@ -148,7 +147,6 @@ describe('runNightlyQualityReview', () => {
     const result = await runNightlyQualityReview(supabase as unknown as Parameters<typeof runNightlyQualityReview>[0])
 
     expect(sendAdminAlert).toHaveBeenCalledWith(
-      expect.anything(),
       'api_failure',
       'u1',
       expect.stringContaining('Claude API error'),

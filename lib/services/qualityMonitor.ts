@@ -126,7 +126,7 @@ export async function runNightlyQualityReview(
 
   if (convError) {
     console.error('[QualityMonitor] Failed to fetch conversations:', convError.message)
-    await sendAdminAlert(supabase, 'api_failure', null, `Quality review failed to fetch conversations: ${convError.message}`)
+    await sendAdminAlert('api_failure', null, `Quality review failed to fetch conversations: ${convError.message}`)
     return { reviewed: 0, flagged: 0 }
   }
 
@@ -173,7 +173,7 @@ export async function runNightlyQualityReview(
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err)
       console.error(`[QualityMonitor] Claude API error for user ${userId}:`, errMsg)
-      await sendAdminAlert(supabase, 'api_failure', userId, `Quality review Claude API error: ${errMsg}`)
+      await sendAdminAlert('api_failure', userId, `Quality review Claude API error: ${errMsg}`)
       continue
     }
 

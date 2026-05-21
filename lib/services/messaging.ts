@@ -34,7 +34,6 @@ export async function sendMessageToHomeowner(
 
   if (smsError) {
     await sendAdminAlert(
-      supabase,
       'delivery_failure',
       userId,
       `Outbound SMS failed for user ${userId}: ${smsError instanceof Error ? smsError.message : String(smsError)}`,

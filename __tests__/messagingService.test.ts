@@ -68,7 +68,6 @@ describe('sendMessageToHomeowner', () => {
     mockSendSms.mockRejectedValueOnce(new Error('carrier blocked'))
     await sendMessageToHomeowner(makeSupabase(), 'u1', 'Hello')
     expect(sendAdminAlert).toHaveBeenCalledWith(
-      expect.anything(),
       'delivery_failure',
       'u1',
       expect.stringContaining('carrier blocked'),
