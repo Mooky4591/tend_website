@@ -36,6 +36,10 @@ captured credentials.
 - `isAdminAuthenticated` splits on the **last** colon (to tolerate HMAC hex that contains no
   colons), rejects tokens with no colon, invalid numeric `issuedAt`, or age >
   `COOKIE_MAX_AGE_SECONDS * 1000` ms.
+- HMAC comparison **must** use `crypto.timingSafeEqual` (not `===`). Convert both the received
+  and expected HMAC strings to `Buffer` via `Buffer.from(hex, 'hex')` and check lengths match
+  before calling `timingSafeEqual` — a malformed received HMAC produces a shorter buffer that
+  would otherwise cause `timingSafeEqual` to throw.
 - Fails closed: `isAdminAuthenticated()` returns `false` immediately when `ADMIN_PASSWORD` is unset.
 
 ## Tests Required

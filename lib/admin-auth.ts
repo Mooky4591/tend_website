@@ -44,7 +44,15 @@ export function isAdminAuthenticated(): boolean {
   const issuedAt = Number(issuedAtStr)
   if (!issuedAtStr || !Number.isFinite(issuedAt)) return false
   if (Date.now() - issuedAt > COOKIE_MAX_AGE_SECONDS * 1000) return false
-  return receivedHmac === hashPassword(issuedAtStr)
+  // Timing-safe comparison: prevents character-by-character timing attacks that could
+  // recover the expected HMAC from the public cookie endpoint via repeated probing.
+  const expectedHmac = hashPassword(issuedAtStr)
+  const receivedBuf = Buffer.from(receivedHmac, 'hex')
+  const expectedBuf = Buffer.from(expectedHmac, 'hex')
+  // Length guard: timingSafeEqual throws on mismatched lengths; a malformed
+  // receivedHmac (not valid 64-char hex) would produce a shorter buffer.
+  if (receivedBuf.length !== expectedBuf.length) return false
+  return crypto.timingSafeEqual(receivedBuf, expectedBuf)
 }
 
 /**

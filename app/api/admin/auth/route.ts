@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { hashPassword, createSessionToken, adminCookieOptions, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 
@@ -33,8 +34,12 @@ export async function POST(request: NextRequest) {
   }
 
   const submittedHash = hashPassword(password)
+  const expectedHash  = hashPassword(adminPassword)
 
-  if (submittedHash !== hashPassword(adminPassword)) {
+  // Timing-safe comparison: both values are 64-char SHA-256 hex strings (32-byte buffers),
+  // so they are always the same length. Using === here would leak timing information per
+  // character on this public endpoint.
+  if (!crypto.timingSafeEqual(Buffer.from(submittedHash, 'hex'), Buffer.from(expectedHash, 'hex'))) {
     const url = new URL('/admin/login', request.url)
     url.searchParams.set('error', 'Incorrect password')
     return NextResponse.redirect(url, { status: 303 })

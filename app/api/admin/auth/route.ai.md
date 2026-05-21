@@ -23,6 +23,9 @@ sets the admin session cookie on success, and clears it on logout.
 ## Required Patterns
 - Read `password` and `action` from `request.formData()`.
 - Redirect to `/admin/login?error=...` for missing password, unconfigured ADMIN_PASSWORD, and wrong password.
+- Password comparison **must** use `crypto.timingSafeEqual` on the two `Buffer.from(hash,'hex')`
+  buffers (not `===` / `!==`). Both hashes are always 64-char SHA-256 hex (32 bytes), so no
+  length guard is needed here, but the comparison must be constant-time.
 - Set cookie using `adminCookieOptions` from `lib/admin-auth.ts`.
 - On logout: set cookie with `maxAge: 0` to expire it immediately.
 - **All redirects must use status 303** (`NextResponse.redirect(url, { status: 303 })`) so

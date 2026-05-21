@@ -4,8 +4,14 @@
 
 import { NextRequest } from 'next/server'
 
+// hashPassword must return valid 64-character hex strings so that
+// crypto.timingSafeEqual(Buffer.from(a,'hex'), Buffer.from(b,'hex')) works correctly.
+// Non-hex strings produce 0-byte buffers, which compare equal regardless of value.
+const CORRECT_HASH = 'a'.repeat(64) // 32 bytes of 0xaa
+const WRONG_HASH   = 'b'.repeat(64) // 32 bytes of 0xbb — different from CORRECT_HASH
+
 jest.mock('@/lib/admin-auth', () => ({
-  hashPassword: jest.fn((p: string) => (p === 'correct-password' ? 'correct-hash' : 'wrong-hash')),
+  hashPassword: jest.fn((p: string) => (p === 'correct-password' ? CORRECT_HASH : WRONG_HASH)),
   createSessionToken: jest.fn().mockReturnValue('session-token'),
   adminCookieOptions: { httpOnly: true, maxAge: 3600 },
   ADMIN_COOKIE_NAME: 'admin_session',
