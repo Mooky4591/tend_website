@@ -27,13 +27,19 @@ async function getConversationReview() {
   // Get unique user IDs
   const userIds = Array.from(new Set(recentConvos.map(c => c.user_id)))
 
-  // Fetch user data
-  const { data: users } = await supabase
-    .from('users')
-    .select('id, first_name, last_name, phone_number')
-    .in('id', userIds)
+  // Fetch user data — chunk the ID list so each .in() call stays within the 1,000-row cap.
+  type UserRow = { id: string; first_name: string | null; last_name: string | null; phone_number: string | null }
+  const allUsers: UserRow[] = []
+  for (let i = 0; i < userIds.length; i += PAGE_SIZE) {
+    const chunk = userIds.slice(i, i + PAGE_SIZE)
+    const { data } = await supabase
+      .from('users')
+      .select('id, first_name, last_name, phone_number')
+      .in('id', chunk)
+    if (data) allUsers.push(...(data as UserRow[]))
+  }
 
-  const userMap = new Map((users ?? []).map(u => [u.id, u]))
+  const userMap = new Map(allUsers.map(u => [u.id, u]))
 
   // Get latest conversation per user
   const latestByUser = new Map<string, typeof recentConvos[0]>()

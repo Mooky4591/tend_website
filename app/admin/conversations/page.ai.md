@@ -9,6 +9,9 @@ in the last 7 days, showing AI quality flags, manual flags, and links to the ful
   `.range()` loop (PAGE_SIZE = 1000) to avoid Supabase's default row cap silently truncating
   high-volume periods.
 - Deduplicate to show one row per user (most recent conversation used for flag status).
+- Fetch the matching user rows by chunking the deduplicated `userIds` list into PAGE_SIZE
+  batches and making one `.in('id', chunk)` call per batch, so the lookup is also safe above
+  1 000 active users per week.
 - Display: name, phone, last message timestamp, AI quality flag, AI quality reason (truncated to 100 chars), manually flagged.
 - Link to `/admin/conversation/[userId]` for the full thread view.
 
