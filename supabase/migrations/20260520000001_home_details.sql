@@ -26,10 +26,16 @@ CREATE TABLE IF NOT EXISTS public.home_details (
 COMMENT ON TABLE public.home_details IS
   'Physical attributes of a homeowner''s property, collected during SMS onboarding.';
 
-CREATE INDEX home_details_user_id_idx ON public.home_details (user_id);
+-- IF NOT EXISTS guards all objects so the migration is safe to run on environments
+-- where home_details was already created (e.g. a staging DB that pre-dates this PR).
+
+CREATE INDEX IF NOT EXISTS home_details_user_id_idx ON public.home_details (user_id);
 
 ALTER TABLE public.home_details ENABLE ROW LEVEL SECURITY;
 
+-- DROP + CREATE is the standard idempotency pattern for policies; Postgres has no
+-- CREATE OR REPLACE POLICY syntax.
+DROP POLICY IF EXISTS "home_details: tenant members can select" ON public.home_details;
 CREATE POLICY "home_details: tenant members can select"
   ON public.home_details FOR SELECT
   USING (
@@ -40,7 +46,9 @@ CREATE POLICY "home_details: tenant members can select"
     )
   );
 
--- Trigger to keep updated_at current
+-- Trigger to keep updated_at current.
+-- CREATE OR REPLACE FUNCTION is already idempotent.
+-- CREATE OR REPLACE TRIGGER (Postgres 14+) replaces the trigger if it already exists.
 CREATE OR REPLACE FUNCTION public.set_updated_at()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$
 BEGIN
@@ -49,6 +57,6 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER home_details_updated_at
+CREATE OR REPLACE TRIGGER home_details_updated_at
   BEFORE UPDATE ON public.home_details
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
