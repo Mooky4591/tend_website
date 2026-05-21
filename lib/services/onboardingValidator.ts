@@ -103,13 +103,12 @@ export async function validateOnboardingCompleteness(
 
     if (!isMissing) continue
 
-    // Check if the user explicitly said they don't know *about this field*.
-    // Match against the field name so a single "I don't know" about an unrelated
-    // attribute does not suppress every other gap in the same pass.
-    const fieldLabel = field.replace(/_/g, ' ')
-    const userSaidUnknown = userMessages.some(
-      msg => containsUnknownPhrase(msg) && msg.toLowerCase().includes(fieldLabel),
-    )
+    // Check if the user ever said they don't know.
+    // Field-label co-occurrence is NOT required: in real onboarding flows the user
+    // answers "I don't know" to the AI's question, and the field label only appears
+    // in the AI's message (which is not in userMessages). Requiring the label here
+    // causes false-positive gaps for valid "I don't know" answers.
+    const userSaidUnknown = userMessages.some(msg => containsUnknownPhrase(msg))
 
     if (!userSaidUnknown) {
       gaps.push(field)

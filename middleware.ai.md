@@ -31,7 +31,8 @@ cookie-based auth via `isAdminAuthenticated()`).
 
 ## Required Patterns
 - Cookie propagation pattern: `supabaseResponse.cookies.getAll().forEach(cookie => redirectResponse.cookies.set(cookie))` on both redirect paths.
-- `authOnlyPages` array must match the `config.matcher` list exactly (minus `/dashboard/:path*`).
+- Admin early-return: `/admin/:path*` is in `config.matcher` but is handled by an early `return NextResponse.next(...)` **before** the Supabase client is constructed. Admin routes are therefore **not** included in `authOnlyPages`, which only covers Supabase-auth-gated pages.
+- `authOnlyPages` must contain exactly the auth-wall pages that also appear in `config.matcher` (currently `/login` and `/forgot-password`). Any route that uses its own auth mechanism (like `/admin`) uses an early-return path instead and must not appear in `authOnlyPages`.
 - `getUser()` result used only for null-check; no user data is consumed beyond `user !== null`.
 
 ## Tests Required

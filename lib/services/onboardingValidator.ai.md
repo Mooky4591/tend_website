@@ -10,7 +10,7 @@ a human-readable summary.
 - Define and export the canonical list of required home detail fields (`REQUIRED_HOME_DETAIL_FIELDS`).
 - Accept a Supabase client (dependency injection) and a `userId`.
 - Fetch the user's `home_details` record and their conversation history (`role: 'user'` messages).
-- Classify a null field as a gap only when no user message contains a phrase indicating "I don't know" or "I don't have one" **AND** also mentions the specific field label (field name with underscores replaced by spaces). This prevents a single unrelated "I don't know" from suppressing all other null gaps.
+- Classify a null field as a gap only when **no** user message contains a phrase indicating "I don't know" or "I don't have one". Field-label co-occurrence is **not** required — in real onboarding flows the field name appears in the AI's question (an assistant-role message), and the user's reply is typically a bare "I don't know" that contains no field label. Requiring the label causes false-positive gaps for valid unknown responses.
 - Skip `washer_dryer_age_years` unless `home_details.has_washer_dryer` is strictly `true` (null and false both skip it).
 - Write `onboarding_gaps` (array or null) and `onboarding_gap_flagged` (boolean) back to the `users` table.
 - Log a console summary with the user's name and the gap list (or confirmation of no gaps).
@@ -39,7 +39,8 @@ a human-readable summary.
 - Returns the correct gap list when fields are null and user never said "I don't know".
 - Does NOT include `washer_dryer_age_years` as a gap when `has_washer_dryer` is false.
 - DOES include `washer_dryer_age_years` as a gap when `has_washer_dryer` is true and age is null.
-- Skips a null field (no gap) when at least one user message contains "I don't know".
+- Skips a null field when at least one user message contains "I don't know" (bare phrase, no field label required).
+- Suppresses ALL null fields when any user message contains an unknown phrase (label-free check).
 - Persists `onboarding_gaps` and `onboarding_gap_flagged: true` when gaps are found.
 - Persists `null` and `false` when no gaps are found.
 - Logs the user's name and gap fields.

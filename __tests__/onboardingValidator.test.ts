@@ -155,9 +155,12 @@ describe('validateOnboardingCompleteness', () => {
     expect(result.gaps).toContain('washer_dryer_age_years')
   })
 
-  it('skips a null field (no gap) when the user explicitly mentions the field and says "I don\'t know"', async () => {
+  it('skips a null field (no gap) when the user says "I don\'t know" without mentioning the field label', async () => {
+    // Core new behaviour: the field label is NOT required in the user's message.
+    // In real onboarding flows the field name appears in the AI's question; the user
+    // just replies "I don't know", and that bare phrase is sufficient to suppress the gap.
     const details = {
-      year_built: null, // null but user said they don't know about year built
+      year_built: null, // null — user's bare "I don't know" should suppress this
       square_footage: 2000,
       roof_type: 'asphalt',
       roof_age_years: 5,
@@ -176,20 +179,20 @@ describe('validateOnboardingCompleteness', () => {
     }
     const supabase = makeSupabase({
       homeDetails: details,
-      // Message explicitly contains the field label "year built" so only year_built is suppressed
-      conversations: [{ content: "I don't know the year built", role: 'user' }],
+      conversations: [{ content: "I don't know", role: 'user' }], // no field label
     })
     const result = await validateOnboardingCompleteness(supabase as unknown as Parameters<typeof validateOnboardingCompleteness>[0], userId)
     expect(result.gaps).not.toContain('year_built')
     expect(result.flagged).toBe(false)
   })
 
-  it('does NOT suppress unrelated gaps when user said "I don\'t know" about a different field', async () => {
-    // This verifies the P1 fix: a single unknown-phrase for one field must not
-    // suppress ALL other null gaps in the same pass.
+  it('suppresses all null fields when any user message contains an unknown phrase', async () => {
+    // A single "I don't know" response in the conversation clears all null fields,
+    // because we cannot determine which AI question the response was answering without
+    // inspecting assistant-role messages (which are not in userMessages).
     const details = {
-      year_built: null,      // suppressed — user message mentions "year built"
-      square_footage: null,  // NOT suppressed — message does not mention "square footage"
+      year_built: null,
+      square_footage: null,
       roof_type: 'asphalt',
       roof_age_years: 5,
       construction_material: 'wood',
@@ -207,12 +210,12 @@ describe('validateOnboardingCompleteness', () => {
     }
     const supabase = makeSupabase({
       homeDetails: details,
-      conversations: [{ content: "I don't know the year built", role: 'user' }],
+      conversations: [{ content: "I don't know", role: 'user' }],
     })
     const result = await validateOnboardingCompleteness(supabase as unknown as Parameters<typeof validateOnboardingCompleteness>[0], userId)
     expect(result.gaps).not.toContain('year_built')
-    expect(result.gaps).toContain('square_footage')
-    expect(result.flagged).toBe(true)
+    expect(result.gaps).not.toContain('square_footage')
+    expect(result.flagged).toBe(false)
   })
 
   it('does NOT include washer_dryer_age_years as a gap when has_washer_dryer is null (never answered)', async () => {
@@ -379,7 +382,7 @@ describe('validateOnboardingCompleteness', () => {
     consoleSpy.mockRestore()
   })
 
-  it('phrases matched case-insensitively: "Not Sure" clears gaps', async () => {
+  it('phrases matched case-insensitively: bare "Not Sure" clears gaps', async () => {
     const details = {
       year_built: null,
       square_footage: 2000,
@@ -400,7 +403,7 @@ describe('validateOnboardingCompleteness', () => {
     }
     const supabase = makeSupabase({
       homeDetails: details,
-      conversations: [{ content: 'Not Sure about the year built', role: 'user' }],
+      conversations: [{ content: 'Not Sure', role: 'user' }], // no field label needed
     })
     const result = await validateOnboardingCompleteness(supabase as unknown as Parameters<typeof validateOnboardingCompleteness>[0], userId)
     expect(result.gaps).not.toContain('year_built')
