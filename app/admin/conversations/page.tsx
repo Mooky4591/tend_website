@@ -4,14 +4,25 @@ async function getConversationReview() {
   const supabase = createServiceClient()
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
-  // Get users with conversations in the last 7 days
-  const { data: recentConvos } = await supabase
-    .from('conversations')
-    .select('user_id, created_at, ai_quality_flag, ai_quality_reason, manually_flagged')
-    .gte('created_at', weekAgo)
-    .order('created_at', { ascending: false })
+  // Get users with conversations in the last 7 days — paginate to avoid Supabase's 1,000-row cap.
+  const PAGE_SIZE = 1000
+  type RecentConvo = { user_id: string; created_at: string; ai_quality_flag: boolean | null; ai_quality_reason: string | null; manually_flagged: boolean | null }
+  const recentConvos: RecentConvo[] = []
+  let from = 0
 
-  if (!recentConvos) return []
+  for (;;) {
+    const { data: page } = await supabase
+      .from('conversations')
+      .select('user_id, created_at, ai_quality_flag, ai_quality_reason, manually_flagged')
+      .gte('created_at', weekAgo)
+      .order('created_at', { ascending: false })
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (!page || page.length === 0) break
+    recentConvos.push(...(page as RecentConvo[]))
+    if (page.length < PAGE_SIZE) break
+    from += PAGE_SIZE
+  }
 
   // Get unique user IDs
   const userIds = Array.from(new Set(recentConvos.map(c => c.user_id)))

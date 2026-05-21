@@ -18,13 +18,25 @@ export default async function AdminUsersPage() {
     `)
     .order('created_at', { ascending: false })
 
-  // Fetch conversation counts per user
-  const { data: convoCounts } = await supabase
-    .from('conversations')
-    .select('user_id, created_at')
+  // Fetch conversation counts per user — paginate to avoid Supabase's 1,000-row cap.
+  const PAGE_SIZE = 1000
+  const allConvos: Array<{ user_id: string; created_at: string }> = []
+  let from = 0
+
+  for (;;) {
+    const { data: page } = await supabase
+      .from('conversations')
+      .select('user_id, created_at')
+      .range(from, from + PAGE_SIZE - 1)
+
+    if (!page || page.length === 0) break
+    allConvos.push(...page)
+    if (page.length < PAGE_SIZE) break
+    from += PAGE_SIZE
+  }
 
   const countMap = new Map<string, { count: number; lastAt: string }>()
-  for (const c of convoCounts ?? []) {
+  for (const c of allConvos) {
     const entry = countMap.get(c.user_id)
     if (!entry) {
       countMap.set(c.user_id, { count: 1, lastAt: c.created_at })

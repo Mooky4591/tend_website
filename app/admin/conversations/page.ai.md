@@ -5,7 +5,9 @@ Admin conversation review page at `/admin/conversations`. Lists all users with c
 in the last 7 days, showing AI quality flags, manual flags, and links to the full thread.
 
 ## Allowed Responsibilities
-- Fetch conversations and users for the last 7 days using the service-role client.
+- Fetch conversations for the last 7 days using the service-role client via a paginated
+  `.range()` loop (PAGE_SIZE = 1000) to avoid Supabase's default row cap silently truncating
+  high-volume periods.
 - Deduplicate to show one row per user (most recent conversation used for flag status).
 - Display: name, phone, last message timestamp, AI quality flag, AI quality reason (truncated to 100 chars), manually flagged.
 - Link to `/admin/conversation/[userId]` for the full thread view.
