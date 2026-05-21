@@ -32,6 +32,16 @@ describe('POST /api/cron/quality-review', () => {
     process.env = { ...ORIGINAL_ENV }
   })
 
+  it('returns 401 when CRON_SECRET env var is not set (fail closed)', async () => {
+    delete process.env.CRON_SECRET
+    const { POST } = await import('@/app/api/cron/quality-review/route')
+    // Even sending the literal string 'undefined' must not grant access
+    const res = await POST(makePostRequest('undefined'))
+    expect(res.status).toBe(401)
+    const body = await res.json()
+    expect(body.error).toBe('Unauthorized')
+  })
+
   it('returns 401 when x-cron-secret header is missing', async () => {
     const { POST } = await import('@/app/api/cron/quality-review/route')
     const res = await POST(makePostRequest())

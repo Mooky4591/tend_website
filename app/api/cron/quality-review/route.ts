@@ -18,7 +18,7 @@ import { runNightlyQualityReview } from '@/lib/services/qualityMonitor'
  */
 export async function POST(request: NextRequest) {
   const cronSecret = request.headers.get('x-cron-secret')
-  if (!cronSecret || cronSecret !== process.env.CRON_SECRET) {
+  if (!process.env.CRON_SECRET || !cronSecret || cronSecret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

@@ -25,11 +25,19 @@ describe('admin-auth helpers', () => {
     expect(h1).not.toBe(h2)
   })
 
-  it('validSessionToken returns consistent value', async () => {
-    const { validSessionToken } = await import('@/lib/admin-auth')
-    const t1 = validSessionToken()
-    const t2 = validSessionToken()
-    expect(t1).toBe(t2)
+  it('createSessionToken returns a string in hmac:issuedAt format', async () => {
+    const { createSessionToken } = await import('@/lib/admin-auth')
+    const token = createSessionToken()
+    expect(token).toMatch(/^[0-9a-f]{64}:\d+$/)
+  })
+
+  it('createSessionToken returns a unique token on each call', async () => {
+    const { createSessionToken } = await import('@/lib/admin-auth')
+    const t1 = createSessionToken()
+    // Advance time slightly so timestamps differ
+    await new Promise(r => setTimeout(r, 2))
+    const t2 = createSessionToken()
+    expect(t1).not.toBe(t2)
   })
 
   it('isAdminAuthenticated returns false when cookie is absent', async () => {
@@ -54,13 +62,46 @@ describe('admin-auth helpers', () => {
     expect(isAdminAuthenticated()).toBe(false)
   })
 
-  it('isAdminAuthenticated returns true when cookie matches validSessionToken', async () => {
+  it('isAdminAuthenticated returns false for an old-format token (no issuedAt suffix)', async () => {
     const secret = process.env.ADMIN_PASSWORD!
-    const expectedToken = crypto.createHmac('sha256', secret).update(secret).digest('hex')
+    // Old format: HMAC(password, password) — no `:timestamp` suffix
+    const oldToken = crypto.createHmac('sha256', secret).update(secret).digest('hex')
+    jest.mock('next/headers', () => ({
+      cookies: () => ({
+        get: jest.fn().mockReturnValue({ value: oldToken }),
+        getAll: jest.fn().mockReturnValue([]),
+      }),
+    }))
+    const { isAdminAuthenticated } = await import('@/lib/admin-auth')
+    expect(isAdminAuthenticated()).toBe(false)
+  })
+
+  it('isAdminAuthenticated returns false for an expired token', async () => {
+    const secret = process.env.ADMIN_PASSWORD!
+    // issuedAt more than 8 hours ago
+    const issuedAt = (Date.now() - 8 * 60 * 60 * 1000 - 1000).toString()
+    const hmac = crypto.createHmac('sha256', secret).update(issuedAt).digest('hex')
+    const expiredToken = `${hmac}:${issuedAt}`
 
     jest.mock('next/headers', () => ({
       cookies: () => ({
-        get: jest.fn().mockReturnValue({ value: expectedToken }),
+        get: jest.fn().mockReturnValue({ value: expiredToken }),
+        getAll: jest.fn().mockReturnValue([]),
+      }),
+    }))
+    const { isAdminAuthenticated } = await import('@/lib/admin-auth')
+    expect(isAdminAuthenticated()).toBe(false)
+  })
+
+  it('isAdminAuthenticated returns true for a valid per-session token', async () => {
+    const secret = process.env.ADMIN_PASSWORD!
+    const issuedAt = Date.now().toString()
+    const hmac = crypto.createHmac('sha256', secret).update(issuedAt).digest('hex')
+    const validToken = `${hmac}:${issuedAt}`
+
+    jest.mock('next/headers', () => ({
+      cookies: () => ({
+        get: jest.fn().mockReturnValue({ value: validToken }),
         getAll: jest.fn().mockReturnValue([]),
       }),
     }))
@@ -70,14 +111,11 @@ describe('admin-auth helpers', () => {
 
   it('isAdminAuthenticated returns false when ADMIN_PASSWORD is not set (fail closed)', async () => {
     delete process.env.ADMIN_PASSWORD
-    // Even with a cookie present, auth must be rejected when the password is unconfigured
-    // so a crafted HMAC value cannot bypass auth in misconfigured environments.
     jest.mock('next/headers', () => ({
       cookies: () => ({
-        // Return the HMAC of '' with '' as key — what validSessionToken() produces when
-        // ADMIN_PASSWORD is unset — to confirm the check fails even for this value.
+        // A crafted token that looks valid structurally should still be rejected
         get: jest.fn().mockReturnValue({
-          value: crypto.createHmac('sha256', '').update('').digest('hex'),
+          value: `${crypto.createHmac('sha256', '').update(Date.now().toString()).digest('hex')}:${Date.now()}`,
         }),
         getAll: jest.fn().mockReturnValue([]),
       }),

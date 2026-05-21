@@ -6,7 +6,7 @@ import { NextRequest } from 'next/server'
 
 jest.mock('@/lib/admin-auth', () => ({
   hashPassword: jest.fn((p: string) => (p === 'correct-password' ? 'correct-hash' : 'wrong-hash')),
-  validSessionToken: jest.fn().mockReturnValue('correct-hash'),
+  createSessionToken: jest.fn().mockReturnValue('session-token'),
   adminCookieOptions: { httpOnly: true, maxAge: 3600 },
   ADMIN_COOKIE_NAME: 'admin_session',
 }))

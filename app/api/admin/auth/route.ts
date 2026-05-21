@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { hashPassword, validSessionToken, adminCookieOptions, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
+import { hashPassword, createSessionToken, adminCookieOptions, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 
 /**
  * POST /api/admin/auth
@@ -33,15 +33,15 @@ export async function POST(request: NextRequest) {
   }
 
   const submittedHash = hashPassword(password)
-  const expectedHash = validSessionToken()
 
-  if (submittedHash !== expectedHash) {
+  if (submittedHash !== hashPassword(adminPassword)) {
     const url = new URL('/admin/login', request.url)
     url.searchParams.set('error', 'Incorrect password')
     return NextResponse.redirect(url, { status: 303 })
   }
 
+  const sessionToken = createSessionToken()
   const response = NextResponse.redirect(new URL('/admin', request.url), { status: 303 })
-  response.cookies.set(ADMIN_COOKIE_NAME, expectedHash, adminCookieOptions)
+  response.cookies.set(ADMIN_COOKIE_NAME, sessionToken, adminCookieOptions)
   return response
 }

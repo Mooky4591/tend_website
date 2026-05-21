@@ -22,11 +22,16 @@ header; not tied to Supabase auth.
 - `export async function POST(request: NextRequest): Promise<NextResponse>`
 
 ## Required Patterns
-- Return 401 JSON when `x-cron-secret` header is absent or does not match `CRON_SECRET`.
+- Auth guard: `if (!process.env.CRON_SECRET || !cronSecret || cronSecret !== process.env.CRON_SECRET)`
+  — check that `CRON_SECRET` is configured first so the endpoint fails closed when the env var is
+  absent (prevents the literal string `'undefined'` from passing the comparison).
+- Return 401 JSON `{ error: 'Unauthorized' }` when the guard fails.
 - Wrap the review call in try/catch; return 500 with the error message on failure.
 - Log fatal errors to the console before returning 500.
 
 ## Tests Required
+- POST returns 401 when `CRON_SECRET` env var is not set (fail closed — must reject even if
+  the caller sends the literal string `'undefined'`).
 - POST returns 401 when `x-cron-secret` header is missing.
 - POST returns 401 when `x-cron-secret` header is wrong.
 - POST returns `{ ok: true, reviewed, flagged }` when authorized and review succeeds.
