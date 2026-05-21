@@ -5,9 +5,9 @@ Admin user list page at `/admin/users`. Shows all homeowners across all tenants 
 key status fields and links to their conversation threads.
 
 ## Allowed Responsibilities
-- Fetch all users with tenant info and conversation counts using the service-role client.
-- Fetch conversation counts via a paginated `.range()` loop (PAGE_SIZE = 1000) to avoid
-  Supabase's default row cap silently truncating the count for high-volume deployments.
+- Fetch all users and conversation counts using the service-role client, both via
+  paginated `.range()` loops (PAGE_SIZE = 1000) to avoid Supabase's default row cap
+  silently truncating results for high-volume deployments.
 - Display: name, phone, tenant name, onboarding status, gap flagged, conversation count, last active timestamp.
 - Link to `/admin/conversation/[userId]` for the full thread.
 

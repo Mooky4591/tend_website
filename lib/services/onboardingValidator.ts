@@ -80,16 +80,25 @@ export async function validateOnboardingCompleteness(
   // 3. Fetch all conversations (user AND assistant) in chronological order.
   //    Both roles are needed to scope each unknown response to the field
   //    the assistant was asking about immediately before it.
-  const { data: conversationRows } = await supabase
-    .from('conversations')
-    .select('content, role')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: true })
+  //    Paginate to avoid Supabase's 1,000-row cap on high-volume users.
+  const PAGE_SIZE = 1000
+  type ConvoMsg = { content: string; role: string }
+  const allMessages: ConvoMsg[] = []
+  let convoFrom = 0
 
-  const allMessages = (conversationRows ?? []).map(c => ({
-    content: c.content ?? '',
-    role: c.role as string,
-  }))
+  for (;;) {
+    const { data: page } = await supabase
+      .from('conversations')
+      .select('content, role')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
+      .range(convoFrom, convoFrom + PAGE_SIZE - 1)
+
+    if (!page || page.length === 0) break
+    allMessages.push(...page.map(c => ({ content: c.content ?? '', role: c.role as string })))
+    if (page.length < PAGE_SIZE) break
+    convoFrom += PAGE_SIZE
+  }
 
   // Build the set of fields the user explicitly said they don't know.
   // Scope each unknown response to the field label found in:

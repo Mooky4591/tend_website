@@ -36,12 +36,15 @@ function makeSupabase({
         }),
       }),
     },
-    // The validator now fetches all roles (user + assistant) in one query:
-    // .select().eq('user_id', ...).order(...)  — no role filter.
+    // The validator fetches all roles (user + assistant) with pagination:
+    // .select().eq('user_id', ...).order(...).range(from, to)
+    // Returning fewer than PAGE_SIZE rows causes the loop to stop after one call.
     conversations: {
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
-          order: jest.fn().mockResolvedValue({ data: conversations }),
+          order: jest.fn().mockReturnValue({
+            range: jest.fn().mockResolvedValue({ data: conversations }),
+          }),
         }),
       }),
     },
@@ -232,7 +235,9 @@ describe('validateOnboardingCompleteness', () => {
       return {
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({ data: [] }),
+            order: jest.fn().mockReturnValue({
+              range: jest.fn().mockResolvedValue({ data: [] }),
+            }),
           }),
         }),
       }
@@ -272,10 +277,13 @@ describe('validateOnboardingCompleteness', () => {
           }),
         }
       }
+      // conversations — all fields populated, no gaps expected
       return {
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({ data: [] }),
+            order: jest.fn().mockReturnValue({
+              range: jest.fn().mockResolvedValue({ data: [] }),
+            }),
           }),
         }),
       }

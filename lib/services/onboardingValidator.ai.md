@@ -10,7 +10,9 @@ a human-readable summary.
 - Define and export the canonical list of required home detail fields (`REQUIRED_HOME_DETAIL_FIELDS`).
 - Accept a Supabase client (dependency injection) and a `userId`.
 - Fetch the user's `home_details` record and their conversation history (`role: 'user'` messages).
-- Fetch **all** conversation messages (both `role='user'` and `role='assistant'`) in chronological order.
+- Fetch **all** conversation messages (both `role='user'` and `role='assistant'`) in chronological
+  order via a paginated `.range()` loop (PAGE_SIZE = 1000) to avoid Supabase's default row cap
+  silently truncating the history for high-volume users.
 - Classify a null field as a gap only when no scoped unknown response covers it. A "scoped unknown
   response" is a user message containing an unknown phrase where the field label (`field.replace(/_/g,' ')`)
   appears in either (a) the user's own message or (b) the immediately preceding assistant message.

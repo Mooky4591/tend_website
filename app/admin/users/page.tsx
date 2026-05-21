@@ -3,36 +3,50 @@ import { createServiceClient } from '@/lib/supabase/service'
 export default async function AdminUsersPage() {
   const supabase = createServiceClient()
 
-  // Fetch all users with conversation counts
-  const { data: users } = await supabase
-    .from('users')
-    .select(`
-      id,
-      first_name,
-      last_name,
-      phone_number,
-      onboarding_complete,
-      onboarding_gap_flagged,
-      created_at,
-      tenants:tenant_id (name)
-    `)
-    .order('created_at', { ascending: false })
+  // Paginate both queries to avoid Supabase's 1,000-row default cap.
+  const PAGE_SIZE = 1000
+
+  // Fetch all users — paginate so tenants with > 1,000 homeowners are not silently truncated.
+  type UserRow = {
+    id: string
+    first_name: string | null
+    last_name: string | null
+    phone_number: string | null
+    onboarding_complete: boolean | null
+    onboarding_gap_flagged: boolean | null
+    created_at: string
+    tenants: { name?: string } | null
+  }
+  const allUsers: UserRow[] = []
+  let usersFrom = 0
+
+  for (;;) {
+    const { data: page } = await supabase
+      .from('users')
+      .select('id, first_name, last_name, phone_number, onboarding_complete, onboarding_gap_flagged, created_at, tenants:tenant_id (name)')
+      .order('created_at', { ascending: false })
+      .range(usersFrom, usersFrom + PAGE_SIZE - 1)
+
+    if (!page || page.length === 0) break
+    allUsers.push(...(page as UserRow[]))
+    if (page.length < PAGE_SIZE) break
+    usersFrom += PAGE_SIZE
+  }
 
   // Fetch conversation counts per user — paginate to avoid Supabase's 1,000-row cap.
-  const PAGE_SIZE = 1000
   const allConvos: Array<{ user_id: string; created_at: string }> = []
-  let from = 0
+  let convosFrom = 0
 
   for (;;) {
     const { data: page } = await supabase
       .from('conversations')
       .select('user_id, created_at')
-      .range(from, from + PAGE_SIZE - 1)
+      .range(convosFrom, convosFrom + PAGE_SIZE - 1)
 
     if (!page || page.length === 0) break
     allConvos.push(...page)
     if (page.length < PAGE_SIZE) break
-    from += PAGE_SIZE
+    convosFrom += PAGE_SIZE
   }
 
   const countMap = new Map<string, { count: number; lastAt: string }>()
@@ -46,7 +60,7 @@ export default async function AdminUsersPage() {
     }
   }
 
-  const rows = users ?? []
+  const rows = allUsers
 
   return (
     <div>
