@@ -6,6 +6,9 @@ import { sendMessageToHomeowner } from '@/lib/services/messaging'
 import { sendSms } from '@/lib/twilio'
 
 jest.mock('@/lib/twilio', () => ({ sendSms: jest.fn() }))
+jest.mock('@/lib/services/alerts', () => ({ sendAdminAlert: jest.fn().mockResolvedValue(undefined) }))
+
+import { sendAdminAlert } from '@/lib/services/alerts'
 
 const mockSendSms = sendSms as jest.Mock
 
@@ -59,6 +62,17 @@ describe('sendMessageToHomeowner', () => {
     mockSendSms.mockRejectedValueOnce(new Error('unreachable'))
     const result = await sendMessageToHomeowner(makeSupabase(), 'u1', 'Hello')
     expect(result).toMatchObject({ status: 502, error: 'SMS delivery failed' })
+  })
+
+  it('calls sendAdminAlert with type "delivery_failure" when Twilio throws', async () => {
+    mockSendSms.mockRejectedValueOnce(new Error('carrier blocked'))
+    await sendMessageToHomeowner(makeSupabase(), 'u1', 'Hello')
+    expect(sendAdminAlert).toHaveBeenCalledWith(
+      expect.anything(),
+      'delivery_failure',
+      'u1',
+      expect.stringContaining('carrier blocked'),
+    )
   })
 
   it('does not insert a conversation row when Twilio fails', async () => {

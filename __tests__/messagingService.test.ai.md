@@ -29,8 +29,10 @@ Unit tests for `lib/services/messaging.ts`. Verifies the full orchestration: hom
 - Returns `{ status: 404, error: 'User not found' }` when homeowner is not found.
 - Returns `{ status: 500 }` when tenant has no Twilio number.
 - Returns `{ status: 502, error: 'SMS delivery failed' }` when Twilio throws.
+- Calls `sendAdminAlert` with type `"delivery_failure"` when Twilio throws.
 - Does not call `conversations.insert` when Twilio fails.
 - Returns `{ status: 500 }` with error containing "Message sent but could not be saved" when insert fails after SMS success.
 
 ## Notes for AI Agents
 - If `sendMessageToHomeowner` adds new failure paths, add matching tests here.
+- `@/lib/services/alerts` must be mocked to prevent real email sends during tests.
