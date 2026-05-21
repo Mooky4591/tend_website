@@ -1,4 +1,4 @@
-import { reviewUserConversation, runNightlyQualityReview } from '@/lib/services/qualityMonitor'
+import { reviewUserConversation, runNightlyQualityReview, QUALITY_REVIEW_MODEL } from '@/lib/services/qualityMonitor'
 import type Anthropic from '@anthropic-ai/sdk'
 
 // Mock @anthropic-ai/sdk
@@ -70,6 +70,17 @@ describe('reviewUserConversation', () => {
       },
     }
     await expect(reviewUserConversation(client as unknown as Anthropic, '{}', 'thread')).rejects.toThrow()
+  })
+
+  it('calls client.messages.create with the QUALITY_REVIEW_MODEL identifier', async () => {
+    const mockCreate = jest.fn().mockResolvedValue(makeAnthropicResponse('{"flagged":false,"issues":[]}'))
+    const client = { messages: { create: mockCreate } }
+    await reviewUserConversation(client as unknown as Anthropic, '{}', 'thread')
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ model: QUALITY_REVIEW_MODEL }),
+    )
+    // Explicitly assert the string value so any drift in the constant is caught here.
+    expect(QUALITY_REVIEW_MODEL).toBe('claude-opus-4-7')
   })
 })
 

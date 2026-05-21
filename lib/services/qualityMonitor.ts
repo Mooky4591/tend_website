@@ -58,6 +58,13 @@ export interface NightlyReviewSummary {
   flagged: number
 }
 
+/**
+ * Anthropic model used for quality reviews.
+ * This is the Opus 4.7 alias — the same non-date alias format used by claude-sonnet-4-6.
+ * Update this constant (and the .ai.md contract) when a newer model becomes available.
+ */
+export const QUALITY_REVIEW_MODEL = 'claude-opus-4-7' as const
+
 function buildPrompt(homeDetailsJson: string, conversationThread: string): string {
   return `${REVIEW_PROMPT_HEADER}
 
@@ -80,7 +87,7 @@ export async function reviewUserConversation(
   const prompt = buildPrompt(homeDetailsJson, conversationThread)
 
   const message = await client.messages.create({
-    model: 'claude-opus-4-7',
+    model: QUALITY_REVIEW_MODEL,
     max_tokens: 1024,
     messages: [{ role: 'user', content: prompt }],
   })

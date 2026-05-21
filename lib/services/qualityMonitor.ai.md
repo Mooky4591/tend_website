@@ -23,7 +23,10 @@ are detected.
 - Do not accept or validate HTTP requests — this is a pure service function.
 - Do not construct `NextResponse` objects.
 - Do not call `createClient()` — accept the Supabase client as a parameter.
-- Do not use a model other than `claude-opus-4-7` for the quality review.
+- Do not use a model other than the value of `QUALITY_REVIEW_MODEL` (`'claude-opus-4-7'`)
+  for the quality review. `claude-opus-4-7` is the Anthropic alias for Opus 4.7, following
+  the same non-date alias format as `claude-sonnet-4-6`. Update `QUALITY_REVIEW_MODEL` (and
+  this contract) when a newer model becomes available.
 - Do not update more than the most recent conversation row per user.
 - Do not invent issues; the prompt explicitly instructs Claude to only report actual issues.
 
@@ -31,6 +34,7 @@ are detected.
 - `export interface QualityIssue { type: string; description: string }`
 - `export interface QualityReviewResult { flagged: boolean; issues: QualityIssue[] }`
 - `export interface NightlyReviewSummary { reviewed: number; flagged: number }`
+- `export const QUALITY_REVIEW_MODEL: 'claude-opus-4-7'`
 - `export async function reviewUserConversation(client: Anthropic, homeDetailsJson: string, conversationThread: string): Promise<QualityReviewResult>`
 - `export async function runNightlyQualityReview(supabase): Promise<NightlyReviewSummary>`
 
@@ -58,6 +62,7 @@ are detected.
 - `runNightlyQualityReview` calls `sendAdminAlert` when the conversations fetch fails.
 - `runNightlyQualityReview` labels `staff`-role messages as `Staff` (not `Assistant`) in the thread.
 - `runNightlyQualityReview` fetches a second page when the first returns exactly `PAGE_SIZE` rows.
+- `reviewUserConversation` passes `QUALITY_REVIEW_MODEL` as the model; a test pins the exact string value.
 
 ## Notes for AI Agents
 - Consumed by `app/api/cron/quality-review/route.ts`.
