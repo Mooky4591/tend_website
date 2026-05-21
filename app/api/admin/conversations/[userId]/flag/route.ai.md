@@ -25,3 +25,4 @@ Admin action route that manually flags or unflags the most recent conversation f
 
 ## Notes for AI Agents
 - Uses service-role client.
+- All `NextResponse.redirect` calls must use `request.url` as the base URL, not `'http://localhost'`.

@@ -6,7 +6,9 @@ renders the shared navigation bar. Any admin page that is not `/admin/login` is 
 this layout.
 
 ## Allowed Responsibilities
-- Call `isAdminAuthenticated()` and redirect to `/admin/login` if the session is invalid.
+- Read `x-pathname` from `headers()` (set by middleware) to determine the current path.
+- Call `isAdminAuthenticated()` and redirect to `/admin/login` if the session is invalid,
+  **unless** the current path is `/admin/login` (prevents the redirect loop).
 - Render the `<html>`, `<head>`, and `<body>` tags with global admin styles (inline `<style>`).
 - Render a top navigation bar with links to all admin pages.
 - Render the logout button (POST form to `/api/admin/auth` with `action=logout`).
@@ -27,6 +29,9 @@ this layout.
 - Renders a logout form that POSTs to `/api/admin/auth`.
 
 ## Notes for AI Agents
-- The `app/admin/login/page.tsx` does NOT use this layout — it renders its own `<html>` so
-  the redirect loop cannot occur.
+- `app/admin/login/page.tsx` IS wrapped by this layout (Next.js App Router wraps all
+  pages under a segment). The redirect loop is prevented by checking `x-pathname` (set by
+  middleware) and skipping the auth guard when the path starts with `/admin/login`.
+- The `x-pathname` header is forwarded by the middleware early-return for `/admin/*` routes.
+  If middleware is not running (e.g. tests), mock `headers()` to return the correct pathname.
 - Adding a new admin page requires adding a nav link to `NAV_LINKS` in this layout.

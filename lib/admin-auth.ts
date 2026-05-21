@@ -23,8 +23,11 @@ export function validSessionToken(): string {
 /**
  * Checks whether the current request has a valid admin session cookie.
  * Call this at the top of every admin Server Component.
+ * Fails closed: returns false immediately when ADMIN_PASSWORD is not set
+ * so a misconfigured environment cannot be bypassed with a crafted cookie.
  */
 export function isAdminAuthenticated(): boolean {
+  if (!process.env.ADMIN_PASSWORD) return false
   const cookieStore = cookies()
   const sessionCookie = cookieStore.get(ADMIN_COOKIE_NAME)
   if (!sessionCookie) return false

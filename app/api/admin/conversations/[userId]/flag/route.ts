@@ -12,7 +12,7 @@ export async function POST(
   { params }: { params: { userId: string } },
 ) {
   if (!isAdminAuthenticated()) {
-    return NextResponse.redirect(new URL('/admin/login', 'http://localhost'))
+    return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
   const supabase = createServiceClient()
@@ -47,6 +47,6 @@ export async function POST(
   }
 
   return NextResponse.redirect(
-    new URL(`/admin/conversation/${params.userId}`, 'http://localhost'),
+    new URL(`/admin/conversation/${params.userId}`, request.url),
   )
 }

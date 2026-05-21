@@ -35,4 +35,8 @@ Supabase auth.
 
 ## Notes for AI Agents
 - Consumed by `app/admin/layout.tsx` (server component) and `app/api/admin/auth/route.ts`.
-- The `ADMIN_PASSWORD` env var must be set; if missing, all HMAC values will use an empty string as the key, which effectively disables auth in development (acceptable for local use only).
+- The `ADMIN_PASSWORD` env var must be set. `isAdminAuthenticated()` fails closed (returns
+  `false`) when it is unset — a crafted cookie cannot bypass auth in a misconfigured environment.
+- The auth route (`app/api/admin/auth/route.ts`) already rejects login attempts when
+  `ADMIN_PASSWORD` is unset, so the fail-closed guard in `isAdminAuthenticated()` is a
+  defence-in-depth measure for direct cookie manipulation.

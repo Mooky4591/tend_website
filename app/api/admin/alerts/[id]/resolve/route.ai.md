@@ -13,7 +13,7 @@ Admin action route that marks a system_alerts row as resolved.
 - Do not render HTML.
 
 ## Public Interfaces
-- `export async function POST(_request, { params }): Promise<NextResponse>`
+- `export async function POST(request, { params }): Promise<NextResponse>`
 
 ## Tests Required
 - POST redirects to login when not authenticated.
@@ -21,3 +21,4 @@ Admin action route that marks a system_alerts row as resolved.
 
 ## Notes for AI Agents
 - Uses service-role client.
+- All `NextResponse.redirect` calls must use `request.url` as the base URL, not `'http://localhost'`.

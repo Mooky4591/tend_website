@@ -7,11 +7,11 @@ import { isAdminAuthenticated } from '@/lib/admin-auth'
  * Marks the most recent conversation for a user as manually reviewed.
  */
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { userId: string } },
 ) {
   if (!isAdminAuthenticated()) {
-    return NextResponse.redirect(new URL('/admin/login', 'http://localhost'))
+    return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
   const supabase = createServiceClient()
@@ -33,6 +33,6 @@ export async function POST(
   }
 
   return NextResponse.redirect(
-    new URL(`/admin/conversation/${params.userId}`, 'http://localhost'),
+    new URL(`/admin/conversation/${params.userId}`, request.url),
   )
 }

@@ -7,11 +7,11 @@ import { isAdminAuthenticated } from '@/lib/admin-auth'
  * Marks a system alert as resolved.
  */
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   if (!isAdminAuthenticated()) {
-    return NextResponse.redirect(new URL('/admin/login', 'http://localhost'))
+    return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
   const supabase = createServiceClient()
@@ -21,5 +21,5 @@ export async function POST(
     .update({ resolved: true })
     .eq('id', params.id)
 
-  return NextResponse.redirect(new URL('/admin/alerts', 'http://localhost'))
+  return NextResponse.redirect(new URL('/admin/alerts', request.url))
 }

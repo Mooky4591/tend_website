@@ -67,4 +67,22 @@ describe('admin-auth helpers', () => {
     const { isAdminAuthenticated } = await import('@/lib/admin-auth')
     expect(isAdminAuthenticated()).toBe(true)
   })
+
+  it('isAdminAuthenticated returns false when ADMIN_PASSWORD is not set (fail closed)', async () => {
+    delete process.env.ADMIN_PASSWORD
+    // Even with a cookie present, auth must be rejected when the password is unconfigured
+    // so a crafted HMAC value cannot bypass auth in misconfigured environments.
+    jest.mock('next/headers', () => ({
+      cookies: () => ({
+        // Return the HMAC of '' with '' as key — what validSessionToken() produces when
+        // ADMIN_PASSWORD is unset — to confirm the check fails even for this value.
+        get: jest.fn().mockReturnValue({
+          value: crypto.createHmac('sha256', '').update('').digest('hex'),
+        }),
+        getAll: jest.fn().mockReturnValue([]),
+      }),
+    }))
+    const { isAdminAuthenticated } = await import('@/lib/admin-auth')
+    expect(isAdminAuthenticated()).toBe(false)
+  })
 })

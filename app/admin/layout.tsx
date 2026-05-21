@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 const NAV_LINKS = [
@@ -10,7 +11,10 @@ const NAV_LINKS = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  if (!isAdminAuthenticated()) {
+  // Skip auth guard for the login page itself so the middleware x-pathname header
+  // prevents the redirect-to-login-from-login loop.
+  const pathname = headers().get('x-pathname') ?? ''
+  if (!pathname.startsWith('/admin/login') && !isAdminAuthenticated()) {
     redirect('/admin/login')
   }
 

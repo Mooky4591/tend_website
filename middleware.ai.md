@@ -1,24 +1,33 @@
 # AI Contract: middleware.ts
 
 ## Purpose
-Next.js middleware that enforces two auth redirect rules: (1) unauthenticated users hitting `/dashboard/:path*` are redirected to `/login`; (2) authenticated users hitting `/login` or `/forgot-password` are redirected to `/dashboard`. Propagates refreshed session cookies on all redirects.
+Next.js middleware with two responsibilities: (1) forward the `x-pathname` request header so
+Server Components can read the current path without client hooks; (2) enforce Supabase auth
+redirects for dashboard and login routes. Admin routes are handled separately — the middleware
+passes them through with `x-pathname` set but skips Supabase auth (admin uses its own
+cookie-based auth via `isAdminAuthenticated()`).
 
 ## Allowed Responsibilities
-- Construct an inline `createServerClient` (not the shared helper) for Edge-runtime compatibility.
+- Set `x-pathname` on the forwarded request headers for ALL matched routes so Server Components
+  (especially `AdminLayout`) can determine the current path.
+- For `/admin/:path*`: return early with `NextResponse.next({ request: { headers: requestHeaders } })`
+  — skip Supabase auth entirely.
+- Construct an inline `createServerClient` (not the shared helper) for non-admin routes.
 - Propagate cookie mutations from `getUser()` onto all responses (including redirects) so token rotations are not lost.
 - Redirect unauthenticated users from `/dashboard` paths to `/login`.
 - Redirect authenticated users from `authOnlyPages` to `/dashboard`.
-- Return `supabaseResponse` unchanged for all other routes.
+- Return `supabaseResponse` (with x-pathname header) unchanged for all non-admin, non-redirect routes.
 
 ## Not Allowed
 - Do not import `createClient` from `@/lib/supabase/server`; the middleware must construct its own client to satisfy Next.js middleware constraints.
 - Do not perform database queries; only `supabase.auth.getUser()` is permitted.
 - Do not add any application logic (data fetching, business rules).
-- Do not add routes to the `config.matcher` without also adding corresponding redirect logic.
+- Do not add routes to the `config.matcher` without also updating this contract and adding
+  either an early-return path (like the admin pass-through) or a redirect rule.
 
 ## Public Interfaces
 - `export async function middleware(request: NextRequest): Promise<NextResponse>`
-- `export const config: { matcher: string[] }` — currently matches `/dashboard/:path*`, `/login`, `/forgot-password`.
+- `export const config: { matcher: string[] }` — currently matches `/dashboard/:path*`, `/login`, `/forgot-password`, `/admin/:path*`.
 
 ## Required Patterns
 - Cookie propagation pattern: `supabaseResponse.cookies.getAll().forEach(cookie => redirectResponse.cookies.set(cookie))` on both redirect paths.

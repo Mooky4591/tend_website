@@ -7,11 +7,11 @@ import { isAdminAuthenticated } from '@/lib/admin-auth'
  * Clears the onboarding gap flag for a user (sets onboarding_gap_flagged = false).
  */
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { userId: string } },
 ) {
   if (!isAdminAuthenticated()) {
-    return NextResponse.redirect(new URL('/admin/login', 'http://localhost'))
+    return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 
   const supabase = createServiceClient()
@@ -21,5 +21,5 @@ export async function POST(
     .update({ onboarding_gap_flagged: false })
     .eq('id', params.userId)
 
-  return NextResponse.redirect(new URL('/admin/onboarding-gaps', 'http://localhost'))
+  return NextResponse.redirect(new URL('/admin/onboarding-gaps', request.url))
 }

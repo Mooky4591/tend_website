@@ -155,9 +155,9 @@ describe('validateOnboardingCompleteness', () => {
     expect(result.gaps).toContain('washer_dryer_age_years')
   })
 
-  it('skips a null field (no gap) when a user message contains "I don\'t know"', async () => {
+  it('skips a null field (no gap) when the user explicitly mentions the field and says "I don\'t know"', async () => {
     const details = {
-      year_built: null, // null but user said they don't know
+      year_built: null, // null but user said they don't know about year built
       square_footage: 2000,
       roof_type: 'asphalt',
       roof_age_years: 5,
@@ -176,11 +176,72 @@ describe('validateOnboardingCompleteness', () => {
     }
     const supabase = makeSupabase({
       homeDetails: details,
-      conversations: [{ content: "I don't know when it was built", role: 'user' }],
+      // Message explicitly contains the field label "year built" so only year_built is suppressed
+      conversations: [{ content: "I don't know the year built", role: 'user' }],
     })
     const result = await validateOnboardingCompleteness(supabase as unknown as Parameters<typeof validateOnboardingCompleteness>[0], userId)
     expect(result.gaps).not.toContain('year_built')
     expect(result.flagged).toBe(false)
+  })
+
+  it('does NOT suppress unrelated gaps when user said "I don\'t know" about a different field', async () => {
+    // This verifies the P1 fix: a single unknown-phrase for one field must not
+    // suppress ALL other null gaps in the same pass.
+    const details = {
+      year_built: null,      // suppressed — user message mentions "year built"
+      square_footage: null,  // NOT suppressed — message does not mention "square footage"
+      roof_type: 'asphalt',
+      roof_age_years: 5,
+      construction_material: 'wood',
+      hvac_brand: 'Carrier',
+      hvac_age_years: 3,
+      hvac_last_service: '2025-01-01',
+      water_heater_age_years: 4,
+      water_heater_last_flush: '2024-06-01',
+      electrical_panel_age_years: 10,
+      plumbing_type: 'copper',
+      has_washer_dryer: false,
+      washer_dryer_age_years: null,
+      refrigerator_age_years: 3,
+      dishwasher_age_years: 3,
+    }
+    const supabase = makeSupabase({
+      homeDetails: details,
+      conversations: [{ content: "I don't know the year built", role: 'user' }],
+    })
+    const result = await validateOnboardingCompleteness(supabase as unknown as Parameters<typeof validateOnboardingCompleteness>[0], userId)
+    expect(result.gaps).not.toContain('year_built')
+    expect(result.gaps).toContain('square_footage')
+    expect(result.flagged).toBe(true)
+  })
+
+  it('does NOT include washer_dryer_age_years as a gap when has_washer_dryer is null (never answered)', async () => {
+    // Verifies the P2 fix: null has_washer_dryer (unanswered) must also skip
+    // washer_dryer_age_years, not only false.
+    const details = {
+      year_built: 1990,
+      square_footage: 2000,
+      roof_type: 'asphalt',
+      roof_age_years: 5,
+      construction_material: 'wood',
+      hvac_brand: 'Carrier',
+      hvac_age_years: 3,
+      hvac_last_service: '2025-01-01',
+      water_heater_age_years: 4,
+      water_heater_last_flush: '2024-06-01',
+      electrical_panel_age_years: 10,
+      plumbing_type: 'copper',
+      has_washer_dryer: null,         // never answered
+      washer_dryer_age_years: null,   // null but should be skipped
+      refrigerator_age_years: 3,
+      dishwasher_age_years: 3,
+    }
+    const supabase = makeSupabase({ homeDetails: details })
+    const result = await validateOnboardingCompleteness(supabase as unknown as Parameters<typeof validateOnboardingCompleteness>[0], userId)
+    // washer_dryer_age_years must not appear — the washer/dryer question is unanswered
+    expect(result.gaps).not.toContain('washer_dryer_age_years')
+    // has_washer_dryer IS a gap — it is a required field that is null
+    expect(result.gaps).toContain('has_washer_dryer')
   })
 
   it('persists gaps and onboarding_gap_flagged = true when gaps are found', async () => {

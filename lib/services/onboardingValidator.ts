@@ -91,10 +91,11 @@ export async function validateOnboardingCompleteness(
   const gaps: string[] = []
 
   for (const field of REQUIRED_HOME_DETAIL_FIELDS) {
-    // Skip washer_dryer_age_years if has_washer_dryer is false
+    // Skip washer_dryer_age_years unless the user has explicitly confirmed they
+    // have a washer/dryer. Null (never answered) and false both bypass this field.
     if (field === 'washer_dryer_age_years') {
       const hasWasherDryer = homeDetails?.has_washer_dryer
-      if (hasWasherDryer === false) continue
+      if (hasWasherDryer !== true) continue
     }
 
     const value = homeDetails?.[field]
@@ -102,8 +103,13 @@ export async function validateOnboardingCompleteness(
 
     if (!isMissing) continue
 
-    // Check if the user explicitly said they don't know
-    const userSaidUnknown = userMessages.some(msg => containsUnknownPhrase(msg))
+    // Check if the user explicitly said they don't know *about this field*.
+    // Match against the field name so a single "I don't know" about an unrelated
+    // attribute does not suppress every other gap in the same pass.
+    const fieldLabel = field.replace(/_/g, ' ')
+    const userSaidUnknown = userMessages.some(
+      msg => containsUnknownPhrase(msg) && msg.toLowerCase().includes(fieldLabel),
+    )
 
     if (!userSaidUnknown) {
       gaps.push(field)
