@@ -134,6 +134,23 @@ describe('middleware', () => {
     })
   })
 
+  describe('admin routes', () => {
+    it('passes /admin routes through without redirecting', async () => {
+      const res = await middleware(makeRequest('/admin/alerts'))
+      expect(res.status).not.toBe(307)
+    })
+
+    it('passes /admin/login through without redirecting', async () => {
+      const res = await middleware(makeRequest('/admin/login'))
+      expect(res.status).not.toBe(307)
+    })
+
+    it('does NOT call Supabase auth for /admin routes', async () => {
+      await middleware(makeRequest('/admin/alerts'))
+      expect(mockGetUser).not.toHaveBeenCalled()
+    })
+  })
+
   describe('cookie adapter', () => {
     it('exposes request cookies to supabase via getAll so the auth client can read the session', async () => {
       mockGetUser.mockResolvedValueOnce({ data: { user: null } })

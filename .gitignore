@@ -31,3 +31,14 @@ e2e/.auth/
 
 # claude code local config (contains local paths and usernames)
 .claude/
+
+# test artifacts
+/coverage/
+/playwright-report/
+/test-results/
+
+# supabase local temp
+supabase/.temp/
+
+# nested repo clones
+tend_website/

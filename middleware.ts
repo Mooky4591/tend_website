@@ -2,7 +2,20 @@ import { createServerClient, type SetAllCookies } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  const { pathname } = request.nextUrl
+
+  // Build request headers with x-pathname so Server Components (e.g. AdminLayout)
+  // can read the current path without needing client-side hooks.
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-pathname', pathname)
+
+  // Admin routes use their own cookie-based auth (isAdminAuthenticated), not
+  // Supabase. Just forward x-pathname and pass through — no auth redirect here.
+  if (pathname.startsWith('/admin')) {
+    return NextResponse.next({ request: { headers: requestHeaders } })
+  }
+
+  let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +27,8 @@ export async function middleware(request: NextRequest) {
         },
         setAll(cookiesToSet: Parameters<SetAllCookies>[0]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
+          // Preserve x-pathname when reassigning supabaseResponse after a token rotation.
+          supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -50,5 +64,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/forgot-password'],
+  matcher: ['/dashboard/:path*', '/login', '/forgot-password', '/admin/:path*'],
 }

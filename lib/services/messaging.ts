@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { sendSms } from '@/lib/twilio'
+import { sendAdminAlert } from './alerts'
 
 type ServiceError = { error: string; status: number }
 
@@ -31,7 +32,14 @@ export async function sendMessageToHomeowner(
     .then(() => null)
     .catch((err: unknown) => err)
 
-  if (smsError) return { error: 'SMS delivery failed', status: 502 }
+  if (smsError) {
+    await sendAdminAlert(
+      'delivery_failure',
+      userId,
+      `Outbound SMS failed for user ${userId}: ${smsError instanceof Error ? smsError.message : String(smsError)}`,
+    )
+    return { error: 'SMS delivery failed', status: 502 }
+  }
 
   const { error: insertError } = await supabase.from('conversations').insert({
     user_id: userId,
